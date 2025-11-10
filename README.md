@@ -1,1 +1,0 @@
-# manzaspots-frontend
