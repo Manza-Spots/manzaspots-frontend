@@ -1,3 +1,3 @@
 # manzaspots-pwa
 
-Manza Spots pwa
+Manza Spots PWAA
