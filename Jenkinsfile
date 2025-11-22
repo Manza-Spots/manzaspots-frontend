@@ -4,6 +4,10 @@ pipeline {
     environment {
         PROJECT_NAME = "manza-spots"
         AWS_REGION = "us-east-2"
+        S3_DEV = "manzaspots-pwa-dev"
+        S3_PROD = "manzaspots-pwa-prod"
+        CF_DEV = "E2RYJ6R8DR2H4A"
+        CF_PROD = "E1MTDWWF0FJ2NH"
     }
 
     stages {
@@ -15,33 +19,33 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                echo "Instalando dependencias del proyecto..."
-                sh 'echo Aquí irían los comandos para instalar dependencias'
-            }
-        }
-
-        stage('Run tests') {
-            steps {
-                echo "Ejecutando pruebas (placeholder)..."
-                sh 'echo Aquí irían los tests'
+                echo "Instalando dependencias..."
+                sh 'npm install'
             }
         }
 
         stage('Build') {
-            when {
-                branch 'develop'
-            }
             steps {
-                echo "Build ambiente DEVELOP"
+                echo "Construyendo PWA..."
+                sh 'npm run build'
             }
         }
 
-        stage('Deploy') {
-            when {
-                branch 'main'
-            }
+        stage('Deploy to DEV') {
+            when { branch 'develop' }
             steps {
-                echo "Desplegando a PRODUCCIÓN"
+                echo "Subiendo artefactos a DEV..."
+                sh 'aws s3 sync dist/ s3://${S3_DEV} --delete'
+                sh 'aws cloudfront create-invalidation --distribution-id ${CF_DEV} --paths "/*"'
+            }
+        }
+
+        stage('Deploy to PROD') {
+            when { branch 'main' }
+            steps {
+                echo "Subiendo artefactos a PROD..."
+                sh 'aws s3 sync dist/ s3://${S3_PROD} --delete'
+                sh 'aws cloudfront create-invalidation --distribution-id ${CF_PROD} --paths "/*"'
             }
         }
     }
