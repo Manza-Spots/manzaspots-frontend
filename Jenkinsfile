@@ -32,7 +32,7 @@ pipeline {
                 branch 'develop'
             }
             steps {
-                echo "Build ambiente DEV"
+                echo "Build ambiente DEVELOP"
             }
         }
 
