@@ -80,7 +80,7 @@ pipeline {
                         --cache-control "public, max-age=31536000" \
                         --exclude "index.html"
                     
-                    aws s3 cp dist/index.html s3/${S3_PROD}/index.html \
+                    aws s3 cp dist/index.html s3://${S3_PROD}/index.html \
                         --cache-control "no-cache"
                     
                     aws cloudfront create-invalidation \
