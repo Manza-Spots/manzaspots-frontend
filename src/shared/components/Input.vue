@@ -1,0 +1,246 @@
+<script setup>
+import { computed, ref } from 'vue'
+import Icon from './Icon.vue'
+
+defineOptions({
+  name: 'InputComponent',
+})
+
+const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
+  type: {
+    type: String,
+    default: 'text',
+  },
+  placeholder: {
+    type: String,
+    default: '',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  error: {
+    type: String,
+    default: '',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
+  iconRight: {
+    type: String,
+    default: '',
+  },
+  size: {
+    type: String,
+    default: 'md',
+    validator: (value) => ['sm', 'md', 'lg'].includes(value),
+  },
+})
+
+const emit = defineEmits(['update:modelValue', 'blur', 'focus', 'iconClick'])
+
+const inputRef = ref(null)
+const isFocused = ref(false)
+
+const inputClasses = computed(() => {
+  return [
+    'input',
+    `input-${props.size}`,
+    {
+      'input-error': props.error,
+      'input-disabled': props.disabled,
+      'input-with-icon': props.icon,
+      'input-with-icon-right': props.iconRight,
+    },
+  ]
+})
+
+const handleInput = (event) => {
+  emit('update:modelValue', event.target.value)
+}
+
+const handleFocus = (event) => {
+  isFocused.value = true
+  emit('focus', event)
+}
+
+const handleBlur = (event) => {
+  isFocused.value = false
+  emit('blur', event)
+}
+
+const handleIconClick = () => {
+  emit('iconClick')
+  inputRef.value?.focus()
+}
+
+const focus = () => {
+  inputRef.value?.focus()
+}
+
+defineExpose({ focus })
+</script>
+
+<template>
+  <div class="input-wrapper">
+    <label v-if="label" class="input-label">
+      {{ label }}
+    </label>
+
+    <div class="input-container">
+      <div v-if="icon" class="input-icon input-icon-left" @click="handleIconClick">
+        <Icon :name="icon" :size="size === 'sm' ? 16 : size === 'lg' ? 20 : 18" />
+      </div>
+
+      <input
+        ref="inputRef"
+        :type="type"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        :class="inputClasses"
+        @input="handleInput"
+        @focus="handleFocus"
+        @blur="handleBlur"
+      />
+
+      <div v-if="iconRight" class="input-icon input-icon-right" @click="emit('iconClick')">
+        <Icon :name="iconRight" :size="size === 'sm' ? 16 : size === 'lg' ? 20 : 18" />
+      </div>
+    </div>
+
+    <p v-if="error" class="input-error-message">
+      {{ error }}
+    </p>
+  </div>
+</template>
+
+<style scoped>
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.input-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.input:disabled {
+  background-color: var(--color-gray-100);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input:read-only {
+  background-color: var(--color-gray-50);
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Sizes */
+.input-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  height: 36px;
+}
+
+.input-md {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  height: 44px;
+}
+
+.input-lg {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--text-lg);
+  height: 52px;
+}
+
+/* With icons */
+.input-with-icon {
+  padding-left: 40px;
+}
+
+.input-with-icon-right {
+  padding-right: 40px;
+}
+
+.input-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.input-icon:hover {
+  color: var(--color-text-primary);
+}
+
+.input-icon-left {
+  left: var(--space-3);
+}
+
+.input-icon-right {
+  right: var(--space-3);
+}
+
+/* Error state */
+.input-error {
+  border-color: var(--color-error);
+}
+
+.input-error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input-error-message {
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  margin: 0;
+}
+</style>
