@@ -5,8 +5,11 @@ const config: CapacitorConfig = {
   appName: 'Manzaspots',
   webDir: 'dist',
   server: {
-    url: 'http://192.168.3.160:5174',
+    url: 'http://192.168.3.160:5173', // para debugueo local
     cleartext: true,
+    androidScheme: 'https',
+    // Permitir navegación a tu API
+    allowNavigation: ['http://192.168.3.160:8000', 'http://localhost:8000'],
   },
   plugins: {
     SplashScreen: {
@@ -34,6 +37,8 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     backgroundColor: '#000000',
+    // Habilitar WebView inspector en desarrollo
+    webContentsDebuggingEnabled: true,
   },
 }
 

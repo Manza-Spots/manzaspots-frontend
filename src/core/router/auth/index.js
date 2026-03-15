@@ -5,6 +5,8 @@ export default [
     component: () => import('@/features/auth/views/LoginView.vue'),
     meta: {
       requiresAuth: false,
+      requiresGuest: true,
+      title: 'Iniciar Sesión',
     },
   },
   {
@@ -13,6 +15,8 @@ export default [
     component: () => import('@/features/auth/views/RegisterView.vue'),
     meta: {
       requiresAuth: false,
+      requiresGuest: true,
+      title: 'Crear Cuenta',
     },
   },
 ]

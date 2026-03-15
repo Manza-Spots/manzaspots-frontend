@@ -1,12 +1,8 @@
 import { Capacitor } from '@capacitor/core'
-import { App } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { SplashScreen } from '@capacitor/splash-screen'
-import { Network } from '@capacitor/network'
-import { disableDoubleTapZoom } from './disableZoom'
 
 export const isNative = Capacitor.isNativePlatform()
-export const platform = Capacitor.getPlatform() // 'ios' | 'android' | 'web'
+export const platform = Capacitor.getPlatform()
 
 // Configuración de colores para Status Bar
 export const statusBarConfig = {
@@ -80,7 +76,6 @@ export async function showStatusBar() {
   }
 }
 
-// Inicialización de Capacitor
 export async function initializeCapacitor() {
   if (!isNative) return
 

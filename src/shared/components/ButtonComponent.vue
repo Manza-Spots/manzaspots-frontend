@@ -1,10 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 
-defineOptions({
-  name: 'ButtonComponent',
-})
-
 const props = defineProps({
   variant: {
     type: String,
