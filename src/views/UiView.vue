@@ -2,13 +2,9 @@
 import { ref } from 'vue'
 import { useToast } from '@/shared/composables/useToast'
 import { useRouter } from 'vue-router'
-
-defineOptions({
-  name: 'UiView',
-})
-
+import { useAuth } from '@/features/auth/composables/useAuth'
 import Icon from '@/shared/components/Icon.vue'
-import Button from '@/shared/components/Button.vue'
+import Button from '@/shared/components/ButtonComponent.vue'
 import Input from '@/shared/components/Input.vue'
 import Textarea from '@/shared/components/Textarea.vue'
 import Select from '@/shared/components/Select.vue'
@@ -24,6 +20,7 @@ import Avatar from '@/shared/components/Avatar.vue'
 
 const toast = useToast()
 const router = useRouter()
+const { isAuthenticated, user, logout } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -46,6 +43,14 @@ const countries = [
 const handleToast = (variant) => {
   toast[variant](`Este es un ${variant} toast`, { duration: 3000 })
 }
+
+const handleLogout = async () => {
+  try {
+    await logout()
+  } catch (error) {
+    console.error('Logout err:', error)
+  }
+}
 </script>
 
 <template>
@@ -54,7 +59,25 @@ const handleToast = (variant) => {
       <header class="showcase-header">
         <h1>Sistema de Diseño</h1>
         <p>Todos los componentes base de la aplicación</p>
-        <Button variant="outline" size="lg" @click="router.push('/')"> Home </Button>
+        <Card v-if="isAuthenticated" class="auth-card">
+          <div class="auth-info">
+            <div class="auth-user">
+              <Avatar :name="user?.email || 'Usuario'" size="md" />
+              <div class="user-details">
+                <p class="user-email">{{ user?.email || 'usuario@example.com' }}</p>
+                <Badge variant="success" dot>Autenticado</Badge>
+              </div>
+            </div>
+            <Button variant="danger" size="sm" @click="router.push('/')">
+              <Icon name="Home" :size="16" />
+              Home
+            </Button>
+            <Button variant="danger" size="sm" @click="handleLogout">
+              <Icon name="LogOut" :size="16" />
+              Cerrar Sesión
+            </Button>
+          </div>
+        </Card>
       </header>
 
       <!-- Icons -->

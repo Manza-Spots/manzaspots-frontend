@@ -5,7 +5,7 @@ import { useForm } from '@/shared/composables/useForm'
 import { useToast } from '@/shared/composables/useToast'
 import { useValidation } from '@/shared/composables/useValidation'
 import Input from '@/shared/components/Input.vue'
-import Button from '@/shared/components/Button.vue'
+import Button from '@/shared/components/ButtonComponent.vue'
 import Icon from '@/shared/components/Icon.vue'
 import Checkbox from '@/shared/components/CheckboxComponent.vue'
 
@@ -78,10 +78,10 @@ const goToLogin = () => {
 }
 
 const goToTermsAndConditions = () => {
-  router.push('/terms-conditions')
+  router.push('/terms')
 }
 const goToPolicyPrivacy = () => {
-  router.push('/policy-privacy')
+  router.push('/privacy')
 }
 </script>
 

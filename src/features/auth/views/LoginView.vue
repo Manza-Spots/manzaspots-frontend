@@ -1,53 +1,61 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useForm } from '@/shared/composables/useForm'
-import { useToast } from '@/shared/composables/useToast'
-import { useValidation } from '@/shared/composables/useValidation'
+import { useAuth } from '@/features/auth/composables/useAuth'
 import Input from '@/shared/components/Input.vue'
-import Button from '@/shared/components/Button.vue'
+import Button from '@/shared/components/ButtonComponent.vue'
 import Icon from '@/shared/components/Icon.vue'
+import { useValidation } from '@/shared/composables/useValidation'
 
-const router = useRouter()
-const toast = useToast()
+const { login } = useAuth()
 const { validators } = useValidation()
 
 const showPassword = ref(false)
 
-const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit } = useForm(
-  {
-    email: '',
-    password: '',
-    rememberMe: false,
-  },
-  {
-    email: [validators.required(), validators.email()],
-    password: [validators.required(), validators.minLength(6)],
-  },
-  {
-    onSubmit: async (formValues) => {
-      // Simular login
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      toast.success('¡Bienvenido de vuelta!')
-      router.push('/')
+const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, setErrors } =
+  useForm(
+    {
+      email: '',
+      password: '',
+      rememberMe: false,
     },
-  }
-)
+    {
+      email: [validators.required(), validators.email()],
+      password: [validators.required(), validators.minLength(6)],
+    },
+    {
+      onSubmit: async (formValues) => {
+        try {
+          await login(
+            {
+              email: formValues.email,
+              password: formValues.password,
+            },
+            '/ui'
+          )
+        } catch (error) {
+          if (error.fieldErrors) {
+            setErrors(error.fieldErrors)
+          } else if (error.status === 401) {
+            // Error de credenciales
+            setErrors({
+              email: ' ',
+              password: 'Email o contraseña incorrectos',
+            })
+          }
+        }
+      },
+    }
+  )
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
-}
-
-const goToRegister = () => {
-  router.push('/register')
 }
 </script>
 
 <template>
   <div class="login-view">
     <div class="login-container">
-      <!-- Header -->
       <div class="login-header">
         <div class="logo">
           <Icon name="Mountain" :size="48" />
@@ -56,7 +64,6 @@ const goToRegister = () => {
         <p class="subtitle">Inicia sesión para continuar tu aventura</p>
       </div>
 
-      <!-- Form -->
       <form class="login-form" @submit="handleSubmit">
         <Input
           :model-value="values.email"
@@ -66,6 +73,7 @@ const goToRegister = () => {
           icon="Mail"
           autocomplete="email"
           :error="errors.email"
+          :disabled="isSubmitting"
           @update:model-value="setFieldValue('email', $event)"
           @blur="handleBlur('email')"
         />
@@ -79,6 +87,7 @@ const goToRegister = () => {
           :icon-right="showPassword ? 'EyeOff' : 'Eye'"
           autocomplete="current-password"
           :error="errors.password"
+          :disabled="isSubmitting"
           @update:model-value="setFieldValue('password', $event)"
           @blur="handleBlur('password')"
           @icon-click="togglePassword"
@@ -86,10 +95,17 @@ const goToRegister = () => {
 
         <div class="form-options">
           <label class="remember-me">
-            <input v-model="values.rememberMe" type="checkbox" class="checkbox" />
+            <input
+              v-model="values.rememberMe"
+              type="checkbox"
+              class="checkbox"
+              :disabled="isSubmitting"
+            />
             <span>Recordarme</span>
           </label>
-          <button type="button" class="forgot-password">¿Olvidaste tu contraseña?</button>
+          <button type="button" class="forgot-password" :disabled="isSubmitting">
+            ¿Olvidaste tu contraseña?
+          </button>
         </div>
 
         <Button
@@ -104,14 +120,12 @@ const goToRegister = () => {
         </Button>
       </form>
 
-      <!-- Divider -->
       <div class="divider">
         <span>o continúa con</span>
       </div>
 
-      <!-- Social Login -->
       <div class="social-login">
-        <button type="button" class="social-button google">
+        <button type="button" class="social-button google" :disabled="isSubmitting">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
               d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z"
@@ -133,10 +147,10 @@ const goToRegister = () => {
           Google
         </button>
 
-        <button type="button" class="social-button apple">
+        <button type="button" class="social-button apple" :disabled="isSubmitting">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path
-              d="M16.365 1.43c0 1.14-.465 2.17-1.215 2.94-.75.78-1.98 1.38-3.03 1.29-.135-1.11.435-2.25 1.14-2.97.78-.81 2.085-1.395 3.105-1.26zM20.49 17.19c-.48 1.08-.705 1.56-1.32 2.52-.855 1.335-2.055 3.015-3.54 3.03-1.32.015-1.665-.855-3.465-.855-1.8 0-2.175.84-3.495.87-1.485.06-2.625-1.47-3.48-2.805-2.385-3.69-2.64-8.01-1.17-10.26 1.035-1.605 2.67-2.55 4.2-2.55 1.56 0 2.55.855 3.84.855 1.26 0 2.025-.855 3.825-.855 1.365 0 2.82.75 3.855 2.04-3.405 1.86-2.85 6.72.75 7.98z"
+              d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"
             />
           </svg>
           Apple
@@ -147,7 +161,7 @@ const goToRegister = () => {
       <div class="login-footer">
         <p>
           ¿No tienes cuenta?
-          <button type="button" class="link" @click="goToRegister">Regístrate</button>
+          <router-link to="/register" class="link"> Regístrate </router-link>
         </p>
       </div>
     </div>

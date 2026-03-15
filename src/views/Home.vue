@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import Button from '@/shared/components/Button.vue'
+import Button from '@/shared/components/ButtonComponent.vue'
 
 const router = useRouter()
 defineOptions({
@@ -15,13 +15,15 @@ defineOptions({
         <h1>Manza Spotss</h1>
 
         <div class="actions">
-          <Button variant="primary" size="lg" @click="router.push('/login')">
+          <Button variant="primary" size="lg" @click="router.push({ name: 'Login' })">
             Iniciar Sesión
           </Button>
-          <Button variant="outline" size="lg" @click="router.push('/register')">
+          <Button variant="outline" size="lg" @click="router.push({ name: 'Register' })">
             Registrarse
           </Button>
-          <Button variant="ghost" size="md" @click="router.push('/ui')"> Ver UI </Button>
+          <Button variant="ghost" size="md" @click="router.push({ name: 'UiShowCase' })">
+            Ver UI
+          </Button>
         </div>
       </div>
     </div>

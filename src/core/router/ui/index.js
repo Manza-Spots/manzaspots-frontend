@@ -2,9 +2,11 @@ export default [
   {
     path: '/ui',
     name: 'UiShowCase',
-    component: () => import('@/views/Ui.vue'),
+    component: () => import('@/views/UiView.vue'),
     meta: {
-      requiresAuth: false,
+      requiresAuth: true,
+      requiresGuest: false,
+      title: 'Sistema de Diseño',
     },
   },
 ]

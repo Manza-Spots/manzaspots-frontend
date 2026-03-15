@@ -1,18 +1,20 @@
 export default [
   {
-    path: '/terms-conditions',
-    name: 'TermsAndConditions',
+    path: '/terms',
+    name: 'Terms',
     component: () => import('@/views/TermsAndConditions.vue'),
     meta: {
       requiresAuth: false,
+      title: 'Términos y Condiciones',
     },
   },
   {
-    path: '/policy-privacy',
-    name: 'PolicyPrivacy',
+    path: '/privacy',
+    name: 'Privacy',
     component: () => import('@/views/PolicyPrivacy.vue'),
     meta: {
       requiresAuth: false,
+      title: 'Política de Privacidad',
     },
   },
 ]
