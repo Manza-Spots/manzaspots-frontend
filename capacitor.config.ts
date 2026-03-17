@@ -13,18 +13,25 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 1000,
-      backgroundColor: '#ffffff',
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      launchFadeOutDuration: 300,
+      backgroundColor: '#10b981',
       showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true,
     },
     LocalNotifications: {
       smallIcon: 'ic_stat_icon_config_sample',
       iconColor: '#488AFF',
     },
     StatusBar: {
-      style: 'light',
-      backgroundColor: '#000000',
       overlaysWebView: false,
+    },
+    Keyboard: {
+      resize: 'native',
+      style: 'dark',
+      resizeOnFullScreen: true,
     },
     Geolocation: {
       // Configuración específica para tracking continuo
@@ -37,6 +44,7 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     backgroundColor: '#000000',
+    scrollEnabled: true,
     // Habilitar WebView inspector en desarrollo
     webContentsDebuggingEnabled: true,
   },

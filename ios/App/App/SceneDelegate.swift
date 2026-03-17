@@ -10,9 +10,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let viewController = CAPBridgeViewController()
+        let viewController = ViewController()
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
+        print("✅ Scene connected with custom ViewController")
+
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

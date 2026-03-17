@@ -15,10 +15,11 @@ export function useAuth() {
   async function login(credentials, redirectTo = '/') {
     try {
       await authStore.login(credentials)
+
       toast.success(`¡Bienvenido de vuelta, ${authStore.userName}!`)
 
       const redirect = router.currentRoute.value.query.redirect || redirectTo
-      router.push(redirect)
+      router.replace(redirect)
 
       return true
     } catch (error) {
@@ -33,7 +34,7 @@ export function useAuth() {
       await authStore.register(userData)
       toast.success(`¡Bienvenido, ${authStore.userName}! Tu cuenta ha sido creada.`)
 
-      router.push(redirectTo)
+      router.replace(redirectTo)
 
       return true
     } catch (error) {
@@ -55,11 +56,15 @@ export function useAuth() {
 
       toast.info('Sesión cerrada correctamente')
 
-      router.push('/login')
+      router.replace('/login')
     } catch (error) {
       console.error('Logout error:', error)
-      router.push('/login')
+      router.replace('/login')
     }
+  }
+
+  function hasRole(role) {
+    return user.value?.role === role
   }
 
   function hasPermission(permission) {
@@ -81,6 +86,7 @@ export function useAuth() {
     register,
     logout,
     hasPermission,
+    hasRole,
     isEmailVerified,
   }
 }

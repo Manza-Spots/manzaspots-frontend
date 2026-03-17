@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { mainGuard } from './guards'
-import ui from './ui'
-import auth from './auth'
-import legal from './legal'
+import { isNative, platform } from '../capacitor'
+import { App } from '@capacitor/app'
+import ui from './modules/ui'
+import auth from './modules/auth'
+import legal from './modules/legal'
 
 const routes = [
   {
@@ -40,7 +42,19 @@ router.beforeEach(mainGuard)
 
 router.afterEach((to, from) => {
   if (import.meta.env.DEV) {
-    console.log('🔀 Navigation:', from.name || from.path, '→', to.name || to.path)
+    console.log('Navigation:', from.name || from.path, '→', to.name || to.path)
   }
 })
+
+if (isNative && platform === 'Android') {
+  App.addListener('backButton', ({ canGoBack }) => {
+    console.log('Android back button presset. Can go back:', canGoBack)
+    if (canGoBack) {
+      router.back()
+    } else {
+      App.exitApp
+    }
+  })
+}
+
 export default router
