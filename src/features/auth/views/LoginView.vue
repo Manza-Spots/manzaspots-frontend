@@ -37,7 +37,6 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
           if (error.fieldErrors) {
             setErrors(error.fieldErrors)
           } else if (error.status === 401) {
-            // Error de credenciales
             setErrors({
               email: ' ',
               password: 'Email o contraseña incorrectos',
@@ -186,9 +185,10 @@ const togglePassword = () => {
   justify-content: center;
   width: 100%;
   max-width: 100%;
-  padding: var(--space-8);
   padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
-  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--space-6));
+  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--space-2));
+  padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
+  padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
   min-height: 100vh;
   min-height: -webkit-fill-available;
 }

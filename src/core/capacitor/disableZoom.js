@@ -1,4 +1,3 @@
-// Prevenir double-tap zoom en iOS/Android
 export function disableDoubleTapZoom() {
   let lastTouchEnd = 0
 
@@ -7,7 +6,6 @@ export function disableDoubleTapZoom() {
     (event) => {
       const now = Date.now()
 
-      // Si hay dos taps en menos de 300ms, prevenir
       if (now - lastTouchEnd <= 300) {
         event.preventDefault()
       }
@@ -17,7 +15,6 @@ export function disableDoubleTapZoom() {
     { passive: false }
   )
 
-  // Prevenir pinch zoom
   document.addEventListener(
     'gesturestart',
     (event) => {

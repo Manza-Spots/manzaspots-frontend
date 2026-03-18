@@ -11,6 +11,7 @@ export async function authGuard(to, from, next) {
     next({
       name: 'Login',
       query: { redirect: to.fullPath },
+      replace: true,
     })
     return
   }
@@ -37,7 +38,7 @@ export async function guestGuard(to, from, next) {
   }
 
   if (authStore.isAuthenticated) {
-    next({ name: 'Home' })
+    next({ name: 'Home', replace: true })
     return
   }
 

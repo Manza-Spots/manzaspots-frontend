@@ -12,7 +12,7 @@ defineOptions({
   <div class="home">
     <div class="container">
       <div class="hero">
-        <h1>Manza Spotss</h1>
+        <h1>Manza Spots</h1>
 
         <div class="actions">
           <Button variant="primary" size="lg" @click="router.push({ name: 'Login' })">

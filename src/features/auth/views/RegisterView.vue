@@ -90,10 +90,6 @@ const goToPolicyPrivacy = () => {
     <div class="register-container">
       <!-- Header -->
       <div class="register-header">
-        <button type="button" class="back-button" @click="goToLogin">
-          <Icon name="ChevronLeft" :size="24" />
-        </button>
-
         <div class="logo">
           <Icon name="Mountain" :size="48" />
         </div>
@@ -256,40 +252,17 @@ const goToPolicyPrivacy = () => {
   justify-content: center;
   width: 100%;
   max-width: 100%;
-  padding: var(--space-6);
-  padding-top: max(calc(var(--safe-area-inset-top) + var(--space-4)), var(--space-4));
-  padding-bottom: max(calc(var(--safe-area-inset-bottom) + var(--space-6)), var(--space-6));
-  position: relative;
-  box-sizing: border-box;
+  padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
+  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--space-2));
+  padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
+  padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
   min-height: 100vh;
   min-height: -webkit-fill-available;
 }
 
-.back-button {
-  position: absolute;
-  top: calc(var(--safe-area-inset-top) + var(--space-4));
-  left: var(--space-4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
-  color: var(--color-text-primary);
-  background: var(--color-gray-100);
-  transition: all var(--transition-fast);
-  z-index: 10;
-}
-
-.back-button:active {
-  transform: scale(0.95);
-  background: var(--color-gray-200);
-}
-
 .register-header {
   text-align: center;
-  margin-bottom: var(--space-8);
-  padding-top: var(--space-12);
+  margin-bottom: var(--space-10);
 }
 
 .logo {
