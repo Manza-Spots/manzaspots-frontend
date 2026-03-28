@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { mainGuard } from './guards'
-import { isNative, platform } from '../capacitor'
 import { App } from '@capacitor/app'
-import ui from './modules/ui'
-import auth from './modules/auth'
-import legal from './modules/legal'
+import { isNative, platform } from '@/core/capacitor'
+import ui from './ui'
+import auth from './auth'
+import legal from './legal'
+import app from './app'
 
 const routes = [
   {
@@ -19,6 +20,7 @@ const routes = [
   ...ui,
   ...auth,
   ...legal,
+  ...app,
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -39,6 +41,16 @@ const router = createRouter({
 })
 
 router.beforeEach(mainGuard)
+
+if (isNative && platform === 'android') {
+  App.addListener('backButton', ({ canGoBack }) => {
+    if (canGoBack) {
+      router.back()
+    } else {
+      App.exitApp()
+    }
+  })
+}
 
 router.afterEach((to, from) => {
   if (import.meta.env.DEV) {

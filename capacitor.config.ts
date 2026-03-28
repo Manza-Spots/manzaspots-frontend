@@ -29,13 +29,11 @@ const config: CapacitorConfig = {
       overlaysWebView: false,
     },
     Keyboard: {
-      resize: 'native',
+      resize: 'none',
+      resizeOnFullScreen: false,
       style: 'dark',
-      resizeOnFullScreen: true,
     },
-    Geolocation: {
-      // Configuración específica para tracking continuo
-    },
+    Geolocation: {},
   },
   android: {
     allowMixedContent: true,
@@ -44,8 +42,7 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     backgroundColor: '#000000',
-    scrollEnabled: true,
-    // Habilitar WebView inspector en desarrollo
+    scrollEnabled: false,
     webContentsDebuggingEnabled: true,
   },
 }
