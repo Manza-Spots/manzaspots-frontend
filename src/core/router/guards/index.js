@@ -9,7 +9,7 @@ export async function authGuard(to, from, next) {
 
   if (!authStore.isAuthenticated) {
     next({
-      name: 'Login',
+      name: 'Profile',
       query: { redirect: to.fullPath },
       replace: true,
     })
@@ -22,7 +22,7 @@ export async function authGuard(to, from, next) {
     } catch (error) {
       console.error('Error fetching user:', error)
       await authStore.logout()
-      next({ name: 'Login' })
+      next({ name: 'Profile' })
       return
     }
   }

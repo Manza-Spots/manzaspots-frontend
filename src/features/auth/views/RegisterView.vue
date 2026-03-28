@@ -6,12 +6,13 @@ import { useToast } from '@/shared/composables/useToast'
 import { useValidation } from '@/shared/composables/useValidation'
 import Input from '@/shared/components/Input.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
-import Icon from '@/shared/components/Icon.vue'
 import Checkbox from '@/shared/components/CheckboxComponent.vue'
 
 const router = useRouter()
 const toast = useToast()
 const { validators } = useValidation()
+
+const emit = defineEmits(['switch-to-login'])
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -55,12 +56,12 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit } 
     ],
   },
   {
-    onSubmit: async (formValues) => {
+    onSubmit: async () => {
       // Simular registro
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       toast.success('¡Cuenta creada exitosamente!')
-      router.push('/')
+      router.push('/profile')
     },
   }
 )
@@ -74,7 +75,7 @@ const toggleConfirmPassword = () => {
 }
 
 const goToLogin = () => {
-  router.push('/login')
+  emit('switch-to-login')
 }
 
 const goToTermsAndConditions = () => {
@@ -88,16 +89,11 @@ const goToPolicyPrivacy = () => {
 <template>
   <div class="register-view">
     <div class="register-container">
-      <!-- Header -->
       <div class="register-header">
-        <div class="logo">
-          <Icon name="Mountain" :size="48" />
-        </div>
         <h1 class="title">Crear Cuenta</h1>
         <p class="subtitle">Únete a la comunidad de aventureros</p>
       </div>
 
-      <!-- Form -->
       <form class="register-form" @submit="handleSubmit">
         <Input
           :model-value="values.name"
@@ -184,12 +180,10 @@ const goToPolicyPrivacy = () => {
         </Button>
       </form>
 
-      <!-- Divider -->
       <div class="divider">
         <span>o regístrate con</span>
       </div>
 
-      <!-- Social Register -->
       <div class="social-register">
         <button type="button" class="social-button google">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -223,7 +217,6 @@ const goToPolicyPrivacy = () => {
         </button>
       </div>
 
-      <!-- Footer -->
       <div class="register-footer">
         <p>
           ¿Ya tienes cuenta?
@@ -237,12 +230,9 @@ const goToPolicyPrivacy = () => {
 <style scoped>
 .register-view {
   min-height: 100vh;
-  min-height: -webkit-fill-available;
   display: flex;
   flex-direction: column;
-  background: white;
-  overflow-x: hidden;
-  overflow-y: auto;
+  background: var(--color-bg-primary);
 }
 
 .register-container {
@@ -253,28 +243,14 @@ const goToPolicyPrivacy = () => {
   width: 100%;
   max-width: 100%;
   padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
-  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--space-2));
+  padding-bottom: calc(120px + var(--safe-area-inset-bottom));
   padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
   padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
 }
 
 .register-header {
   text-align: center;
   margin-bottom: var(--space-10);
-}
-
-.logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: var(--radius-2xl);
-  color: white;
-  margin-bottom: var(--space-6);
 }
 
 .title {

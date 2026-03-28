@@ -14,30 +14,27 @@ const config: CapacitorConfig = {
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
-      launchAutoHide: true,
+      launchAutoHide: false,
       launchFadeOutDuration: 300,
       backgroundColor: '#10b981',
       showSpinner: false,
       splashFullScreen: true,
-      splashImmersive: true,
+      splashImmersive: false,
     },
     LocalNotifications: {
       smallIcon: 'ic_stat_icon_config_sample',
       iconColor: '#488AFF',
     },
     StatusBar: {
-      overlaysWebView: false,
     },
     Keyboard: {
       resize: 'none',
       resizeOnFullScreen: false,
-      style: 'dark',
     },
     Geolocation: {},
   },
   android: {
     allowMixedContent: true,
-    backgroundColor: '#10b981',
   },
   ios: {
     contentInset: 'automatic',

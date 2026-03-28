@@ -3,9 +3,7 @@ import { useRouter } from 'vue-router'
 import Button from '@/shared/components/ButtonComponent.vue'
 
 const router = useRouter()
-defineOptions({
-  name: 'HomeView',
-})
+
 </script>
 
 <template>

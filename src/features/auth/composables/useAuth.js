@@ -16,8 +16,6 @@ export function useAuth() {
     try {
       await authStore.login(credentials)
 
-      toast.success(`¡Bienvenido de vuelta, ${authStore.userName}!`)
-
       const redirect = router.currentRoute.value.query.redirect || redirectTo
       router.replace(redirect)
 
@@ -53,13 +51,10 @@ export function useAuth() {
   async function logout() {
     try {
       await authStore.logout()
-
-      toast.info('Sesión cerrada correctamente')
-
-      router.replace('/login')
+      router.replace('/profile')
     } catch (error) {
       console.error('Logout error:', error)
-      router.replace('/login')
+      router.replace('/profile')
     }
   }
 

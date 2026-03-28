@@ -1,18 +1,23 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import PWAUpdatePrompt from '@/shared/components/PWAUpdatePrompt.vue'
 import OfflineIndicator from '@/shared/components/OfflineIndicator.vue'
 import ToastContainer from '@/shared/components/ToastContainer.vue'
 import BottomNav from './shared/components/BottomNav.vue'
+import { useAppReady } from '@/shared/composables/useAppReady'
 
 const route = useRoute()
+const { markReady } = useAppReady()
 
 const hideBottomNav = computed(() => {
-  const authRoutes = ['/login', '/register']
-  const otherRoutes = ['/ui', '/terms', '/privacy']
-  return authRoutes.includes(route.path) || otherRoutes.includes(route.path)
+  const hiddenRoutes = ['/ui', '/terms', '/privacy']
+  return hiddenRoutes.includes(route.path)
+})
+
+onMounted(() => {
+  markReady()
 })
 </script>
 
