@@ -11,7 +11,8 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/views/Home.vue'),
+    component: () => import('@/views/HomeView.vue'),
+    redirect: '/spots',
     meta: {
       requiresAuth: false,
       title: 'Inicio',
@@ -24,7 +25,7 @@ const routes = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFound.vue'),
+    component: () => import('@/views/NotFoundView.vue'),
   },
 ]
 

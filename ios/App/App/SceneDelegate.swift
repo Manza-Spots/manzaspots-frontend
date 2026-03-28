@@ -13,8 +13,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let viewController = ViewController()
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
-        print("✅ Scene connected with custom ViewController")
-
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

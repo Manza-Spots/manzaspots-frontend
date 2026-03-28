@@ -4,37 +4,18 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 export const isNative = Capacitor.isNativePlatform()
 export const platform = Capacitor.getPlatform()
 
-// Configuración de colores para Status Bar
+
 export const statusBarConfig = {
   light: {
     style: Style.Dark,
-    backgroundColor: '#ffffff',
   },
   dark: {
     style: Style.Light,
-    backgroundColor: '#111827',
   },
 }
 
 export function isDarkMode() {
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-export async function applyStatusBarTheme() {
-  if (!isNative) return
-
-  const darkMode = isDarkMode()
-  const config = darkMode ? statusBarConfig.dark : statusBarConfig.light
-
-  try {
-    await StatusBar.setStyle({ style: config.style })
-
-    if (platform === 'android') {
-      await StatusBar.setBackgroundColor({ color: config.backgroundColor })
-    }
-  } catch (error) {
-    console.error('Error applying status bar theme:', error)
-  }
 }
 
 export async function setStatusBarStyle(theme = 'light') {
@@ -45,34 +26,9 @@ export async function setStatusBarStyle(theme = 'light') {
 
     await StatusBar.setStyle({ style: config.style })
 
-    // Solo en Android configurar backgroundColor
-    if (platform === 'android') {
-      await StatusBar.setBackgroundColor({ color: config.backgroundColor })
-    }
-
     await StatusBar.show()
   } catch (error) {
     console.error('Error setting status bar style:', error)
-  }
-}
-
-export async function hideStatusBar() {
-  if (!isNative) return
-
-  try {
-    await StatusBar.hide()
-  } catch (error) {
-    console.error('Error hiding status bar:', error)
-  }
-}
-
-export async function showStatusBar() {
-  if (!isNative) return
-
-  try {
-    await StatusBar.show()
-  } catch (error) {
-    console.error('Error showing status bar:', error)
   }
 }
 
@@ -80,22 +36,17 @@ export async function initializeCapacitor() {
   if (!isNative) return
 
   try {
-    // Configurar Status Bar
     if (platform === 'ios') {
-      // En iOS: NO usar overlay, dejar que iOS maneje el espacio
-      await StatusBar.setOverlaysWebView({ overlay: false })
+      await StatusBar.setOverlaysWebView({ overlay: true })
 
-      // FORZAR estilo Light (texto blanco) independientemente del tema del sistema
-      await StatusBar.setStyle({ style: Style.Light })
-
-      // Forzar fondo si es necesario (aunque con overlay:false no debería ser necesario)
-      await StatusBar.setBackgroundColor({ color: '#ffffff' })
     } else if (platform === 'android') {
-      // En Android: configuración normal
-      await setStatusBarStyle('light')
+        await StatusBar.setOverlaysWebView({ overlay: true })
+        await StatusBar.setBackgroundColor({ color: '#00000000' })
+        window.matchMedia('(prefers-color-scheme: dark)')
+            .addEventListener('change', async () => {
+                await StatusBar.setBackgroundColor({ color: '#00000000' })
+            })
     }
-
-    // ... resto del código igual
   } catch (error) {
     console.error('Error initializing Capacitor:', error)
   }

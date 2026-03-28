@@ -1,10 +1,14 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Icon from './Icon.vue'
+import { useAppReady } from '@/shared/composables/useAppReady'
+
+import { Keyboard } from '@capacitor/keyboard'
 
 const router = useRouter()
 const route = useRoute()
+const { isAppReady } = useAppReady()
 
 const isSearching = ref(false)
 const searchQuery = ref('')
@@ -17,6 +21,36 @@ const isActionClicking = ref(false)
 const currentFingerX = ref(0)
 const initialTouchX = ref(0)
 const hasMoved = ref(false)
+const isNavVisible = ref(false)
+const keyboardHeight = ref(0)
+
+watch(isAppReady, (ready) => {
+  if (ready) {
+    requestAnimationFrame(() => {
+      isNavVisible.value = true
+    })
+  }
+}, { immediate: true })
+
+watch(isSearching, (val) => {
+  if (!val) {
+    searchQuery.value = ''
+  }
+})
+
+onMounted(() => {
+  Keyboard.addListener('keyboardWillShow', (info) => {
+    keyboardHeight.value = info.keyboardHeight
+  })
+
+  Keyboard.addListener('keyboardWillHide', () => {
+    keyboardHeight.value = 0
+  })
+})
+
+onBeforeUnmount(() => {
+  Keyboard.removeAllListeners()
+})
 
 const clickStartTime = ref(0)
 let clickTimeout = null
@@ -172,8 +206,8 @@ const floatingButton = computed(() => {
       show: true,
     },
     '/profile': {
-      icon: 'Settings',
-      action: 'settings',
+      icon: 'Search',
+      action: 'search',
       show: true,
     },
   }
@@ -181,15 +215,6 @@ const floatingButton = computed(() => {
   return buttonConfig[route.path] || { show: false }
 })
 
-watch(isSearching, (val) => {
-  if (val) {
-    setTimeout(() => {
-      searchInput.value?.focus()
-    }, 50)
-  } else {
-    searchQuery.value = ''
-  }
-})
 
 const openSearch = () => {
   isSearching.value = true
@@ -224,8 +249,13 @@ const handleFloatingAction = () => {
 </script>
 
 <template>
-  <nav class="bottom-nav" @touchstart.passive="() => {}">
-    <div class="nav-layout">
+<nav
+  class="bottom-nav"
+  :class="{ 'bottom-nav--gradient': keyboardHeight === 0 }"
+  @touchstart.passive="() => {}"
+  :style="{ transform: `translateY(-${keyboardHeight}px)` }"
+>
+    <div class="nav-layout" :class="{ 'is-visible': isNavVisible }">
       <div
         class="nav-pill"
         :class="{ 'is-compact': isSearching, 'is-zoomed': isDragging || isClicking }"
@@ -312,11 +342,20 @@ const handleFloatingAction = () => {
   z-index: 100;
   pointer-events: none;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 0.25s ease;
+}
+
+.bottom-nav--gradient {
   background: linear-gradient(
     to top,
-    rgba(70, 70, 70, 0.25),
-    rgba(70, 70, 70, 0.15),
-    rgba(70, 70, 70, 0)
+    rgba(85, 85, 85, 0.45) 0%,
+    rgba(85, 85, 85, 0.41) 19%,
+    rgba(85, 85, 85, 0.32) 34%,
+    rgba(85, 85, 85, 0.21) 47%,
+    rgba(85, 85, 85, 0.12) 60%,
+    rgba(85, 85, 85, 0.06) 73%,
+    rgba(85, 85, 85, 0.02) 86%,
+    rgba(85, 85, 85, 0) 100%
   );
 }
 
@@ -326,6 +365,15 @@ const handleFloatingAction = () => {
   max-width: 520px;
   margin: 0 auto;
   height: 56px;
+  transform: translateY(calc(100% + var(--space-6)));
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.4s ease;
+}
+
+.nav-layout.is-visible {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .nav-pill {
@@ -334,6 +382,8 @@ const handleFloatingAction = () => {
   left: 0;
   display: flex;
   background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: saturate(180%) blur(2px);
+  backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
   height: 56px;
   width: calc(100% - 56px - var(--space-2));
@@ -404,6 +454,8 @@ const handleFloatingAction = () => {
   align-items: center;
   justify-content: flex-start;
   background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: saturate(180%) blur(2px);
+  backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
   height: 56px;
   width: 56px;
@@ -438,7 +490,7 @@ const handleFloatingAction = () => {
 
 .pill-icon {
   flex-shrink: 0;
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   transition: color 0.3s ease;
 }
 .action-pill.is-expanded .pill-icon {
@@ -506,7 +558,7 @@ const handleFloatingAction = () => {
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--color-text-tertiary);
+  color: var(--color-text-primary);
   flex: 1 1 0px;
   min-width: 72px;
   touch-action: manipulation;
@@ -602,7 +654,7 @@ const handleFloatingAction = () => {
 @media (prefers-color-scheme: dark) {
   .nav-pill,
   .action-pill {
-    background: rgba(28, 28, 30, 0.85);
+    background: rgba(28, 28, 30, 0.7);
   }
 }
 </style>

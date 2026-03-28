@@ -4,8 +4,9 @@ import { useForm } from '@/shared/composables/useForm'
 import { useAuth } from '@/features/auth/composables/useAuth'
 import Input from '@/shared/components/Input.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
-import Icon from '@/shared/components/Icon.vue'
 import { useValidation } from '@/shared/composables/useValidation'
+
+const emit = defineEmits(['switch-to-register'])
 
 const { login } = useAuth()
 const { validators } = useValidation()
@@ -31,7 +32,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
               email: formValues.email,
               password: formValues.password,
             },
-            '/ui'
+            '/profile'
           )
         } catch (error) {
           if (error.fieldErrors) {
@@ -56,9 +57,6 @@ const togglePassword = () => {
   <div class="login-view">
     <div class="login-container">
       <div class="login-header">
-        <div class="logo">
-          <Icon name="Mountain" :size="48" />
-        </div>
         <h1 class="title">Bienvenido</h1>
         <p class="subtitle">Inicia sesión para continuar tu aventura</p>
       </div>
@@ -156,11 +154,10 @@ const togglePassword = () => {
         </button>
       </div>
 
-      <!-- Footer -->
       <div class="login-footer">
         <p>
           ¿No tienes cuenta?
-          <router-link to="/register" class="link"> Regístrate </router-link>
+          <button type="button" class="link" @click="emit('switch-to-register')"> Regístrate </button>
         </p>
       </div>
     </div>
@@ -170,12 +167,9 @@ const togglePassword = () => {
 <style scoped>
 .login-view {
   min-height: 100vh;
-  min-height: -webkit-fill-available;
   display: flex;
   flex-direction: column;
-  background: white;
-  overflow-x: hidden;
-  overflow-y: auto;
+  background: var(--color-bg-primary);
 }
 
 .login-container {
@@ -186,28 +180,14 @@ const togglePassword = () => {
   width: 100%;
   max-width: 100%;
   padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
-  padding-bottom: calc(var(--safe-area-inset-bottom) + var(--space-2));
+  padding-bottom: calc(120px + var(--safe-area-inset-bottom));
   padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
   padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
 }
 
 .login-header {
   text-align: center;
   margin-bottom: var(--space-10);
-}
-
-.logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: var(--radius-2xl);
-  color: white;
-  margin-bottom: var(--space-6);
 }
 
 .title {
