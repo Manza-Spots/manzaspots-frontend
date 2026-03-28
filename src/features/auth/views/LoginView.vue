@@ -353,20 +353,14 @@ const togglePassword = () => {
   color: var(--color-primary-dark);
 }
 
-/* Desktop fallback (opcional) */
 @media (min-width: 768px) {
   .login-view {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     align-items: center;
     justify-content: center;
   }
 
   .login-container {
     max-width: 440px;
-    background: white;
-    border-radius: var(--radius-2xl);
-    padding: var(--space-8);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
 }
 </style>
