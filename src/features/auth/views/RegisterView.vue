@@ -2,35 +2,40 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from '@/shared/composables/useForm'
-import { useToast } from '@/shared/composables/useToast'
 import { useValidation } from '@/shared/composables/useValidation'
-import Input from '@/shared/components/Input.vue'
+import Input from '@/shared/components/InputComponent.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Checkbox from '@/shared/components/CheckboxComponent.vue'
+import Icon from '@/shared/components/Icon.vue'
+import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
-const toast = useToast()
+const { register } = useAuth()
 const { validators } = useValidation()
 
-const emit = defineEmits(['switch-to-login'])
+
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit } = useForm(
+const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, setErrors } = useForm(
   {
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
     acceptTerms: false,
   },
   {
-    name: [
-      validators.required('El nombre es requerido'),
-      validators.minLength(3, 'El nombre debe tener al menos 3 caracteres'),
+    username: [
+      validators.required('El usuario es requerido'),
+      validators.alphanumeric(),
+      validators.minLength(5, 'El usuario debe tener al menos 5 caractéres'),
     ],
-    email: [validators.required(), validators.email()],
+    email: [
+      validators.required(), 
+      validators.email()
+    ],
     password: [
       validators.required(),
       validators.minLength(8, 'La contraseña debe tener al menos 8 caracteres'),
@@ -42,11 +47,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit } 
     confirmPassword: [
       validators.required('Debes confirmar tu contraseña'),
       validators.match(
-        {
-          get value() {
-            return values.password
-          },
-        },
+        () => values.password,
         'contraseña',
         'Las contraseñas no coinciden'
       ),
@@ -56,12 +57,22 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit } 
     ],
   },
   {
-    onSubmit: async () => {
-      // Simular registro
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      toast.success('¡Cuenta creada exitosamente!')
-      router.push('/profile')
+    onSubmit: async (formValues) => {
+      try {
+        await register(
+          {
+            username: formValues.username,
+            email: formValues.email,
+            password: formValues.password,
+            confirmPassword: formValues.confirmPassword
+          },
+          '/email-verified'
+        )
+      } catch (error) {
+        if(error.fieldErrors) {
+          setErrors(error.fieldErrors)
+        }
+      }
     },
   }
 )
@@ -74,20 +85,21 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-const goToLogin = () => {
-  emit('switch-to-login')
-}
+const goToLogin = () => router.push('/login')
 
-const goToTermsAndConditions = () => {
-  router.push('/terms')
-}
-const goToPolicyPrivacy = () => {
-  router.push('/privacy')
-}
+const goToTermsAndConditions = () => router.push('/terms')
+
+const goToPolicyPrivacy = () => router.push('/privacy')
+
+const goToProfile = () => router.push('/profile')
+
 </script>
 
 <template>
   <div class="register-view">
+    <button class="back-button" @click="goToProfile()">
+      <Icon name="ArrowLeft"/>
+    </button>
     <div class="register-container">
       <div class="register-header">
         <h1 class="title">Crear Cuenta</h1>
@@ -96,22 +108,22 @@ const goToPolicyPrivacy = () => {
 
       <form class="register-form" @submit="handleSubmit">
         <Input
-          :model-value="values.name"
+          :model-value="values.username"
           type="text"
-          label="Nombre completo"
-          placeholder="Juan Pérez"
+          label="Usuario"
+          placeholder="MaestroCaminante76"
           icon="User"
-          autocomplete="name"
-          :error="errors.name"
-          @update:model-value="setFieldValue('name', $event)"
-          @blur="handleBlur('name')"
+          autocomplete="username"
+          :error="errors.username"
+          @update:model-value="setFieldValue('username', $event)"
+          @blur="handleBlur('username')"
         />
 
         <Input
           :model-value="values.email"
           type="email"
           label="Email"
-          placeholder="tu@email.com"
+          placeholder="ejemplo@email.com"
           icon="Mail"
           autocomplete="email"
           :error="errors.email"
@@ -127,6 +139,7 @@ const goToPolicyPrivacy = () => {
           icon="Lock"
           :icon-right="showPassword ? 'EyeOff' : 'Eye'"
           autocomplete="new-password"
+          :icon-right-size="22"
           :error="errors.password"
           @update:model-value="setFieldValue('password', $event)"
           @blur="handleBlur('password')"
@@ -141,6 +154,7 @@ const goToPolicyPrivacy = () => {
           icon="Lock"
           :icon-right="showConfirmPassword ? 'EyeOff' : 'Eye'"
           autocomplete="new-password"
+          :icon-right-size="22"
           :error="errors.confirmPassword"
           @update:model-value="setFieldValue('confirmPassword', $event)"
           @blur="handleBlur('confirmPassword')"
@@ -171,12 +185,11 @@ const goToPolicyPrivacy = () => {
         <Button
           type="submit"
           variant="primary"
-          size="lg"
           full-width
           :loading="isSubmitting"
           :disabled="isSubmitting"
         >
-          Crear Cuenta
+          Crear cuenta
         </Button>
       </form>
 
@@ -185,7 +198,7 @@ const goToPolicyPrivacy = () => {
       </div>
 
       <div class="social-register">
-        <button type="button" class="social-button google">
+        <button type="button" class="social-button">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
               d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z"
@@ -229,10 +242,33 @@ const goToPolicyPrivacy = () => {
 
 <style scoped>
 .register-view {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--color-bg-primary);
+}
+
+.back-button {
+  position: absolute;
+  top: calc(var(--safe-area-inset-top) + var(--space-4));
+  left: calc(var(--safe-area-inset-left) + var(--space-4));
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  color: var(--color-text-primary);
+  transition: transform 0.2s ease;
+}
+
+.back-button:active {
+  transform: scale(0.9);
 }
 
 .register-container {
@@ -242,15 +278,15 @@ const goToPolicyPrivacy = () => {
   justify-content: center;
   width: 100%;
   max-width: 100%;
-  padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
+  padding-top: calc(var(--safe-area-inset-top) + var(--space-10));
   padding-bottom: calc(120px + var(--safe-area-inset-bottom));
-  padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
-  padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
+  padding-left: calc(var(--safe-area-inset-left) + var(--space-6));
+  padding-right: calc(var(--safe-area-inset-right) + var(--space-6));
 }
 
 .register-header {
   text-align: center;
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-5);
 }
 
 .title {
@@ -269,8 +305,8 @@ const goToPolicyPrivacy = () => {
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  margin-bottom: var(--space-8);
+  gap: var(--space-4);
+  margin-bottom: var(--space-1);
 }
 
 .terms-field {
@@ -287,6 +323,7 @@ const goToPolicyPrivacy = () => {
   color: var(--color-primary);
   font-weight: var(--font-medium);
   transition: color var(--transition-fast);
+  font-size: var(--text-sm);
 }
 
 .terms-link:active {
@@ -296,7 +333,7 @@ const goToPolicyPrivacy = () => {
 .divider {
   position: relative;
   text-align: center;
-  margin: var(--space-8) 0;
+  margin: var(--space-3) 0;
 }
 
 .divider::before,
@@ -329,7 +366,7 @@ const goToPolicyPrivacy = () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-2);
 }
 
 .social-button {
@@ -337,7 +374,6 @@ const goToPolicyPrivacy = () => {
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   font-size: var(--text-base);
@@ -345,7 +381,7 @@ const goToPolicyPrivacy = () => {
   color: var(--color-text-primary);
   background: white;
   transition: all var(--transition-fast);
-  min-height: 52px;
+  min-height: 45px;
 }
 
 .social-button:active {
@@ -359,13 +395,12 @@ const goToPolicyPrivacy = () => {
 
 .register-footer {
   text-align: center;
-  margin-top: auto;
-  padding-top: var(--space-6);
+  margin-top: var(--space-5);
 }
 
 .register-footer p {
   margin: 0;
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }
 
@@ -373,6 +408,7 @@ const goToPolicyPrivacy = () => {
   color: var(--color-primary);
   font-weight: var(--font-semibold);
   transition: color var(--transition-fast);
+  font-size: var(--text-sm);
 }
 
 .link:active {

@@ -1,86 +1,74 @@
-import { ref, computed } from 'vue'
+import { ref, computed, isRef } from 'vue'
+
+function resolveValue(target) {
+  if (isRef(target)) return target.value
+  if (typeof target === 'function') return target()
+  return target
+}
 
 export function useValidation(rules) {
   const errors = ref({})
   const touched = ref({})
   const isValidating = ref(false)
+  const revalidationDeps = {}
 
   const validators = {
     required:
       (message = 'Este campo es requerido') =>
       (value) => {
-        if (value === null || value === undefined || value === '') {
-          return message
-        }
-        if (Array.isArray(value) && value.length === 0) {
-          return message
-        }
+        const v = resolveValue(value)
+        if (v === null || v === undefined || v === '') return message
+        if (Array.isArray(v) && v.length === 0) return message
         return null
       },
 
     email:
       (message = 'Email inválido') =>
       (value) => {
-        if (!value) return null
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(value)) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : message
       },
 
     minLength: (min, message) => (value) => {
-      if (!value) return null
-      const msg = message || `Debe tener al menos ${min} caracteres`
-      if (value.length < min) {
-        return msg
-      }
-      return null
+      const v = resolveValue(value)
+      if (!v) return null
+      return v.length < min ? (message || `Debe tener al menos ${min} caracteres`) : null
     },
 
     maxLength: (max, message) => (value) => {
-      if (!value) return null
-      const msg = message || `No debe exceder ${max} caracteres`
-      if (value.length > max) {
-        return msg
-      }
-      return null
+      const v = resolveValue(value)
+      if (!v) return null
+      return v.length > max ? (message || `No debe exceder ${max} caracteres`) : null
     },
 
     min: (min, message) => (value) => {
-      if (!value && value !== 0) return null
-      const msg = message || `El valor mínimo es ${min}`
-      if (Number(value) < min) {
-        return msg
-      }
-      return null
+      const v = resolveValue(value)
+      if (!v && v !== 0) return null
+      return Number(v) < min ? (message || `El valor mínimo es ${min}`) : null
     },
 
     max: (max, message) => (value) => {
-      if (!value && value !== 0) return null
-      const msg = message || `El valor máximo es ${max}`
-      if (Number(value) > max) {
-        return msg
-      }
-      return null
+      const v = resolveValue(value)
+      if (!v && v !== 0) return null
+      return Number(v) > max ? (message || `El valor máximo es ${max}`) : null
     },
 
     pattern:
       (regex, message = 'Formato inválido') =>
       (value) => {
-        if (!value) return null
-        if (!regex.test(value)) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        return regex.test(v) ? null : message
       },
 
     url:
       (message = 'URL inválida') =>
       (value) => {
-        if (!value) return null
+        const v = resolveValue(value)
+        if (!v) return null
         try {
-          new URL(value)
+          new URL(v)
           return null
         } catch {
           return message
@@ -90,83 +78,70 @@ export function useValidation(rules) {
     numeric:
       (message = 'Solo se permiten números') =>
       (value) => {
-        if (!value) return null
-        if (!/^\d+$/.test(value)) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        return /^\d+$/.test(v) ? null : message
       },
 
     alpha:
       (message = 'Solo se permiten letras') =>
       (value) => {
-        if (!value) return null
-        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(v) ? null : message
       },
 
     alphanumeric:
       (message = 'Solo se permiten letras y números') =>
       (value) => {
-        if (!value) return null
-        if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        return /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+$/.test(v) ? null : message
       },
 
     phone:
       (message = 'Teléfono inválido') =>
       (value) => {
-        if (!value) return null
-        const phoneRegex = /^[\d\s\-+()]+$/
-        if (!phoneRegex.test(value) || value.replace(/\D/g, '').length < 10) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        if (!v) return null
+        const clean = v.replace(/\D/g, '')
+        return /^[\d\s\-+()]+$/.test(v) && clean.length >= 10 ? null : message
       },
 
-    match: (fieldRef, fieldLabel, message) => (value) => {
-      if (!value) return null
-      const msg = message || `No coincide con ${fieldLabel}`
-      if (value !== fieldRef.value) {
-        return msg
+    match: (target, fieldLabel, message) => {
+      const validator = (value) => {
+        const v = resolveValue(value)
+        if (!v) return null
+        const targetVal = resolveValue(target)
+        return v === targetVal ? null : (message || `No coincide con ${fieldLabel}`)
       }
-      return null
+
+      validator._matchTarget = target
+      return validator
     },
 
     oneOf: (options, message) => (value) => {
-      if (!value) return null
-      const msg = message || `Debe ser uno de: ${options.join(', ')}`
-      if (!options.includes(value)) {
-        return msg
-      }
-      return null
+      const v = resolveValue(value)
+      if (!v) return null
+      return options.includes(v) ? null : (message || `Debe ser uno de: ${options.join(', ')}`)
     },
 
     custom:
       (validatorFn, message = 'Validación fallida') =>
       (value) => {
-        const isValid = validatorFn(value)
-        if (!isValid) {
-          return message
-        }
-        return null
+        const v = resolveValue(value)
+        return validatorFn(v) ? null : message
       },
 
     async:
       (asyncFn, message = 'Validación fallida') =>
       async (value) => {
+        const v = resolveValue(value)
         try {
-          const isValid = await asyncFn(value)
-          if (!isValid) {
-            return message
-          }
-          return null
+          const isValid = await asyncFn(v)
+          return isValid ? null : message
         } catch (error) {
-          return message + `: ${error}`
+          return `${message}: ${error}`
         }
       },
   }
@@ -187,7 +162,6 @@ export function useValidation(rules) {
           return false
         }
       }
-
       errors.value[fieldName] = null
       isValidating.value = false
       return true
@@ -203,33 +177,36 @@ export function useValidation(rules) {
     isValidating.value = true
     let isValid = true
 
-    const validationPromises = Object.keys(rules).map(async (fieldName) => {
-      const fieldValid = await validateField(fieldName, values[fieldName])
-      if (!fieldValid) {
-        isValid = false
-      }
-    })
+    await Promise.all(
+      Object.keys(rules).map(async (fieldName) => {
+        const fieldValid = await validateField(fieldName, values[fieldName])
+        if (!fieldValid) isValid = false
+      })
+    )
 
-    await Promise.all(validationPromises)
     isValidating.value = false
-
     return isValid
   }
 
-  const clearErrors = (fieldName) => {
-    if (fieldName) {
-      errors.value[fieldName] = null
-    } else {
-      errors.value = {}
+  const registerRevalidation = (dependentField, sourceField) => {
+    if (!revalidationDeps[sourceField]) {
+      revalidationDeps[sourceField] = []
+    }
+    if (!revalidationDeps[sourceField].includes(dependentField)) {
+      revalidationDeps[sourceField].push(dependentField)
     }
   }
 
+  const getDependents = (fieldName) => revalidationDeps[fieldName] ?? []
+
+  const clearErrors = (fieldName) => {
+    if (fieldName) errors.value[fieldName] = null
+    else errors.value = {}
+  }
+
   const clearTouched = (fieldName) => {
-    if (fieldName) {
-      touched.value[fieldName] = false
-    } else {
-      touched.value = {}
-    }
+    if (fieldName) touched.value[fieldName] = false
+    else touched.value = {}
   }
 
   const reset = () => {
@@ -242,21 +219,15 @@ export function useValidation(rules) {
     touched.value[fieldName] = value
   }
 
-  const hasErrors = computed(() => {
-    return Object.values(errors.value).some((error) => error !== null && error !== undefined)
-  })
+  const hasErrors = computed(() =>
+    Object.values(errors.value).some((e) => e !== null && e !== undefined)
+  )
 
-  const isFieldValid = (fieldName) => {
-    return computed(() => {
-      return touched.value[fieldName] && !errors.value[fieldName]
-    })
-  }
+  const isFieldValid = (fieldName) =>
+    computed(() => touched.value[fieldName] && !errors.value[fieldName])
 
-  const isFieldInvalid = (fieldName) => {
-    return computed(() => {
-      return touched.value[fieldName] && !!errors.value[fieldName]
-    })
-  }
+  const isFieldInvalid = (fieldName) =>
+    computed(() => touched.value[fieldName] && !!errors.value[fieldName])
 
   return {
     errors,
@@ -272,5 +243,7 @@ export function useValidation(rules) {
     hasErrors,
     isFieldValid,
     isFieldInvalid,
+    registerRevalidation,
+    getDependents,
   }
 }

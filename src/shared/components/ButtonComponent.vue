@@ -73,7 +73,6 @@ const buttonClasses = computed(() => {
   transform: scale(0.98);
 }
 
-/* Sizes */
 .btn-sm {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
@@ -92,7 +91,6 @@ const buttonClasses = computed(() => {
   min-height: 48px;
 }
 
-/* Variants */
 .btn-primary {
   background-color: var(--color-primary);
   color: white;
@@ -140,7 +138,6 @@ const buttonClasses = computed(() => {
   background-color: #dc2626;
 }
 
-/* States */
 .btn-full {
   width: 100%;
 }
@@ -160,7 +157,7 @@ const buttonClasses = computed(() => {
   position: absolute;
   width: 16px;
   height: 16px;
-  border: 2px solid currentColor;
+  border: 2px solid #ffffff;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;

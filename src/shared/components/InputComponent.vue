@@ -2,10 +2,6 @@
 import { computed, ref } from 'vue'
 import Icon from './Icon.vue'
 
-defineOptions({
-  name: 'InputComponent',
-})
-
 const props = defineProps({
   modelValue: {
     type: [String, Number],
@@ -47,6 +43,10 @@ const props = defineProps({
     type: String,
     default: 'md',
     validator: (value) => ['sm', 'md', 'lg'].includes(value),
+  },
+  iconRightSize: {
+    type: Number,
+    default: 18,
   },
 })
 
@@ -112,14 +112,17 @@ defineExpose({ focus })
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
-        :class="inputClasses"
+        :class="[
+          inputClasses,
+          { 'input-password': type === 'password' }
+        ]"
         @input="handleInput"
         @focus="handleFocus"
         @blur="handleBlur"
       />
 
       <div v-if="iconRight" class="input-icon input-icon-right" @click="emit('iconClick')">
-        <Icon :name="iconRight" :size="size === 'sm' ? 16 : size === 'lg' ? 20 : 18" />
+        <Icon :name="iconRight" :size=" iconRightSize || (size === 'sm' ? 16 : size === 'lg' ? 20 : 18)" />
       </div>
     </div>
 
@@ -154,7 +157,7 @@ defineExpose({ focus })
   border-radius: var(--radius-lg);
   background-color: var(--color-bg);
   color: var(--color-text-primary);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast);
   font-family: var(--font-sans);
 }
 
@@ -178,7 +181,6 @@ defineExpose({ focus })
   color: var(--color-text-tertiary);
 }
 
-/* Sizes */
 .input-sm {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
@@ -197,13 +199,12 @@ defineExpose({ focus })
   height: 52px;
 }
 
-/* With icons */
 .input-with-icon {
-  padding-left: 40px;
+  padding-left: var(--space-10);
 }
 
 .input-with-icon-right {
-  padding-right: 40px;
+  padding-right: var(--space-10);
 }
 
 .input-icon {
@@ -216,19 +217,16 @@ defineExpose({ focus })
   transition: color var(--transition-fast);
 }
 
-.input-icon:hover {
-  color: var(--color-text-primary);
-}
-
 .input-icon-left {
   left: var(--space-3);
 }
 
 .input-icon-right {
   right: var(--space-3);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
 }
 
-/* Error state */
 .input-error {
   border-color: var(--color-error);
 }
@@ -242,5 +240,10 @@ defineExpose({ focus })
   font-size: var(--text-sm);
   color: var(--color-error);
   margin: 0;
+}
+
+.input-password {
+  letter-spacing: 2px;
+  font-size: var(--text-sm);
 }
 </style>

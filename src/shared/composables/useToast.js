@@ -11,7 +11,7 @@ export function useToast() {
       id,
       message: options.message || '',
       variant: options.variant || 'info',
-      duration: options.duration || 3000,
+      duration: options.duration ?? 3000,
       closable: options.closable !== false,
     }
 

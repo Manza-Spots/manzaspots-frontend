@@ -39,7 +39,7 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     backgroundColor: '#000000',
-    scrollEnabled: false,
+    scrollEnabled: true,
     webContentsDebuggingEnabled: true,
   },
 }
