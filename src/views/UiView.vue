@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '@/features/auth/composables/useAuth'
 import Icon from '@/shared/components/Icon.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
-import Input from '@/shared/components/Input.vue'
+import Input from '@/shared/components/InputComponent.vue'
 import Textarea from '@/shared/components/Textarea.vue'
 import Select from '@/shared/components/Select.vue'
 import Checkbox from '@/shared/components/CheckboxComponent.vue'
@@ -80,7 +80,6 @@ const handleLogout = async () => {
         </Card>
       </header>
 
-      <!-- Icons -->
       <section class="showcase-section">
         <h2>Iconos</h2>
         <Card padding="lg">
@@ -121,7 +120,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Buttons -->
       <section class="showcase-section">
         <h2>Botones</h2>
         <Card padding="lg">
@@ -156,7 +154,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Inputs -->
       <section class="showcase-section">
         <h2>Inputs</h2>
         <Card padding="lg">
@@ -188,7 +185,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Textarea -->
       <section class="showcase-section">
         <h2>Textarea</h2>
         <Card padding="lg">
@@ -212,7 +208,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Select -->
       <section class="showcase-section">
         <h2>Select</h2>
         <Card padding="lg">
@@ -229,7 +224,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Checkbox -->
       <section class="showcase-section">
         <h2>Checkbox</h2>
         <Card padding="lg">
@@ -259,7 +253,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Radio -->
       <section class="showcase-section">
         <h2>Radio</h2>
         <Card padding="lg">
@@ -285,7 +278,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Switch -->
       <section class="showcase-section">
         <h2>Switch</h2>
         <Card padding="lg">
@@ -298,7 +290,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Badges -->
       <section class="showcase-section">
         <h2>Badges</h2>
         <Card padding="lg">
@@ -335,7 +326,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Alerts -->
       <section class="showcase-section">
         <h2>Alertas</h2>
         <Card padding="lg">
@@ -355,7 +345,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Avatars -->
       <section class="showcase-section">
         <h2>Avatars</h2>
         <Card padding="lg">
@@ -422,7 +411,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Cards -->
       <section class="showcase-section">
         <h2>Cards</h2>
         <div class="card-grid">
@@ -453,7 +441,6 @@ const handleLogout = async () => {
         </div>
       </section>
 
-      <!-- Modal -->
       <section class="showcase-section">
         <h2>Modal</h2>
         <Card padding="lg">
@@ -461,7 +448,6 @@ const handleLogout = async () => {
         </Card>
       </section>
 
-      <!-- Toast -->
       <section class="showcase-section">
         <h2>Toast / Notificaciones</h2>
         <Card padding="lg">
@@ -475,7 +461,6 @@ const handleLogout = async () => {
       </section>
     </div>
 
-    <!-- Modal Demo -->
     <Modal v-model="showModal" title="Ejemplo de Modal" size="md">
       <div class="modal-content">
         <p>Este es un ejemplo de modal con nuestro sistema de diseño.</p>
@@ -546,7 +531,6 @@ const handleLogout = async () => {
   font-weight: var(--font-medium);
 }
 
-/* Grids */
 .icon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));

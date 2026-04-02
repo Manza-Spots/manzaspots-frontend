@@ -12,7 +12,16 @@ const route = useRoute()
 const { markReady } = useAppReady()
 
 const hideBottomNav = computed(() => {
-  const hiddenRoutes = ['/ui', '/terms', '/privacy']
+  const hiddenRoutes = [
+    '/ui', 
+    '/terms', 
+    '/privacy', 
+    '/login', 
+    '/register', 
+    '/forgot-password',
+    '/reset-password',
+    '/email-verified'
+  ]
   return hiddenRoutes.includes(route.path)
 })
 

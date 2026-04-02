@@ -11,6 +11,7 @@ export function useAuth() {
   const isAuthenticated = computed(() => authStore.isAuthenticated)
   const user = computed(() => authStore.user)
   const loading = computed(() => authStore.loading)
+  const registrationEmail = computed(() => authStore.registrationEmail)
 
   async function login(credentials, redirectTo = '/') {
     try {
@@ -23,27 +24,86 @@ export function useAuth() {
     } catch (error) {
       console.error('Login failed:', error)
 
+      if (!error.fieldErrors) {
+        toast.error(error.message || 'Error al iniciar sesión')
+      }
+
       throw error
     }
   }
 
-  async function register(userData, redirectTo = '/') {
+  async function register(userData, redirectTo = '/email-verified') {
     try {
-      await authStore.register(userData)
-      toast.success(`¡Bienvenido, ${authStore.userName}! Tu cuenta ha sido creada.`)
+      const normalizeUserData = {
+        ...userData,
+        email: userData.email.toLowerCase()
+      }
+      await authStore.register(normalizeUserData)
+
+      toast.info(`Revisa tu correo para activar tu cuenta`, {
+        duration: 5000,
+        closable: false
+      })
 
       router.replace(redirectTo)
 
       return true
     } catch (error) {
-      console.error('Register failed:', error)
-
-      if (error.status === 400 || error.status === 422) {
-        if (error.data?.email) {
-          toast.error('Este email ya está registrado')
-        }
+      if (error.fieldErrors) {
+        throw error
       }
+      
+      toast.error(error.message || 'Error al registrarse')
 
+      throw error
+    }
+  }
+
+  async function requestPasswordReset(email) {
+    try {
+      await authStore.requestPasswordReset(email)
+      return true
+    } catch (error) {
+      if (error.fieldErrors) {
+        throw error
+      }
+      toast.error(error.message || 'Error al recuperar contraseña')
+      throw error
+    }
+  }
+
+  async function confirmPasswordReset(data) {
+    try {
+      await authStore.confirmPasswordReset(data)
+      return true
+    } catch (error) {
+      if (error.fieldErrors) {
+        throw error
+      }
+      toast.error(error.message || 'Error al restablecer contraseña')
+      throw error
+    }
+  }
+
+  async function verifyEmail(tokenStr) {
+    try {
+      await authStore.verifyEmail(tokenStr)
+      return true
+    } catch (error) {
+      if (error.fieldErrors) throw error
+      toast.error(error.message || 'Error al validar correo.')
+      throw error
+    }
+  }
+
+  async function resendVerificationEmail(email) {
+    try {
+      await authStore.resendVerificationEmail(email)
+      toast.success('Correo de verificación reenviado exitosamente.')
+      return true
+    } catch (error) {
+      if (error.fieldErrors) throw error
+      toast.error(error.message || 'Error al reenviar correo.')
       throw error
     }
   }
@@ -75,10 +135,15 @@ export function useAuth() {
     isAuthenticated,
     user,
     loading,
+    registrationEmail,
 
     // Methods
     login,
     register,
+    requestPasswordReset,
+    confirmPasswordReset,
+    verifyEmail,
+    resendVerificationEmail,
     logout,
     hasPermission,
     hasRole,

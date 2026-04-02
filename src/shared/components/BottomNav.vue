@@ -206,8 +206,8 @@ const floatingButton = computed(() => {
       show: true,
     },
     '/profile': {
-      icon: 'Search',
-      action: 'search',
+      icon: 'Settings',
+      action: 'settings',
       show: true,
     },
   }
@@ -315,7 +315,7 @@ const handleFloatingAction = () => {
             v-model="searchQuery"
             type="text"
             class="search-input"
-            placeholder="Artistas, canciones, letras..."
+            placeholder="Buscar"
             @input="handleSearch"
             @blur="handleBlur"
           />
@@ -348,14 +348,16 @@ const handleFloatingAction = () => {
 .bottom-nav--gradient {
   background: linear-gradient(
     to top,
-    rgba(85, 85, 85, 0.45) 0%,
-    rgba(85, 85, 85, 0.41) 19%,
-    rgba(85, 85, 85, 0.32) 34%,
-    rgba(85, 85, 85, 0.21) 47%,
-    rgba(85, 85, 85, 0.12) 60%,
-    rgba(85, 85, 85, 0.06) 73%,
-    rgba(85, 85, 85, 0.02) 86%,
-    rgba(85, 85, 85, 0) 100%
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.81) 19%,
+    rgba(255, 255, 255, 0.72) 34%,
+    rgba(255, 255, 255, 0.61) 47%,
+    rgba(255, 255, 255, 0.52) 60%,
+    rgba(255, 255, 255, 0.46) 73%,
+    rgba(255, 255, 255, 0.32) 80%,
+    rgba(255, 255, 255, 0.16) 86%,
+    rgba(255, 255, 255, 0.02) 92%,
+    rgba(255, 255, 255, 0) 100%
   );
 }
 
@@ -381,17 +383,18 @@ const handleFloatingAction = () => {
   top: 0;
   left: 0;
   display: flex;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255, 255, 255);
   -webkit-backdrop-filter: saturate(180%) blur(2px);
   backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   height: 56px;
   width: calc(100% - 56px - var(--space-2));
-  clip-path: inset(0 0 0 0 round 100px);
+  overflow: hidden;
   transform: scale(1);
   transform-origin: center center;
   transition:
-    clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
     transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: clip-path, transform;
   cursor: pointer;
@@ -408,7 +411,7 @@ const handleFloatingAction = () => {
   transform: scale(1.05);
 }
 .nav-pill.is-compact {
-  clip-path: inset(0 calc(100% - 56px) 0 0 round 100px);
+  width: 56px;
 }
 
 .nav-pill-content,
@@ -453,10 +456,11 @@ const handleFloatingAction = () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255, 255, 255);
   -webkit-backdrop-filter: saturate(180%) blur(2px);
   backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   height: 56px;
   width: 56px;
   padding: 0 16px;
@@ -559,7 +563,7 @@ const handleFloatingAction = () => {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--color-text-primary);
-  flex: 1 1 0px;
+  flex: 1 0 0px;
   min-width: 72px;
   touch-action: manipulation;
   -webkit-user-select: none;

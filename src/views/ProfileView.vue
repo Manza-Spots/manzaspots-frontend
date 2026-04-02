@@ -1,28 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuth } from '@/features/auth/composables/useAuth'
-import LoginView from '@/features/auth/views/LoginView.vue'
-import RegisterView from '@/features/auth/views/RegisterView.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Avatar from '@/shared/components/Avatar.vue'
 import Card from '@/shared/components/Card.vue'
+import Icon from '@/shared/components/Icon.vue'
 
+const router = useRouter()
 const { isAuthenticated, user, logout } = useAuth()
 
-const authMode = ref('login')
-
-const switchToRegister = () => {
-  authMode.value = 'register'
-}
-
-const switchToLogin = () => {
-  authMode.value = 'login'
-}
+const goToLogin = () => router.push('/login')
+const goToRegister = () => router.push('/register')
 </script>
 
 <template>
-  <div class="profile-view" :class="{ 'profile-view--auth': !isAuthenticated }">
-    <!-- Authenticated: show profile -->
+  <div class="profile-view" :class="{ 'profile-view--welcome': !isAuthenticated }">
     <template v-if="isAuthenticated">
       <div class="profile-header">
         <h1>Perfil</h1>
@@ -43,21 +35,30 @@ const switchToLogin = () => {
       </div>
     </template>
 
-    <!-- Not authenticated: show login or register -->
     <template v-else>
-      <div class="auth-container">
-        <Transition name="auth-slide" mode="out-in">
-          <LoginView
-            v-if="authMode === 'login'"
-            key="login"
-            @switch-to-register="switchToRegister"
-          />
-          <RegisterView
-            v-else
-            key="register"
-            @switch-to-login="switchToLogin"
-          />
-        </Transition>
+      <div class="welcome-container">
+        <div class="welcome-hero">
+          <div class="welcome-icon-ring">
+            <Icon name="MapPin" :size="48" class="welcome-icon" />
+          </div>
+          <h1 class="welcome-title">Manza Spots</h1>
+          <p class="welcome-subtitle">
+            Descubre, comparte y guarda los mejores lugares de tu ciudad
+          </p>
+        </div>
+
+        <div class="welcome-actions">
+          <Button variant="primary" full-width @click="goToLogin">
+            Iniciar sesión
+          </Button>
+          <Button variant="outline" full-width @click="goToRegister">
+            Crear cuenta
+          </Button>
+        </div>
+
+        <p class="welcome-footer-text">
+          Explora libremente o crea tu cuenta para guardar tus spots favoritos
+        </p>
       </div>
     </template>
   </div>
@@ -71,15 +72,13 @@ const switchToLogin = () => {
   background: var(--color-bg);
 }
 
-/* When showing auth forms: fixed-height scroll container */
-.profile-view--auth {
-  height: 100vh;
-  min-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+.profile-view--welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  padding-top: calc(var(--safe-area-inset-top) + var(--space-6));
+  padding-bottom: calc(120px + var(--safe-area-inset-bottom));
 }
 
 .profile-header {
@@ -122,24 +121,65 @@ const switchToLogin = () => {
   margin: 0;
 }
 
-/* Auth container — fills viewport, scroll happens on .profile-view--auth */
-.auth-container {
-  position: relative;
+.welcome-container {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-/* Slide transition for auth forms */
-.auth-slide-enter-active,
-.auth-slide-leave-active {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+.welcome-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-10);
 }
 
-.auth-slide-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
+.welcome-icon-ring {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
 }
 
-.auth-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
+.welcome-icon {
+  color: var(--color-primary);
+}
+
+.welcome-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2) 0;
+  letter-spacing: -0.02em;
+}
+
+.welcome-subtitle {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+  max-width: 280px;
+}
+
+.welcome-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.welcome-footer-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
 }
 </style>

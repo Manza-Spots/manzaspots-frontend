@@ -1,12 +1,14 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useForm } from '@/shared/composables/useForm'
 import { useAuth } from '@/features/auth/composables/useAuth'
-import Input from '@/shared/components/Input.vue'
+import Input from '@/shared/components/InputComponent.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
+import Icon from '@/shared/components/Icon.vue'
 import { useValidation } from '@/shared/composables/useValidation'
 
-const emit = defineEmits(['switch-to-register'])
+const router = useRouter()
 
 const { login } = useAuth()
 const { validators } = useValidation()
@@ -37,11 +39,6 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
         } catch (error) {
           if (error.fieldErrors) {
             setErrors(error.fieldErrors)
-          } else if (error.status === 401) {
-            setErrors({
-              email: ' ',
-              password: 'Email o contraseña incorrectos',
-            })
           }
         }
       },
@@ -51,13 +48,21 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+
+const goToForgetPassword = () => router.push('/forgot-password')
+
+const goToProfile = () => router.push('/profile')
+
 </script>
 
 <template>
   <div class="login-view">
+    <button class="back-button" @click="goToProfile()">
+      <Icon name="ArrowLeft"/>
+    </button>
     <div class="login-container">
       <div class="login-header">
-        <h1 class="title">Bienvenido</h1>
+        <h1 class="title">¡Bienvenido!</h1>
         <p class="subtitle">Inicia sesión para continuar tu aventura</p>
       </div>
 
@@ -66,7 +71,7 @@ const togglePassword = () => {
           :model-value="values.email"
           type="email"
           label="Email"
-          placeholder="tu@email.com"
+          placeholder="ejemplo@email.com"
           icon="Mail"
           autocomplete="email"
           :error="errors.email"
@@ -85,22 +90,14 @@ const togglePassword = () => {
           autocomplete="current-password"
           :error="errors.password"
           :disabled="isSubmitting"
+          :icon-right-size="22"
           @update:model-value="setFieldValue('password', $event)"
           @blur="handleBlur('password')"
           @icon-click="togglePassword"
         />
 
         <div class="form-options">
-          <label class="remember-me">
-            <input
-              v-model="values.rememberMe"
-              type="checkbox"
-              class="checkbox"
-              :disabled="isSubmitting"
-            />
-            <span>Recordarme</span>
-          </label>
-          <button type="button" class="forgot-password" :disabled="isSubmitting">
+          <button type="button" class="forgot-password" :disabled="isSubmitting" @click="goToForgetPassword()">
             ¿Olvidaste tu contraseña?
           </button>
         </div>
@@ -108,12 +105,11 @@ const togglePassword = () => {
         <Button
           type="submit"
           variant="primary"
-          size="lg"
           full-width
           :loading="isSubmitting"
           :disabled="isSubmitting"
         >
-          Iniciar Sesión
+          Iniciar sesión
         </Button>
       </form>
 
@@ -122,7 +118,7 @@ const togglePassword = () => {
       </div>
 
       <div class="social-login">
-        <button type="button" class="social-button google" :disabled="isSubmitting">
+        <button type="button" class="social-button" :disabled="isSubmitting">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
               d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z"
@@ -157,7 +153,7 @@ const togglePassword = () => {
       <div class="login-footer">
         <p>
           ¿No tienes cuenta?
-          <button type="button" class="link" @click="emit('switch-to-register')"> Regístrate </button>
+          <button type="button" class="link" @click="router.push('/register')"> Regístrate </button>
         </p>
       </div>
     </div>
@@ -166,10 +162,33 @@ const togglePassword = () => {
 
 <style scoped>
 .login-view {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--color-bg-primary);
+}
+
+.back-button {
+  position: absolute;
+  top: calc(var(--safe-area-inset-top) + var(--space-4));
+  left: calc(var(--safe-area-inset-left) + var(--space-4));
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  color: var(--color-text-primary);
+  transition: transform 0.2s ease;
+}
+
+.back-button:active {
+  transform: scale(0.9);
 }
 
 .login-container {
@@ -179,15 +198,15 @@ const togglePassword = () => {
   justify-content: center;
   width: 100%;
   max-width: 100%;
-  padding-top: calc(var(--safe-area-inset-top) + var(--space-2));
+  padding-top: calc(var(--safe-area-inset-top) + var(--space-10));
   padding-bottom: calc(120px + var(--safe-area-inset-bottom));
-  padding-left: calc(var(--safe-area-inset-left) + var(--space-4));
-  padding-right: calc(var(--safe-area-inset-right) + var(--space-4));
+  padding-left: calc(var(--safe-area-inset-left) + var(--space-6));
+  padding-right: calc(var(--safe-area-inset-right) + var(--space-6));
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-5);
 }
 
 .title {
@@ -213,26 +232,10 @@ const togglePassword = () => {
 .form-options {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--space-3);
-  margin-top: calc(var(--space-1) * -1);
+  margin-top: calc(var(--space-2) * -1);
   flex-wrap: wrap;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.remember-me .checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--color-primary);
 }
 
 .forgot-password {
@@ -284,7 +287,7 @@ const togglePassword = () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-2);
 }
 
 .social-button {
@@ -292,7 +295,6 @@ const togglePassword = () => {
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   font-size: var(--text-base);
@@ -300,7 +302,7 @@ const togglePassword = () => {
   color: var(--color-text-primary);
   background: white;
   transition: all var(--transition-fast);
-  min-height: 52px;
+  min-height: 45px;
 }
 
 .social-button:active {
@@ -314,12 +316,12 @@ const togglePassword = () => {
 
 .login-footer {
   text-align: center;
-  margin-top: auto;
+  margin-top: var(--space-5);
 }
 
 .login-footer p {
   margin: 0;
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }
 
@@ -327,6 +329,7 @@ const togglePassword = () => {
   color: var(--color-primary);
   font-weight: var(--font-semibold);
   transition: color var(--transition-fast);
+  font-size: var(--text-sm);
 }
 
 .link:active {

@@ -15,14 +15,15 @@ export const authApi = {
 
   /**
    * Registro de nuevo usuario
-   * @param {Object} userData - {email, password1, password2}
+   * @param {Object} userData - {username, email, password, confirm_password}
    * @returns {Promise<Object>} {access, refresh, user}
    */
   async register(userData) {
     const response = await api.post(API_ENDPOINTS.AUTH.REGISTER, {
+      username: userData.username,
       email: userData.email,
-      password1: userData.password,
-      password2: userData.confirmPassword,
+      password: userData.password,
+      confirm_password: userData.confirmPassword,
     })
     return response.data.data
   },
@@ -62,11 +63,13 @@ export const authApi = {
 
   /**
    * Verificar email con token
-   * @param {string} key - Token de verificación
+   * @param {string} token - Token de verificación
    * @returns {Promise<Object>}
    */
-  async verifyEmail(key) {
-    const response = await api.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { key })
+  async verifyEmail(token) {
+    const response = await api.get(API_ENDPOINTS.AUTH.VERIFY_EMAIL, {
+      params: { token }
+    })
     return response.data.data
   },
 
@@ -92,7 +95,7 @@ export const authApi = {
 
   /**
    * Confirmar reset de contraseña
-   * @param {Object} data - {uid, token, new_password1, new_password2}
+   * @param {Object} data - {uid, token, new_password, confirm_new_password}
    * @returns {Promise<Object>}
    */
   async confirmPasswordReset(data) {

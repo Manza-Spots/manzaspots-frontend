@@ -6,6 +6,7 @@ import { storage } from '@/core/storage'
 const TOKEN_KEY = 'access_token'
 const REFRESH_TOKEN_KEY = 'refresh_token'
 const USER_KEY = 'user'
+const REGISTRATION_EMAIL_KEY = 'registration_email'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -14,6 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(false)
   const initialized = ref(false)
+  const registrationEmail = ref(null)
 
   // Getters
   const isAuthenticated = computed(() => !!token.value)
@@ -27,14 +29,19 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
 
-      const [savedToken, savedRefreshToken, savedUser] = await Promise.all([
+      const [savedToken, savedRefreshToken, savedUser, savedRegEmail] = await Promise.all([
         storage.get(TOKEN_KEY),
         storage.get(REFRESH_TOKEN_KEY),
         storage.get(USER_KEY),
+        storage.get(REGISTRATION_EMAIL_KEY),
       ])
 
       if (savedToken) {
         token.value = savedToken
+      }
+
+      if (savedRegEmail) {
+        registrationEmail.value = savedRegEmail
       }
 
       if (savedRefreshToken) {
@@ -87,15 +94,54 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authApi.register(userData)
 
-      await setToken(response.access)
-      await setRefreshToken(response.refresh)
+      registrationEmail.value = userData.email
+      await storage.set(REGISTRATION_EMAIL_KEY, userData.email)
 
-      if (response.user) {
-        await setUser(response.user)
-      } else {
-        await fetchUser()
-      }
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
 
+  async function requestPasswordReset(email) {
+    loading.value = true
+    try {
+      const response = await authApi.requestPasswordReset(email)
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function confirmPasswordReset(data) {
+    loading.value = true
+    try {
+      const response = await authApi.confirmPasswordReset(data)
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function verifyEmail(tokenStr) {
+    loading.value = true
+    try {
+      const response = await authApi.verifyEmail(tokenStr)
+      // Cleanup after success
+      registrationEmail.value = null
+      await storage.remove(REGISTRATION_EMAIL_KEY)
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function resendVerificationEmail(email) {
+    loading.value = true
+    try {
+      const targetEmail = email || registrationEmail.value
+      if (!targetEmail) throw new Error('No hay un correo asociado para reeneviar.')
+      const response = await authApi.resendVerificationEmail(targetEmail)
       return response
     } finally {
       loading.value = false
@@ -151,11 +197,13 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     refreshToken.value = null
     user.value = null
+    registrationEmail.value = null
 
     await Promise.all([
       storage.remove(TOKEN_KEY),
       storage.remove(REFRESH_TOKEN_KEY),
       storage.remove(USER_KEY),
+      storage.remove(REGISTRATION_EMAIL_KEY),
     ])
   }
 
@@ -209,6 +257,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     loading,
     initialized,
+    registrationEmail,
 
     // Getters
     isAuthenticated,
@@ -218,6 +267,10 @@ export const useAuthStore = defineStore('auth', () => {
     // Actions
     login,
     register,
+    requestPasswordReset,
+    confirmPasswordReset,
+    verifyEmail,
+    resendVerificationEmail,
     logout,
     fetchUser,
     refreshAccessToken,

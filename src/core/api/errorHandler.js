@@ -16,12 +16,10 @@ export class ErrorHandler {
   }
 
   handle(error) {
-    // Error de red (sin respuesta del servidor)
     if (!error.response) {
       return this.handleNetworkError(error)
     }
 
-    // Error con respuesta del servidor
     const { status, data } = error.response
 
     switch (status) {
@@ -66,6 +64,10 @@ export class ErrorHandler {
     const message = this.extractErrorMessage(data) || 'Solicitud inválida'
     const apiError = new ApiError(message, HTTP_STATUS.BAD_REQUEST, data)
 
+    if (data?.errors?.context && typeof data.errors.context === 'object') {
+      apiError.fieldErrors = this.extractFieldErrors(data.errors.context)
+    }
+
     return apiError
   }
 
@@ -103,9 +105,9 @@ export class ErrorHandler {
     const message = this.extractErrorMessage(data) || 'Error de validación'
     const apiError = new ApiError(message, HTTP_STATUS.UNPROCESSABLE_ENTITY, data)
 
-    // Extraer errores de campo específicos
-    if (data && typeof data === 'object') {
-      apiError.fieldErrors = this.extractFieldErrors(data)
+    const context = data?.errors?.context || data
+    if (context && typeof context === 'object') {
+      apiError.fieldErrors = this.extractFieldErrors(context)
     }
 
     return apiError
@@ -138,19 +140,23 @@ export class ErrorHandler {
     return apiError
   }
 
-  // Helpers
   extractErrorMessage(data) {
     if (!data) return null
+
+    if (data.errors?.context && typeof data.errors.context === 'string') {
+      return data.errors.context
+    }
 
     if (data.detail) return data.detail
     if (data.message) return data.message
     if (data.error) return data.error
 
+    if (data.errors?.context && typeof data.errors.context === 'object') {
+      return this.extractFromValidationObject(data.errors.context)
+    }
+
     if (typeof data === 'object' && !Array.isArray(data)) {
-      const firstKey = Object.keys(data)[0]
-      if (firstKey && Array.isArray(data[firstKey])) {
-        return data[firstKey][0]
-      }
+      return this.extractFromValidationObject(data)
     }
 
     if (Array.isArray(data) && data.length > 0) {
@@ -160,15 +166,31 @@ export class ErrorHandler {
     return null
   }
 
+  extractFromValidationObject(obj) {
+    const firstKey = Object.keys(obj)[0]
+    if (!firstKey) return null
+    
+    const value = obj[firstKey]
+    if (Array.isArray(value) && value.length > 0) {
+      return value[0]
+    }
+    if (typeof value === 'string') {
+      return value
+    }
+    return null
+  }
+
   extractFieldErrors(data) {
     const fieldErrors = {}
 
     if (typeof data === 'object' && !Array.isArray(data)) {
       Object.keys(data).forEach((field) => {
-        if (Array.isArray(data[field])) {
-          fieldErrors[field] = data[field][0]
-        } else if (typeof data[field] === 'string') {
-          fieldErrors[field] = data[field]
+        const value = data[field]
+
+        if (Array.isArray(value)) {
+          fieldErrors[field] = value[0]
+        } else if (typeof value === 'string') {
+          fieldErrors[field] = value
         }
       })
     }
