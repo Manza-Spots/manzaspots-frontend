@@ -22,10 +22,6 @@ function toggleLocale() {
 
 <style scoped>
 .lang-switcher {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 9999;
   display: flex;
   align-items: center;
   gap: 6px;
