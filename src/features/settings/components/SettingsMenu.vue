@@ -5,6 +5,7 @@ import Icon from '@/shared/components/Icon.vue'
 import ButtonComponent from '@/shared/components/ButtonComponent.vue'
 import { useAuth } from '@/features/auth/composables/useAuth'
 import { useTheme } from '@/shared/composables/useTheme'
+import { Preferences } from '@capacitor/preferences'
 
 const { t, locale } = useI18n()
 const emit = defineEmits(['close'])
@@ -23,8 +24,16 @@ const onThemeChange = (e) => {
   setTheme(e.target.value)
 }
 
-const onLanguageChange = (e) => {
-  locale.value = e.target.value
+const onLanguageChange = async (e) => {
+  const newLang = e.target.value
+  locale.value = newLang
+  
+  // Grabamos en nativo
+  try {
+    await Preferences.set({ key: 'manzaspots_language_preference', value: newLang })
+  } catch (error) {
+    console.warn('No se pudo guardar la preferencia de idioma', error)
+  }
 }
 </script>
 

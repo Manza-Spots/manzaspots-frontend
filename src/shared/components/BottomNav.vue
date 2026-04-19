@@ -674,10 +674,8 @@ const handleFloatingAction = () => {
   color: var(--color-text-tertiary);
 }
 
-@media (prefers-color-scheme: dark) {
-  .nav-pill,
-  .action-pill {
-    background: rgba(28, 28, 30, 0.7);
-  }
+:global(html.dark) .nav-pill,
+:global(html.dark) .action-pill {
+  background: rgba(28, 28, 30, 0.7);
 }
 </style>
