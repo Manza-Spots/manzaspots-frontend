@@ -5,12 +5,14 @@ import { RouterView } from 'vue-router'
 import PWAUpdatePrompt from '@/shared/components/PWAUpdatePrompt.vue'
 import OfflineIndicator from '@/shared/components/OfflineIndicator.vue'
 import ToastContainer from '@/shared/components/ToastContainer.vue'
+import BottomSheet from '@/shared/components/BottomSheet.vue'
 import BottomNav from './shared/components/BottomNav.vue'
-import LanguageSwitcher from './shared/components/LanguageSwitcher.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
+import { useTheme } from '@/shared/composables/useTheme'
 
 const route = useRoute()
 const { markReady } = useAppReady()
+const { initializeTheme } = useTheme()
 
 const hideBottomNav = computed(() => {
   const hiddenRoutes = [
@@ -28,15 +30,16 @@ const hideBottomNav = computed(() => {
 
 onMounted(() => {
   markReady()
+  initializeTheme()
 })
 </script>
 
 <template>
   <div id="app">
-    <LanguageSwitcher />
     <OfflineIndicator />
     <PWAUpdatePrompt />
     <ToastContainer />
+    <BottomSheet />
 
     <RouterView />
 

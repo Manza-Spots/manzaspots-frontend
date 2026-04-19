@@ -2,6 +2,8 @@
   "buttons": {
     "back": "Volver",
     "cancel": "Cancelar",
+    "close": "Cerrar",
+    "logout": "Cerrar sesión",
     "confirm": "Confirmar",
     "save": "Guardar",
     "loading": "Cargando..."

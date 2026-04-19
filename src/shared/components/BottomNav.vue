@@ -3,12 +3,15 @@ import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Icon from './Icon.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import SettingsMenu from '@/features/settings/components/SettingsMenu.vue'
 
 import { Keyboard } from '@capacitor/keyboard'
 
 const router = useRouter()
 const route = useRoute()
 const { isAppReady } = useAppReady()
+const bottomSheet = useBottomSheet()
 
 const isSearching = ref(false)
 const searchQuery = ref('')
@@ -220,8 +223,22 @@ const openSearch = () => {
   isSearching.value = true
 }
 
+
 const closeSearch = () => {
   isSearching.value = false
+}
+
+const openSettings = () => {
+  bottomSheet.open(SettingsMenu,
+    // Props opcionales que quieras pasarle al SettingsMenu
+    { userId: 123 },
+    // Configuración propia del BottomSheet (opcional, sobreescribe los por defecto)
+    {
+      title: 'Configuraciones',
+      closable: true,
+      closeOnBackdrop: true
+    }
+  )
 }
 
 const handleSearch = () => {
@@ -244,6 +261,8 @@ const clearSearch = () => {
 const handleFloatingAction = () => {
   if (floatingButton.value.action === 'search') {
     openSearch()
+  }else if(floatingButton.value.action === 'settings') {
+    openSettings()
   }
 }
 </script>
