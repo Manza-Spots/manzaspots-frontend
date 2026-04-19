@@ -9,10 +9,13 @@ import BottomSheet from '@/shared/components/BottomSheet.vue'
 import BottomNav from './shared/components/BottomNav.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useTheme } from '@/shared/composables/useTheme'
+import { useI18n } from 'vue-i18n'
+import { Preferences } from '@capacitor/preferences'
 
 const route = useRoute()
 const { markReady } = useAppReady()
 const { initializeTheme } = useTheme()
+const { locale } = useI18n()
 
 const hideBottomNav = computed(() => {
   const hiddenRoutes = [
@@ -28,9 +31,21 @@ const hideBottomNav = computed(() => {
   return hiddenRoutes.includes(route.path)
 })
 
-onMounted(() => {
+onMounted(async () => {
   markReady()
-  initializeTheme()
+  
+  // Persistencia de Idioma Nativa
+  try {
+    const { value } = await Preferences.get({ key: 'manzaspots_language_preference' })
+    if (value) {
+      locale.value = value
+    }
+  } catch(e) {
+    // Falla limpia, asume locale del sistema web
+  }
+  
+  // Persistencia de Tema Nativo
+  await initializeTheme()
 })
 </script>
 

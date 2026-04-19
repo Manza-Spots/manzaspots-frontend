@@ -56,13 +56,11 @@ function toggleLocale() {
   letter-spacing: 0.02em;
 }
 
-@media (prefers-color-scheme: dark) {
-  .lang-switcher {
-    background: rgba(28, 28, 30, 0.75);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  .lang-label {
-    color: #f2f2f7;
-  }
+:global(html.dark) .lang-switcher {
+  background: rgba(28, 28, 30, 0.75);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+:global(html.dark) .lang-label {
+  color: #f2f2f7;
 }
 </style>

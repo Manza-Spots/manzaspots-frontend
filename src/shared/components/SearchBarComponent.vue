@@ -174,10 +174,8 @@ watch(
   transform: translateY(20px);
 }
 
-@media (prefers-color-scheme: dark) {
-  .back-button,
-  .search-container {
-    background: rgba(28, 28, 30, 0.85);
-  }
+:global(html.dark) .back-button,
+:global(html.dark) .search-container {
+  background: rgba(28, 28, 30, 0.85);
 }
 </style>

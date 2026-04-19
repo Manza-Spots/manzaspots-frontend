@@ -1,13 +1,19 @@
 import { ref } from 'vue'
+import { Preferences } from '@capacitor/preferences'
 
 const storageKey = 'manzaspots_theme_preference'
 const currentTheme = ref(localStorage.getItem(storageKey) || 'system')
 let matchMediaInstance = null
 
 export function useTheme() {
-  const setTheme = (theme) => {
+  const setTheme = async (theme) => {
     currentTheme.value = theme
-    localStorage.setItem(storageKey, theme)
+    localStorage.setItem(storageKey, theme) // Web fallback
+    try {
+      await Preferences.set({ key: storageKey, value: theme })
+    } catch (error) {
+      console.warn('Preferences API falló, usando solo localStorage', error)
+    }
     applyTheme(theme)
   }
 
@@ -39,11 +45,23 @@ export function useTheme() {
     }
   }
 
-  const initializeTheme = () => {
+  const initializeTheme = async () => {
     if (window.matchMedia) {
       matchMediaInstance = window.matchMedia('(prefers-color-scheme: dark)')
       matchMediaInstance.addEventListener('change', handleSystemThemeChange)
     }
+
+    // Cargar preferencia nativa en dispositivos iOS/Android si existe
+    try {
+      const { value } = await Preferences.get({ key: storageKey })
+      if (value) {
+        currentTheme.value = value
+        localStorage.setItem(storageKey, value) // Sincronizar el fallback
+      }
+    } catch (e) {
+      // Usar silencio; si falla (e.g. entorno web sin soporte completo) conservamos el localStorage original
+    }
+
     applyTheme(currentTheme.value)
   }
 

@@ -123,30 +123,28 @@ const variantIcons = {
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .toast-info {
-    background-color: rgba(30, 58, 138, 0.95);
-    color: #bfdbfe;
-    border-color: #1e40af;
-  }
+:global(html.dark) .toast-info {
+  background-color: rgba(30, 58, 138, 0.95);
+  color: #bfdbfe;
+  border-color: #1e40af;
+}
 
-  .toast-success {
-    background-color: rgba(6, 95, 70, 0.95);
-    color: #a7f3d0;
-    border-color: #065f46;
-  }
+:global(html.dark) .toast-success {
+  background-color: rgba(6, 95, 70, 0.95);
+  color: #a7f3d0;
+  border-color: #065f46;
+}
 
-  .toast-warning {
-    background-color: rgba(146, 64, 14, 0.95);
-    color: #fde68a;
-    border-color: #92400e;
-  }
+:global(html.dark) .toast-warning {
+  background-color: rgba(146, 64, 14, 0.95);
+  color: #fde68a;
+  border-color: #92400e;
+}
 
-  .toast-error {
-    background-color: rgba(153, 27, 27, 0.95);
-    color: #fecaca;
-    border-color: #991b1b;
-  }
+:global(html.dark) .toast-error {
+  background-color: rgba(153, 27, 27, 0.95);
+  color: #fecaca;
+  border-color: #991b1b;
 }
 
 @media (max-width: 640px) {
