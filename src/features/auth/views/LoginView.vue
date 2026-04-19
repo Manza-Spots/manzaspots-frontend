@@ -10,7 +10,7 @@ import { useValidation } from '@/shared/composables/useValidation'
 
 const router = useRouter()
 
-const { login } = useAuth()
+const { login, webGoogleLogin, nativeGoogleLogin, isNative } = useAuth()
 const { validators } = useValidation()
 
 const showPassword = ref(false)
@@ -47,6 +47,14 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
+}
+
+const handleGoogleLogin = () => {
+  webGoogleLogin()
+}
+
+const handleNativeGoogleLogin = () => {
+  nativeGoogleLogin()
 }
 
 const goToForgetPassword = () => router.push('/forgot-password')
@@ -118,24 +126,22 @@ const goToProfile = () => router.push('/profile')
       </div>
 
       <div class="social-login">
-        <button type="button" class="social-button" :disabled="isSubmitting">
+        <button v-if="isNative" type="button" class="social-button" :disabled="isSubmitting" @click="handleNativeGoogleLogin()">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z"
-              fill="#4285F4"
-            />
-            <path
-              d="M10.2 20C12.9 20 15.1709 19.1045 16.8182 17.5773L13.5864 15.0682C12.6864 15.6682 11.5491 16.0227 10.2 16.0227C7.59545 16.0227 5.38182 14.2636 4.58636 11.9H1.25455V14.4909C2.89091 17.7591 6.29545 20 10.2 20Z"
-              fill="#34A853"
-            />
-            <path
-              d="M4.58636 11.9C4.38636 11.3 4.27273 10.6591 4.27273 10C4.27273 9.34091 4.38636 8.7 4.58636 8.1V5.50909H1.25455C0.572727 6.86364 0.2 8.38636 0.2 10C0.2 11.6136 0.572727 13.1364 1.25455 14.4909L4.58636 11.9Z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M10.2 3.97727C11.6682 3.97727 12.9864 4.48182 14.0273 5.47273L16.8909 2.60909C15.1664 0.990909 12.8955 0 10.2 0C6.29545 0 2.89091 2.24091 1.25455 5.50909L4.58636 8.1C5.38182 5.73636 7.59545 3.97727 10.2 3.97727Z"
-              fill="#EA4335"
-            />
+            <path d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z" fill="#4285F4"/>
+            <path d="M10.2 20C12.9 20 15.1709 19.1045 16.8182 17.5773L13.5864 15.0682C12.6864 15.6682 11.5491 16.0227 10.2 16.0227C7.59545 16.0227 5.38182 14.2636 4.58636 11.9H1.25455V14.4909C2.89091 17.7591 6.29545 20 10.2 20Z" fill="#34A853"/>
+            <path d="M4.58636 11.9C4.38636 11.3 4.27273 10.6591 4.27273 10C4.27273 9.34091 4.38636 8.7 4.58636 8.1V5.50909H1.25455C0.572727 6.86364 0.2 8.38636 0.2 10C0.2 11.6136 0.572727 13.1364 1.25455 14.4909L4.58636 11.9Z" fill="#FBBC05"/>
+            <path d="M10.2 3.97727C11.6682 3.97727 12.9864 4.48182 14.0273 5.47273L16.8909 2.60909C15.1664 0.990909 12.8955 0 10.2 0C6.29545 0 2.89091 2.24091 1.25455 5.50909L4.58636 8.1C5.38182 5.73636 7.59545 3.97727 10.2 3.97727Z" fill="#EA4335"/>
+          </svg>
+          Google
+        </button>
+
+        <button v-else type="button" class="social-button" :disabled="isSubmitting" @click="handleGoogleLogin()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M19.8 10.2273C19.8 9.51818 19.7364 8.83636 19.6182 8.18182H10.2V12.05H15.6109C15.3727 13.3 14.6582 14.3591 13.5864 15.0682V17.5773H16.8182C18.7091 15.8364 19.8 13.2727 19.8 10.2273Z" fill="#4285F4"/>
+            <path d="M10.2 20C12.9 20 15.1709 19.1045 16.8182 17.5773L13.5864 15.0682C12.6864 15.6682 11.5491 16.0227 10.2 16.0227C7.59545 16.0227 5.38182 14.2636 4.58636 11.9H1.25455V14.4909C2.89091 17.7591 6.29545 20 10.2 20Z" fill="#34A853"/>
+            <path d="M4.58636 11.9C4.38636 11.3 4.27273 10.6591 4.27273 10C4.27273 9.34091 4.38636 8.7 4.58636 8.1V5.50909H1.25455C0.572727 6.86364 0.2 8.38636 0.2 10C0.2 11.6136 0.572727 13.1364 1.25455 14.4909L4.58636 11.9Z" fill="#FBBC05"/>
+            <path d="M10.2 3.97727C11.6682 3.97727 12.9864 4.48182 14.0273 5.47273L16.8909 2.60909C15.1664 0.990909 12.8955 0 10.2 0C6.29545 0 2.89091 2.24091 1.25455 5.50909L4.58636 8.1C5.38182 5.73636 7.59545 3.97727 10.2 3.97727Z" fill="#EA4335"/>
           </svg>
           Google
         </button>
@@ -303,6 +309,7 @@ const goToProfile = () => router.push('/profile')
   background: white;
   transition: all var(--transition-fast);
   min-height: 45px;
+  width: 100%;
 }
 
 .social-button:active {
