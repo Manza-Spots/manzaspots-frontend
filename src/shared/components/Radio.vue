@@ -166,8 +166,14 @@ const handleChange = () => {
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-.radio-wrapper:hover .radio-circle {
-  border-color: var(--color-primary);
+@media (hover: hover) {
+  .radio-wrapper:hover .radio-circle {
+    border-color: var(--color-primary);
+  }
+}
+
+.radio-wrapper:active .radio-circle {
+  background-color: var(--color-gray-100);
 }
 
 .radio-disabled {

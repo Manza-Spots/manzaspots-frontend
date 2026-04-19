@@ -11,6 +11,7 @@ import { useAppReady } from '@/shared/composables/useAppReady'
 import { useTheme } from '@/shared/composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import { Preferences } from '@capacitor/preferences'
+import { Keyboard } from '@capacitor/keyboard'
 
 const route = useRoute()
 const { markReady } = useAppReady()
@@ -19,11 +20,11 @@ const { locale } = useI18n()
 
 const hideBottomNav = computed(() => {
   const hiddenRoutes = [
-    '/ui', 
-    '/terms', 
-    '/privacy', 
-    '/login', 
-    '/register', 
+    '/ui',
+    '/terms',
+    '/privacy',
+    '/login',
+    '/register',
     '/forgot-password',
     '/reset-password',
     '/email-verified'
@@ -33,19 +34,31 @@ const hideBottomNav = computed(() => {
 
 onMounted(async () => {
   markReady()
-  
-  // Persistencia de Idioma Nativa
+
   try {
     const { value } = await Preferences.get({ key: 'manzaspots_language_preference' })
     if (value) {
       locale.value = value
     }
   } catch(e) {
-    // Falla limpia, asume locale del sistema web
+    console.error(e)
   }
-  
-  // Persistencia de Tema Nativo
+
   await initializeTheme()
+
+  document.addEventListener('touchend', (e) => {
+    const activeElement = document.activeElement
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+      if (
+        e.target !== activeElement &&
+        e.target.tagName !== 'INPUT' &&
+        e.target.tagName !== 'TEXTAREA'
+      ) {
+        activeElement.blur()
+        Keyboard.hide().catch(() => {})
+      }
+    }
+  })
 })
 </script>
 

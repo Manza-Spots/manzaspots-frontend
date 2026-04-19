@@ -71,6 +71,7 @@ const buttonClasses = computed(() => {
 
 .btn:active:not(.btn-disabled) {
   transform: scale(0.98);
+  filter: brightness(0.95);
 }
 
 .btn-sm {
@@ -96,8 +97,10 @@ const buttonClasses = computed(() => {
   color: white;
 }
 
-.btn-primary:hover:not(.btn-disabled) {
-  background-color: var(--color-primary-dark);
+@media (hover: hover) {
+  .btn-primary:hover:not(.btn-disabled) {
+    background-color: var(--color-primary-dark);
+  }
 }
 
 .btn-secondary {
@@ -105,8 +108,10 @@ const buttonClasses = computed(() => {
   color: white;
 }
 
-.btn-secondary:hover:not(.btn-disabled) {
-  background-color: var(--color-secondary-dark);
+@media (hover: hover) {
+  .btn-secondary:hover:not(.btn-disabled) {
+    background-color: var(--color-secondary-dark);
+  }
 }
 
 .btn-outline {
@@ -115,9 +120,11 @@ const buttonClasses = computed(() => {
   border: 2px solid var(--color-primary);
 }
 
-.btn-outline:hover:not(.btn-disabled) {
-  background-color: var(--color-primary);
-  color: white;
+@media (hover: hover) {
+  .btn-outline:hover:not(.btn-disabled) {
+    background-color: var(--color-primary);
+    color: white;
+  }
 }
 
 .btn-ghost {
@@ -125,8 +132,10 @@ const buttonClasses = computed(() => {
   color: var(--color-text-primary);
 }
 
-.btn-ghost:hover:not(.btn-disabled) {
-  background-color: var(--color-gray-100);
+@media (hover: hover) {
+  .btn-ghost:hover:not(.btn-disabled) {
+    background-color: var(--color-gray-100);
+  }
 }
 
 .btn-danger {
@@ -134,8 +143,10 @@ const buttonClasses = computed(() => {
   color: white;
 }
 
-.btn-danger:hover:not(.btn-disabled) {
-  background-color: #dc2626;
+@media (hover: hover) {
+  .btn-danger:hover:not(.btn-disabled) {
+    background-color: #dc2626;
+  }
 }
 
 .btn-full {

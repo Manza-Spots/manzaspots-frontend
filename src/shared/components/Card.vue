@@ -93,11 +93,18 @@ const cardClasses = computed(() => {
 /* Hover effect */
 .card-hover {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
+@media (hover: hover) {
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+}
+
+.card-hover:active {
+  transform: scale(0.98);
 }
 
 /* Border */

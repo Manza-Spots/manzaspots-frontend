@@ -168,8 +168,14 @@ const checkboxClasses = computed(() => {
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-.checkbox-label:hover .checkbox-box {
-  border-color: var(--color-primary);
+@media (hover: hover) {
+  .checkbox-label:hover .checkbox-box {
+    border-color: var(--color-primary);
+  }
+}
+
+.checkbox-label:active .checkbox-box {
+  background-color: var(--color-gray-100);
 }
 
 .checkbox-disabled .checkbox-label {
