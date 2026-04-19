@@ -6,6 +6,7 @@ import PWAUpdatePrompt from '@/shared/components/PWAUpdatePrompt.vue'
 import OfflineIndicator from '@/shared/components/OfflineIndicator.vue'
 import ToastContainer from '@/shared/components/ToastContainer.vue'
 import BottomNav from './shared/components/BottomNav.vue'
+import LanguageSwitcher from './shared/components/LanguageSwitcher.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 
 const route = useRoute()
@@ -32,6 +33,7 @@ onMounted(() => {
 
 <template>
   <div id="app">
+    <LanguageSwitcher />
     <OfflineIndicator />
     <PWAUpdatePrompt />
     <ToastContainer />

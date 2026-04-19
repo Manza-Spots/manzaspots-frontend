@@ -10,31 +10,31 @@ const router = useRouter()
   <div class="terms-view">
     <div class="container">
       <Card padding="lg" class="terms-content">
-        <h1>Términos y Condiciones</h1>
+        <h1>{{ $t('legal.terms.title') }}</h1>
 
-        <p>Última actualización: {{ new Date().toLocaleDateString() }}</p>
+        <p>{{ $t('legal.terms.updated') }}: {{ new Date().toLocaleDateString() }}</p>
 
         <section>
-          <h2>1. Aceptación de los términos</h2>
-          <p>Al utilizar Hiking Tracker, aceptas estos términos y condiciones.</p>
+          <h2>{{ $t('legal.terms.sections.acceptance.title') }}</h2>
+          <p>{{ $t('legal.terms.sections.acceptance.text') }}</p>
         </section>
 
         <section>
-          <h2>2. Uso del servicio</h2>
-          <p>El servicio está destinado para el seguimiento de rutas de senderismo.</p>
+          <h2>{{ $t('legal.terms.sections.usage.title') }}</h2>
+          <p>{{ $t('legal.terms.sections.usage.text') }}</p>
         </section>
 
         <section>
-          <h2>3. Privacidad</h2>
+          <h2>{{ $t('legal.terms.sections.privacy.title') }}</h2>
           <p>
-            Consulta nuestra
-            <router-link to="/privacy" class="link">Política de Privacidad</router-link>
-            para más información.
+            {{ $t('legal.terms.sections.privacy.intro') }}
+            <router-link to="/privacy" class="link">{{ $t('legal.terms.sections.privacy.link') }}</router-link>
+            {{ $t('legal.terms.sections.privacy.outro') }}
           </p>
         </section>
 
         <div class="actions">
-          <Button variant="primary" @click="router.back()"> Volver </Button>
+          <Button variant="primary" @click="router.back()"> {{ $t('common.buttons.back') }} </Button>
         </div>
       </Card>
     </div>

@@ -17,7 +17,7 @@ const goToRegister = () => router.push('/register')
   <div class="profile-view" :class="{ 'profile-view--welcome': !isAuthenticated }">
     <template v-if="isAuthenticated">
       <div class="profile-header">
-        <h1>Perfil</h1>
+        <h1>{{ $t('profile.title') }}</h1>
       </div>
 
       <div class="profile-content">
@@ -25,12 +25,12 @@ const goToRegister = () => router.push('/register')
           <div class="profile-info">
             <Avatar :name="user?.email" size="xl" />
             <div class="user-details">
-              <h2>{{ user?.email || 'Usuario' }}</h2>
-              <p>{{ user?.first_name || 'Sin nombre' }}</p>
+              <h2>{{ user?.email || $t('profile.details.defaultUser') }}</h2>
+              <p>{{ user?.first_name || $t('profile.details.noName') }}</p>
             </div>
           </div>
 
-          <Button variant="danger" full-width @click="logout"> Cerrar Sesión </Button>
+          <Button variant="danger" full-width @click="logout"> {{ $t('profile.logout') }} </Button>
         </Card>
       </div>
     </template>
@@ -41,23 +41,23 @@ const goToRegister = () => router.push('/register')
           <div class="welcome-icon-ring">
             <Icon name="MapPin" :size="48" class="welcome-icon" />
           </div>
-          <h1 class="welcome-title">Manza Spots</h1>
+          <h1 class="welcome-title">{{ $t('profile.welcome.title') }}</h1>
           <p class="welcome-subtitle">
-            Descubre, comparte y guarda los mejores lugares de tu ciudad
+            {{ $t('profile.welcome.subtitle') }}
           </p>
         </div>
 
         <div class="welcome-actions">
           <Button variant="primary" full-width @click="goToLogin">
-            Iniciar sesión
+            {{ $t('profile.welcome.login') }}
           </Button>
           <Button variant="outline" full-width @click="goToRegister">
-            Crear cuenta
+            {{ $t('profile.welcome.register') }}
           </Button>
         </div>
 
         <p class="welcome-footer-text">
-          Explora libremente o crea tu cuenta para guardar tus spots favoritos
+          {{ $t('profile.welcome.footer') }}
         </p>
       </div>
     </template>

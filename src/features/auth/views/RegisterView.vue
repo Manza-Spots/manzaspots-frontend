@@ -8,9 +8,11 @@ import Button from '@/shared/components/ButtonComponent.vue'
 import Checkbox from '@/shared/components/CheckboxComponent.vue'
 import Icon from '@/shared/components/Icon.vue'
 import { useAuth } from '../composables/useAuth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const { register } = useAuth()
+const { t } = useI18n()
 const { validators } = useValidation()
 
 
@@ -28,32 +30,32 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
   },
   {
     username: [
-      validators.required('El usuario es requerido'),
+      validators.required(t('auth.form.errors.usernameRequired')),
       validators.alphanumeric(),
-      validators.minLength(5, 'El usuario debe tener al menos 5 caractéres'),
+      validators.minLength(5, t('auth.form.errors.usernameMin')),
     ],
     email: [
-      validators.required(), 
-      validators.email()
+      validators.required(t('auth.form.errors.emailRequired')), 
+      validators.email(t('auth.form.errors.emailRequired'))
     ],
     password: [
-      validators.required(),
-      validators.minLength(8, 'La contraseña debe tener al menos 8 caracteres'),
+      validators.required(t('auth.form.errors.passwordRequired')),
+      validators.minLength(8, t('auth.form.errors.passwordMin')),
       validators.pattern(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        'Debe contener mayúscula, minúscula y número'
+        t('auth.form.errors.passwordPattern')
       ),
     ],
     confirmPassword: [
-      validators.required('Debes confirmar tu contraseña'),
+      validators.required(t('auth.form.errors.passwordMatch')),
       validators.match(
         () => values.password,
-        'contraseña',
-        'Las contraseñas no coinciden'
+        t('common.labels.password').toLowerCase(),
+        t('auth.form.errors.passwordMatch')
       ),
     ],
     acceptTerms: [
-      validators.custom((value) => value === true, 'Debes aceptar los términos y condiciones'),
+      validators.custom((value) => value === true, t('auth.form.errors.terms')),
     ],
   },
   {
@@ -102,16 +104,16 @@ const goToProfile = () => router.push('/profile')
     </button>
     <div class="register-container">
       <div class="register-header">
-        <h1 class="title">Crear Cuenta</h1>
-        <p class="subtitle">Únete a la comunidad de aventureros</p>
+        <h1 class="title">{{ $t('auth.register.title') }}</h1>
+        <p class="subtitle">{{ $t('auth.register.subtitle') }}</p>
       </div>
 
       <form class="register-form" @submit="handleSubmit">
         <Input
           :model-value="values.username"
           type="text"
-          label="Usuario"
-          placeholder="MaestroCaminante76"
+          :label="$t('common.labels.username')"
+          :placeholder="$t('auth.register.username_placeholder')"
           icon="User"
           autocomplete="username"
           :error="errors.username"
@@ -122,8 +124,8 @@ const goToProfile = () => router.push('/profile')
         <Input
           :model-value="values.email"
           type="email"
-          label="Email"
-          placeholder="ejemplo@email.com"
+          :label="$t('common.labels.email')"
+          :placeholder="$t('common.placeholders.email')"
           icon="Mail"
           autocomplete="email"
           :error="errors.email"
@@ -134,8 +136,8 @@ const goToProfile = () => router.push('/profile')
         <Input
           :model-value="values.password"
           :type="showPassword ? 'text' : 'password'"
-          label="Contraseña"
-          placeholder="••••••••"
+          :label="$t('common.labels.password')"
+          :placeholder="$t('common.placeholders.password')"
           icon="Lock"
           :icon-right="showPassword ? 'EyeOff' : 'Eye'"
           autocomplete="new-password"
@@ -149,8 +151,8 @@ const goToProfile = () => router.push('/profile')
         <Input
           :model-value="values.confirmPassword"
           :type="showConfirmPassword ? 'text' : 'password'"
-          label="Confirmar contraseña"
-          placeholder="••••••••"
+          :label="$t('auth.form.labels.confirmPassword')"
+          :placeholder="$t('common.placeholders.password')"
           icon="Lock"
           :icon-right="showConfirmPassword ? 'EyeOff' : 'Eye'"
           autocomplete="new-password"
@@ -170,13 +172,13 @@ const goToProfile = () => router.push('/profile')
             @blur="handleBlur('acceptTerms')"
           >
             <span class="terms-text">
-              Acepto los
+              {{ $t('auth.register.terms.accept') }}
               <button type="button" class="terms-link" @click="goToTermsAndConditions()">
-                términos y condiciones
+                {{ $t('auth.register.terms.link') }}
               </button>
-              y la
+              {{ $t('auth.register.terms.and') }}
               <button type="button" class="terms-link" @click="goToPolicyPrivacy()">
-                política de privacidad
+                {{ $t('auth.register.terms.privacy') }}
               </button>
             </span>
           </Checkbox>
@@ -189,12 +191,12 @@ const goToProfile = () => router.push('/profile')
           :loading="isSubmitting"
           :disabled="isSubmitting"
         >
-          Crear cuenta
+          {{ $t('auth.register.submit') }}
         </Button>
       </form>
 
       <div class="divider">
-        <span>o regístrate con</span>
+        <span>{{ $t('auth.register.orRegisterWith') }}</span>
       </div>
 
       <div class="social-register">
@@ -217,7 +219,7 @@ const goToProfile = () => router.push('/profile')
               fill="#EA4335"
             />
           </svg>
-          Google
+          {{ $t('auth.google') }}
         </button>
 
         <button type="button" class="social-button apple">
@@ -226,14 +228,14 @@ const goToProfile = () => router.push('/profile')
               d="M16.365 1.43c0 1.14-.465 2.17-1.215 2.94-.75.78-1.98 1.38-3.03 1.29-.135-1.11.435-2.25 1.14-2.97.78-.81 2.085-1.395 3.105-1.26zM20.49 17.19c-.48 1.08-.705 1.56-1.32 2.52-.855 1.335-2.055 3.015-3.54 3.03-1.32.015-1.665-.855-3.465-.855-1.8 0-2.175.84-3.495.87-1.485.06-2.625-1.47-3.48-2.805-2.385-3.69-2.64-8.01-1.17-10.26 1.035-1.605 2.67-2.55 4.2-2.55 1.56 0 2.55.855 3.84.855 1.26 0 2.025-.855 3.825-.855 1.365 0 2.82.75 3.855 2.04-3.405 1.86-2.85 6.72.75 7.98z"
             />
           </svg>
-          Apple
+          {{ $t('auth.apple') }}
         </button>
       </div>
 
       <div class="register-footer">
         <p>
-          ¿Ya tienes cuenta?
-          <button type="button" class="link" @click="goToLogin">Inicia sesión</button>
+          {{ $t('auth.register.alreadyHaveAccount') }}
+          <button type="button" class="link" @click="goToLogin">{{ $t('auth.login') }}</button>
         </p>
       </div>
     </div>

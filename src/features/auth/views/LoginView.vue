@@ -7,10 +7,12 @@ import Input from '@/shared/components/InputComponent.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Icon from '@/shared/components/Icon.vue'
 import { useValidation } from '@/shared/composables/useValidation'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 
 const { login, webGoogleLogin, nativeGoogleLogin, isNative } = useAuth()
+const { t } = useI18n()
 const { validators } = useValidation()
 
 const showPassword = ref(false)
@@ -23,8 +25,14 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
       rememberMe: false,
     },
     {
-      email: [validators.required(), validators.email()],
-      password: [validators.required(), validators.minLength(6)],
+      email: [
+        validators.required(t('auth.form.errors.emailRequired')),
+        validators.email(t('auth.form.errors.emailRequired'))
+      ],
+      password: [
+        validators.required(t('auth.form.errors.passwordRequired')),
+        validators.minLength(8, t('auth.form.errors.passwordMin'))
+      ],
     },
     {
       onSubmit: async (formValues) => {
@@ -70,16 +78,16 @@ const goToProfile = () => router.push('/profile')
     </button>
     <div class="login-container">
       <div class="login-header">
-        <h1 class="title">¡Bienvenido!</h1>
-        <p class="subtitle">Inicia sesión para continuar tu aventura</p>
+        <h1 class="title">{{ t('auth.title') }}</h1>
+        <p class="subtitle">{{ t('auth.subtitle') }}</p>
       </div>
 
       <form class="login-form" @submit="handleSubmit">
         <Input
           :model-value="values.email"
           type="email"
-          label="Email"
-          placeholder="ejemplo@email.com"
+          :label="t('auth.form.labels.email')"
+          :placeholder="t('auth.form.placeholders.email')"
           icon="Mail"
           autocomplete="email"
           :error="errors.email"
@@ -91,8 +99,8 @@ const goToProfile = () => router.push('/profile')
         <Input
           :model-value="values.password"
           :type="showPassword ? 'text' : 'password'"
-          label="Contraseña"
-          placeholder="••••••••"
+          :label="t('auth.form.labels.password')"
+          :placeholder="t('auth.form.placeholders.password')"
           icon="Lock"
           :icon-right="showPassword ? 'EyeOff' : 'Eye'"
           autocomplete="current-password"
@@ -106,7 +114,7 @@ const goToProfile = () => router.push('/profile')
 
         <div class="form-options">
           <button type="button" class="forgot-password" :disabled="isSubmitting" @click="goToForgetPassword()">
-            ¿Olvidaste tu contraseña?
+            {{ t('auth.forgotPassword') }}
           </button>
         </div>
 
@@ -117,12 +125,12 @@ const goToProfile = () => router.push('/profile')
           :loading="isSubmitting"
           :disabled="isSubmitting"
         >
-          Iniciar sesión
+          {{ t('auth.login') }}
         </Button>
       </form>
 
       <div class="divider">
-        <span>o continúa con</span>
+        <span>{{ t('auth.orContinueWith') }}</span>
       </div>
 
       <div class="social-login">
@@ -133,7 +141,7 @@ const goToProfile = () => router.push('/profile')
             <path d="M4.58636 11.9C4.38636 11.3 4.27273 10.6591 4.27273 10C4.27273 9.34091 4.38636 8.7 4.58636 8.1V5.50909H1.25455C0.572727 6.86364 0.2 8.38636 0.2 10C0.2 11.6136 0.572727 13.1364 1.25455 14.4909L4.58636 11.9Z" fill="#FBBC05"/>
             <path d="M10.2 3.97727C11.6682 3.97727 12.9864 4.48182 14.0273 5.47273L16.8909 2.60909C15.1664 0.990909 12.8955 0 10.2 0C6.29545 0 2.89091 2.24091 1.25455 5.50909L4.58636 8.1C5.38182 5.73636 7.59545 3.97727 10.2 3.97727Z" fill="#EA4335"/>
           </svg>
-          Google
+          {{ $t('auth.google') }}
         </button>
 
         <button v-else type="button" class="social-button" :disabled="isSubmitting" @click="handleGoogleLogin()">
@@ -143,7 +151,7 @@ const goToProfile = () => router.push('/profile')
             <path d="M4.58636 11.9C4.38636 11.3 4.27273 10.6591 4.27273 10C4.27273 9.34091 4.38636 8.7 4.58636 8.1V5.50909H1.25455C0.572727 6.86364 0.2 8.38636 0.2 10C0.2 11.6136 0.572727 13.1364 1.25455 14.4909L4.58636 11.9Z" fill="#FBBC05"/>
             <path d="M10.2 3.97727C11.6682 3.97727 12.9864 4.48182 14.0273 5.47273L16.8909 2.60909C15.1664 0.990909 12.8955 0 10.2 0C6.29545 0 2.89091 2.24091 1.25455 5.50909L4.58636 8.1C5.38182 5.73636 7.59545 3.97727 10.2 3.97727Z" fill="#EA4335"/>
           </svg>
-          Google
+          {{ t('auth.google') }}
         </button>
 
         <button type="button" class="social-button apple" :disabled="isSubmitting">
@@ -152,14 +160,14 @@ const goToProfile = () => router.push('/profile')
               d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"
             />
           </svg>
-          Apple
+          {{ t('auth.apple') }}
         </button>
       </div>
 
       <div class="login-footer">
         <p>
-          ¿No tienes cuenta?
-          <button type="button" class="link" @click="router.push('/register')"> Regístrate </button>
+          {{ t('auth.noAccount') }}
+          <button type="button" class="link" @click="router.push('/register')"> {{ t('auth.register.submit') }} </button>
         </p>
       </div>
     </div>

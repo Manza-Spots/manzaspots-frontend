@@ -1,0 +1,54 @@
+{
+  "privacy": {
+    "title": "Política de Privacidad",
+    "updated": "Última actualización",
+    "sections": {
+      "info": {
+        "title": "1. Información que recopilamos",
+        "intro": "Recopilamos información que nos proporcionas directamente:",
+        "items": [
+          "Información de cuenta (email, nombre)",
+          "Datos de ubicación para tracking de rutas",
+          "Información de uso de la aplicación"
+        ]
+      },
+      "usage": {
+        "title": "2. Cómo usamos tu información",
+        "intro": "Utilizamos la información recopilada para:",
+        "items": [
+          "Proporcionar y mejorar nuestros servicios",
+          "Trackear tus rutas de senderismo",
+          "Comunicarnos contigo"
+        ]
+      },
+      "sharing": {
+        "title": "3. Compartir información",
+        "text": "No compartimos tu información personal con terceros sin tu consentimiento."
+      },
+      "security": {
+        "title": "4. Seguridad",
+        "text": "Implementamos medidas de seguridad para proteger tu información."
+      }
+    }
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "updated": "Última actualización",
+    "sections": {
+      "acceptance": {
+        "title": "1. Aceptación de los términos",
+        "text": "Al utilizar Hiking Tracker, aceptas estos términos y condiciones."
+      },
+      "usage": {
+        "title": "2. Uso del servicio",
+        "text": "El servicio está destinado para el seguimiento de rutas de senderismo."
+      },
+      "privacy": {
+        "title": "3. Privacidad",
+        "intro": "Consulta nuestra",
+        "link": "Política de Privacidad",
+        "outro": "para más información."
+      }
+    }
+  }
+}

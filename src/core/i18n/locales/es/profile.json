@@ -1,0 +1,15 @@
+{
+  "title": "Perfil",
+  "logout": "Cerrar sesión",
+  "details": {
+    "noName": "Sin nombre",
+    "defaultUser": "Usuario"
+  },
+  "welcome": {
+    "title": "Manza Spots",
+    "subtitle": "Descubre, comparte y guarda los mejores lugares de tu ciudad",
+    "footer": "Explora libremente o crea tu cuenta para guardar tus spots favoritos",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta"
+  }
+}

@@ -63,19 +63,19 @@ const navItems = [
     name: 'Spots',
     path: '/spots',
     icon: 'MapPin',
-    label: 'Spots',
+    labelKey: 'navigation.spots',
   },
   {
     name: 'RecordRoute',
     path: '/record-route',
     icon: 'Radio',
-    label: 'Grabar',
+    labelKey: 'navigation.record',
   },
   {
     name: 'Profile',
     path: '/profile',
     icon: 'User',
-    label: 'Perfil',
+    labelKey: 'navigation.profile',
   },
 ]
 
@@ -281,7 +281,7 @@ const handleFloatingAction = () => {
               @click.stop="!isSearching && navigateTo(item.path)"
             >
               <Icon :name="item.icon" :size="24" class="nav-item__icon" />
-              <span class="nav-item__label">{{ item.label }}</span>
+              <span class="nav-item__label">{{ $t(item.labelKey) }}</span>
             </button>
           </div>
         </div>
@@ -315,7 +315,7 @@ const handleFloatingAction = () => {
             v-model="searchQuery"
             type="text"
             class="search-input"
-            placeholder="Buscar"
+            :placeholder="$t('common.placeholders.search')"
             @input="handleSearch"
             @blur="handleBlur"
           />

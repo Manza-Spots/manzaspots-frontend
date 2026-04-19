@@ -4,10 +4,12 @@ import { useRouter, useRoute } from 'vue-router'
 import Icon from '@/shared/components/Icon.vue'
 import Button from '@/shared/components/ButtonComponent.vue'
 import { useAuth } from '@/features/auth/composables/useAuth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const route = useRoute()
 const { verifyEmail, resendVerificationEmail, registrationEmail } = useAuth()
+const { t } = useI18n()
 
 const verificationStatus = ref('idle')
 const errorMessage = ref('')
@@ -24,7 +26,7 @@ onMounted(async () => {
       verificationStatus.value = 'success'
     } catch (error) {
       verificationStatus.value = 'error'
-      errorMessage.value = error.message || 'El enlace de verificación es inválido o ha expirado.'
+      errorMessage.value = error.message || t('auth.verify.error.subtitle')
     }
   } else {
     verificationStatus.value = 'idle'
@@ -37,7 +39,7 @@ const handleResend = async () => {
     await resendVerificationEmail()
   } catch (error) {
     verificationStatus.value = 'error'
-    errorMessage.value = error.message || 'El enlace de verificación es inválido o ha expirado.'
+    errorMessage.value = error.message || t('auth.verify.error.subtitle')
   } finally {
     isResending.value = false
   }
@@ -50,30 +52,30 @@ const goToLogin = () => router.push('/login')
   <div class="email-verified-view">
     <div class="verified-container">
       <div v-if="verificationStatus === 'loading'" class="state-container">
-         <h1 class="title">Verificando...</h1>
-         <p class="subtitle">Estamos confirmando tu enlace de acceso seguro.</p>
+         <h1 class="title">{{ $t('auth.verify.loading.title') }}</h1>
+         <p class="subtitle">{{ $t('auth.verify.loading.subtitle') }}</p>
       </div>
       <div v-else-if="verificationStatus === 'success'" class="state-container">
         <div class="icon-circle success">
           <Icon name="CheckCircle" size="48" class="icon-svg" />
         </div>
-        <h1 class="title">¡Correo confirmado!</h1>
+        <h1 class="title">{{ $t('auth.verify.success.title') }}</h1>
         <p class="subtitle">
-          Tu dirección de correo electrónico ha sido verificada exitosamente. Ya tienes acceso completo a todas las funciones de tu cuenta.
+          {{ $t('auth.verify.success.subtitle') }}
         </p>
         <Button variant="primary" full-width class="action-btn" @click="goToLogin">
-          Ir a Iniciar Sesión
+          {{ $t('auth.verify.backToLogin') }}
         </Button>
       </div>
       <div v-else-if="verificationStatus === 'error'" class="state-container">
         <div class="icon-circle error">
           <Icon name="AlertCircle" size="48" class="icon-svg" />
         </div>
-        <h1 class="title">Error de verificación</h1>
+        <h1 class="title">{{ $t('auth.verify.error.title') }}</h1>
         <p class="subtitle text-error">{{ errorMessage }}</p>
         
         <p class="info-text">
-          Puedes solicitar un nuevo enlace de verificación si sientes que el anterior ha dejado de funcionar o ha caducado.
+          {{ $t('auth.verify.error.info') }}
         </p>
 
         <Button 
@@ -84,10 +86,10 @@ const goToLogin = () => router.push('/login')
           :disabled="isResending"
           @click="handleResend"
         >
-          Reenviar correo de verificación
+          {{ $t('auth.verify.resend') }}
         </Button>
         <Button variant="outline" full-width class="action-btn-secondary" @click="goToLogin">
-          Volver al Inicio de Sesión
+          {{ $t('auth.verify.backToLogin') }}
         </Button>
       </div>
 
@@ -95,13 +97,12 @@ const goToLogin = () => router.push('/login')
         <div class="icon-circle info">
           <Icon name="Mail" size="48" class="icon-svg" />
         </div>
-        <h1 class="title">Revisa tu correo</h1>
+        <h1 class="title">{{ $t('auth.verify.idle.title') }}</h1>
         <p class="subtitle">
-          Hemos enviado un correo de verificación a <strong v-if="registrationEmail">{{ registrationEmail }}</strong><span v-else>tu cuenta</span>.
-          Por favor, haz clic en el enlace adjunto para activar tu cuenta.
+          {{ $t('auth.verify.idle.subtitle', { email: registrationEmail || $t('auth.verify.idle.noEmail') }) }}
         </p>
         <p class="info-text">
-          Si no encuentras el correo, por favor revisa tu carpeta de spam o solicita uno nuevo.
+          {{ $t('auth.verify.idle.info') }}
         </p>
         <Button 
           variant="primary" 
@@ -111,10 +112,10 @@ const goToLogin = () => router.push('/login')
           :disabled="isResending"
           @click="handleResend"
         >
-          Reenviar correo de verificación
+          {{ $t('auth.verify.resend') }}
         </Button>
         <Button variant="outline" full-width class="action-btn-secondary" @click="goToLogin">
-          Volver al Inicio de Sesión
+          {{ $t('auth.verify.backToLogin') }}
         </Button>
       </div>
     </div>

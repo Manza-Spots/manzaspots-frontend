@@ -14,13 +14,13 @@ const router = useRouter()
 
         <div class="actions">
           <Button variant="primary" size="lg" @click="router.push({ name: 'Login' })">
-            Iniciar Sesión
+            {{ $t('auth.login') }}
           </Button>
           <Button variant="outline" size="lg" @click="router.push({ name: 'Register' })">
-            Registrarse
+            {{ $t('auth.register.submit') }}
           </Button>
           <Button variant="ghost" size="md" @click="router.push({ name: 'UiShowCase' })">
-            Ver UI
+            {{ $t('profile.details.defaultUser') }} UI
           </Button>
         </div>
       </div>

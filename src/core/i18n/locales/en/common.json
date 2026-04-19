@@ -1,0 +1,30 @@
+{
+  "buttons": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "loading": "Loading..."
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "switchLanguage": "Switch language"
+  },
+  "placeholders": {
+    "email": "example{'@'}email.com",
+    "password": "••••••••",
+    "search": "Search..."
+  },
+  "status": {
+    "pendingContent": "Implementation pending",
+    "loading": "Loading..."
+  },
+  "errors": {
+    "required": "This field is required",
+    "email": "Enter a valid email",
+    "minLength": "Minimum {count} characters",
+    "generic": "Something went wrong, please try again"
+  }
+}

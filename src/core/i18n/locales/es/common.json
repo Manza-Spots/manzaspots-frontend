@@ -1,0 +1,30 @@
+{
+  "buttons": {
+    "back": "Volver",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "loading": "Cargando..."
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Contraseña",
+    "username": "Usuario",
+    "switchLanguage": "Cambiar idioma"
+  },
+  "placeholders": {
+    "email": "ejemplo{'@'}email.com",
+    "password": "••••••••",
+    "search": "Buscar..."
+  },
+  "status": {
+    "pendingContent": "Contenido pendiente de implementación",
+    "loading": "Cargando..."
+  },
+  "errors": {
+    "required": "Este campo es requerido",
+    "email": "Ingresa un email válido",
+    "minLength": "Mínimo {count} caracteres",
+    "generic": "Algo salió mal, intenta de nuevo"
+  }
+}

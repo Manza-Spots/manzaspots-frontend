@@ -1,11 +1,11 @@
 <template>
   <div class="record-route-view">
     <div class="record-route-header">
-      <h1>Grabar Ruta</h1>
+      <h1>{{ $t('navigation.record') }}</h1>
     </div>
 
     <div class="record-route-content">
-      <p>Vista de Grabar Ruta - Contenido pendiente</p>
+      <p>{{ $t('common.status.pendingContent') }}</p>
     </div>
   </div>
 </template>

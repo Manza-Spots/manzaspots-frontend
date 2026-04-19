@@ -7,10 +7,12 @@ import Button from '@/shared/components/ButtonComponent.vue'
 import { useForm } from '@/shared/composables/useForm'
 import { useValidation } from '@/shared/composables/useValidation'
 import { useAuth } from '@/features/auth/composables/useAuth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const route = useRoute()
 const { confirmPasswordReset } = useAuth()
+const { t } = useI18n()
 const { validators } = useValidation()
 
 const resetSuccess = ref(false)
@@ -44,19 +46,19 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
     },
     {
       password: [
-        validators.required(),
-        validators.minLength(8, 'La contraseña debe tener al menos 8 caracteres'),
+        validators.required(t('auth.form.errors.passwordRequired')),
+        validators.minLength(8, t('auth.form.errors.passwordMin')),
         validators.pattern(
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-          'Debe contener mayúscula, minúscula y número'
+          t('auth.form.errors.passwordPattern')
         ),
       ],
       confirmPassword: [
-        validators.required('Debes confirmar tu contraseña'),
+        validators.required(t('auth.form.errors.passwordMatch')),
         validators.match(
           () => values.password,
-          'contraseña',
-          'Las contraseñas no coinciden'
+          t('common.labels.password').toLowerCase(),
+          t('auth.form.errors.passwordMatch')
         ),
       ],
     },
@@ -64,7 +66,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
       onSubmit: async (formValues) => {
         try {
           if (!uidb64.value || !token.value) {
-            setErrors({ password: 'Enlace inválido o expirado. Solicita uno nuevo.' })
+            setErrors({ password: t('auth.reset.errors.invalidLink') })
             return
           }
 
@@ -96,16 +98,16 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
       
       <template v-if="!resetSuccess">
         <div class="reset-header">
-          <h1 class="title">Nueva contraseña</h1>
-          <p class="subtitle">Ingresa tu nueva contraseña, asegúrate de que sea segura</p>
+          <h1 class="title">{{ $t('auth.reset.title') }}</h1>
+          <p class="subtitle">{{ $t('auth.reset.subtitle') }}</p>
         </div>
 
         <form class="reset-form" @submit="handleSubmit">
           <Input
             :model-value="values.password"
             :type="showPassword ? 'text' : 'password'"
-            label="Nueva Contraseña"
-            placeholder="••••••••"
+            :label="$t('auth.reset.labels.newPassword')"
+            :placeholder="$t('common.placeholders.password')"
             icon="Lock"
             :icon-right="showPassword ? 'EyeOff' : 'Eye'"
             autocomplete="new-password"
@@ -119,8 +121,8 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
           <Input
             :model-value="values.confirmPassword"
             :type="showConfirmPassword ? 'text' : 'password'"
-            label="Confirmar nueva contraseña"
-            placeholder="••••••••"
+            :label="$t('auth.reset.labels.confirmNewPassword')"
+            :placeholder="$t('common.placeholders.password')"
             icon="Lock"
             :icon-right="showConfirmPassword ? 'EyeOff' : 'Eye'"
             autocomplete="new-password"
@@ -139,7 +141,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
             :disabled="isSubmitting"
             class="submit-button"
           >
-            Restablecer contraseña
+            {{ $t('auth.reset.submit') }}
           </Button>
         </form>
       </template>
@@ -149,9 +151,9 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
           <div class="icon-circle">
             <Icon name="Check" size="32" class="success-icon" />
           </div>
-          <h1 class="title">¡Contraseña restablecida!</h1>
+          <h1 class="title">{{ $t('auth.reset.success.title') }}</h1>
           <p class="subtitle">
-            Tu contraseña se ha restablecido exitosamente. Ya puedes iniciar sesión con tus nuevas credenciales.
+            {{ $t('auth.reset.success.message') }}
           </p>
           <Button
             variant="primary"
@@ -159,7 +161,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
             class="back-login-btn"
             @click="router.push('/login')"
           >
-            Ir a Iniciar Sesión
+            {{ $t('auth.reset.success.cta') }}
           </Button>
         </div>
       </template>
