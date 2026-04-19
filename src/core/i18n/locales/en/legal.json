@@ -1,0 +1,54 @@
+{
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last update",
+    "sections": {
+      "info": {
+        "title": "1. Information we collect",
+        "intro": "We collect information you provide directly to us:",
+        "items": [
+          "Account information (email, name)",
+          "Location data for route tracking",
+          "App usage information"
+        ]
+      },
+      "usage": {
+        "title": "2. How we use your information",
+        "intro": "We use the collected information to:",
+        "items": [
+          "Provide and improve our services",
+          "Track your hiking routes",
+          "Communicate with you"
+        ]
+      },
+      "sharing": {
+        "title": "3. Information sharing",
+        "text": "We do not share your personal information with third parties without your consent."
+      },
+      "security": {
+        "title": "4. Security",
+        "text": "We implement security measures to protect your information."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "updated": "Last update",
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of terms",
+        "text": "By using Hiking Tracker, you accept these terms and conditions."
+      },
+      "usage": {
+        "title": "2. Service use",
+        "text": "The service is intended for tracking hiking routes."
+      },
+      "privacy": {
+        "title": "3. Privacy",
+        "intro": "Consult our",
+        "link": "Privacy Policy",
+        "outro": "for more information."
+      }
+    }
+  }
+}

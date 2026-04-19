@@ -5,11 +5,11 @@
 <template>
   <div class="spots-view">
     <div class="spots-header">
-      <h1>Spots</h1>
+      <h1>{{ $t('navigation.spots') }}</h1>
     </div>
 
     <div class="spots-content">
-      <p>Vista de Spots - Contenido pendiente</p>
+      <p>{{ $t('common.status.pendingContent') }}</p>
     </div>
   </div>
 </template>

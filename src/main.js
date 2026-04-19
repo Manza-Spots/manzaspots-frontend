@@ -5,6 +5,7 @@ import router from './core/router'
 import { initializeCapacitor } from './core/capacitor'
 import { useAuthStore } from './features/auth/store'
 import vue3GoogleLogin from 'vue3-google-login'
+import i18n from './core/i18n'
 
 import '@fontsource/inter/400.css'
 import '@fontsource/inter/500.css'
@@ -20,6 +21,7 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+app.use(i18n)
 app.use(vue3GoogleLogin, {
   clientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID,
 })

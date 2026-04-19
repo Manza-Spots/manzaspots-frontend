@@ -10,42 +10,42 @@ const router = useRouter()
   <div class="privacy-view">
     <div class="container">
       <Card padding="lg" class="privacy-content">
-        <h1>Política de Privacidad</h1>
+        <h1>{{ $t('legal.privacy.title') }}</h1>
 
-        <p>Última actualización: {{ new Date().toLocaleDateString() }}</p>
+        <p>{{ $t('legal.privacy.updated') }}: {{ new Date().toLocaleDateString() }}</p>
 
         <section>
-          <h2>1. Información que recopilamos</h2>
-          <p>Recopilamos información que nos proporcionas directamente:</p>
+          <h2>{{ $t('legal.privacy.sections.info.title') }}</h2>
+          <p>{{ $t('legal.privacy.sections.info.intro') }}</p>
           <ul>
-            <li>Información de cuenta (email, nombre)</li>
-            <li>Datos de ubicación para tracking de rutas</li>
-            <li>Información de uso de la aplicación</li>
+            <li v-for="(item, index) in $tm('legal.privacy.sections.info.items')" :key="index">
+              {{ $rt(item) }}
+            </li>
           </ul>
         </section>
 
         <section>
-          <h2>2. Cómo usamos tu información</h2>
-          <p>Utilizamos la información recopilada para:</p>
+          <h2>{{ $t('legal.privacy.sections.usage.title') }}</h2>
+          <p>{{ $t('legal.privacy.sections.usage.intro') }}</p>
           <ul>
-            <li>Proporcionar y mejorar nuestros servicios</li>
-            <li>Trackear tus rutas de senderismo</li>
-            <li>Comunicarnos contigo</li>
+            <li v-for="(item, index) in $tm('legal.privacy.sections.usage.items')" :key="index">
+              {{ $rt(item) }}
+            </li>
           </ul>
         </section>
 
         <section>
-          <h2>3. Compartir información</h2>
-          <p>No compartimos tu información personal con terceros sin tu consentimiento.</p>
+          <h2>{{ $t('legal.privacy.sections.sharing.title') }}</h2>
+          <p>{{ $t('legal.privacy.sections.sharing.text') }}</p>
         </section>
 
         <section>
-          <h2>4. Seguridad</h2>
-          <p>Implementamos medidas de seguridad para proteger tu información.</p>
+          <h2>{{ $t('legal.privacy.sections.security.title') }}</h2>
+          <p>{{ $t('legal.privacy.sections.security.text') }}</p>
         </section>
 
         <div class="actions">
-          <Button variant="primary" @click="router.back()"> Volver </Button>
+          <Button variant="primary" @click="router.back()"> {{ $t('common.buttons.back') }} </Button>
         </div>
       </Card>
     </div>

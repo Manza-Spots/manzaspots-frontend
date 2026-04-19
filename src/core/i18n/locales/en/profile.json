@@ -1,0 +1,15 @@
+{
+  "title": "Profile",
+  "logout": "Log Out",
+  "details": {
+    "noName": "No name",
+    "defaultUser": "User"
+  },
+  "welcome": {
+    "title": "Manza Spots",
+    "subtitle": "Discover, share, and save the best places in your city",
+    "footer": "Explore freely or create your account to save your favorite spots",
+    "login": "Sign in",
+    "register": "Create account"
+  }
+}

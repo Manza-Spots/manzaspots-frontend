@@ -7,9 +7,11 @@ import Button from '@/shared/components/ButtonComponent.vue'
 import { useForm } from '@/shared/composables/useForm'
 import { useValidation } from '@/shared/composables/useValidation'
 import { useAuth } from '@/features/auth/composables/useAuth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const { requestPasswordReset } = useAuth()
+const { t } = useI18n()
 const { validators } = useValidation()
 const emailSent = ref(false)
 
@@ -19,7 +21,7 @@ const { values, errors, isSubmitting, setFieldValue, handleBlur, handleSubmit, s
       email: '',
     },
     {
-      email: [validators.required(), validators.email()],
+      email: [validators.required(t('auth.form.errors.emailRequired')), validators.email(t('auth.form.errors.emailRequired'))],
     },
     {
       onSubmit: async (formValues) => {
@@ -45,16 +47,16 @@ const goToLogin = () => router.push('/login')
     <div class="forgot-container">
       <template v-if="!emailSent">
         <div class="forgot-header">
-          <h1 class="title">Recuperar contraseña</h1>
-          <p class="subtitle">Ingresa tu correo electrónico asociado y te enviaremos las instrucciones</p>
+          <h1 class="title">{{ $t('auth.forgot.title') }}</h1>
+          <p class="subtitle">{{ $t('auth.forgot.subtitle') }}</p>
         </div>
 
         <form class="forgot-form" @submit="handleSubmit">
           <Input
             :model-value="values.email"
             type="email"
-            label="Email"
-            placeholder="ejemplo@email.com"
+            :label="$t('common.labels.email')"
+            :placeholder="$t('common.placeholders.email')"
             icon="Mail"
             autocomplete="email"
             :error="errors.email"
@@ -71,7 +73,7 @@ const goToLogin = () => router.push('/login')
             :disabled="isSubmitting"
             class="submit-button"
           >
-            Enviar instrucciones de recuperación
+            {{ $t('auth.forgot.submit') }}
           </Button>
         </form>
       </template>
@@ -81,9 +83,9 @@ const goToLogin = () => router.push('/login')
           <div class="icon-circle">
             <Icon name="Mail" size="32" class="success-icon" />
           </div>
-          <h1 class="title">¡Correo enviado!</h1>
+          <h1 class="title">{{ $t('auth.forgot.success.title') }}</h1>
           <p class="subtitle">
-            Si <strong>{{ values.email }}</strong> está en nuestro sistema, en breve recibirás un enlace para crear una nueva contraseña. Por favor, revisa también tu carpeta de spam.
+            {{ $t('auth.forgot.success.message', { email: values.email }) }}
           </p>
           <Button
             variant="outline"
@@ -91,7 +93,7 @@ const goToLogin = () => router.push('/login')
             class="back-login-btn"
             @click="router.push('/login')"
           >
-            Volver al inicio de sesión
+            {{ $t('auth.forgot.success.backToLogin') }}
           </Button>
         </div>
       </template>
