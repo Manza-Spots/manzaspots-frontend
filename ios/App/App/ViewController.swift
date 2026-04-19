@@ -16,9 +16,7 @@ class ViewController: CAPBridgeViewController {
         guard let webView = self.webView else {
             return
         }
-        
-        webView.allowsBackForwardNavigationGestures = true
-        
+
         webView.scrollView.bounces = false
         
         webView.scrollView.contentInsetAdjustmentBehavior = .never
