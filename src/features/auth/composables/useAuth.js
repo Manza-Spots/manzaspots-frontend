@@ -2,11 +2,16 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
 import { useToast } from '@/shared/composables/useToast'
+import { Capacitor } from '@capacitor/core'
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
+import { googleOneTap } from 'vue3-google-login'
 
 export function useAuth() {
   const authStore = useAuthStore()
   const router = useRouter()
   const toast = useToast()
+
+  const isNative = Capacitor.isNativePlatform()
 
   const isAuthenticated = computed(() => authStore.isAuthenticated)
   const user = computed(() => authStore.user)
@@ -32,6 +37,67 @@ export function useAuth() {
     }
   }
 
+
+  async function webGoogleLogin(redirectTo = '/') {
+    try {
+      const response = await googleOneTap()
+      console.log('[webGoogleLogin response]', response)
+
+      const idToken = response?.credential
+
+      if (!idToken) {
+        throw new Error('No se recibió id_token de Google')
+      }
+
+      await authStore.googleLogin({
+        id_token: idToken
+      })
+
+      const redirect = router.currentRoute.value.query.redirect || redirectTo
+
+      router.replace(redirect)
+
+      return true;
+    } catch (error) {
+      console.error('Login Google web failed:', error)
+      throw error
+    }
+  }
+
+  async function nativeGoogleLogin(redirectTo = '/') {
+    try {
+      // Según la documentación oficial de @capawesome/capacitor-google-sign-in:
+      // El clientId debe ser el Web Client ID en TODAS las plataformas.
+      // En Android, el plugin lo pasa como serverClientId al Credential Manager.
+      // En iOS, se usa directamente para la autenticación.
+      await GoogleSignIn.initialize({
+        clientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID,
+      })
+
+      const result = await GoogleSignIn.signIn()
+      const idToken = result?.idToken
+
+      if (!idToken) {
+        throw new Error('No se recibió id_token de Google')
+      }
+
+      await authStore.googleLogin({
+        id_token: idToken
+      })
+
+      const redirect = router.currentRoute.value.query.redirect || redirectTo
+      router.replace(redirect)
+      return true;
+    } catch (error) {
+      console.error('Native Login Google failed:', error)
+
+      if (error && error.code !== 'SIGN_IN_CANCELED') {
+        toast.error('Error al iniciar sesión con Google')
+      }
+      throw error
+    }
+  }
+
   async function register(userData, redirectTo = '/email-verified') {
     try {
       const normalizeUserData = {
@@ -52,7 +118,7 @@ export function useAuth() {
       if (error.fieldErrors) {
         throw error
       }
-      
+
       toast.error(error.message || 'Error al registrarse')
 
       throw error
@@ -131,14 +197,15 @@ export function useAuth() {
   }
 
   return {
-    // State
+    isNative,
     isAuthenticated,
     user,
     loading,
     registrationEmail,
-
-    // Methods
     login,
+
+    webGoogleLogin,
+    nativeGoogleLogin,
     register,
     requestPasswordReset,
     confirmPasswordReset,
@@ -147,6 +214,6 @@ export function useAuth() {
     logout,
     hasPermission,
     hasRole,
-    isEmailVerified,
+    isEmailVerified
   }
 }

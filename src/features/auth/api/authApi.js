@@ -14,6 +14,17 @@ export const authApi = {
   },
 
   /**
+   * Login con google
+   * @param {Object} token - {access_token}
+   * @returns {Promise<Object>} {access, refresh, user}
+   */
+  async googleLogin(token) {
+    const response = await api.post(API_ENDPOINTS.AUTH.LOGIN_GOOGLE, token)
+
+    return response.data.data
+  },
+
+  /**
    * Registro de nuevo usuario
    * @param {Object} userData - {username, email, password, confirm_password}
    * @returns {Promise<Object>} {access, refresh, user}

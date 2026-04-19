@@ -4,4 +4,5 @@
     <string name="title_activity_main">manzaspots-pwa</string>
     <string name="package_name">com.manzaspots.hiking</string>
     <string name="custom_url_scheme">com.manzaspots.hiking</string>
+    <string name="server_client_id">379877290314-q0f3bsjg8s1bmrtlspqlsql1b3gtighr.apps.googleusercontent.com</string>
 </resources>

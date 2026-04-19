@@ -89,6 +89,25 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function googleLogin(token) {
+    loading.value = true
+    try {
+      const response = await authApi.googleLogin(token)
+      await setToken(response.access)
+      await setRefreshToken(response.refresh)
+
+      if(response.user) {
+        await setUser(response.user)
+      }else {
+        await fetchUser()
+      }
+
+      return response
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function register(userData) {
     loading.value = true
     try {
@@ -266,6 +285,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Actions
     login,
+    googleLogin,
     register,
     requestPasswordReset,
     confirmPasswordReset,

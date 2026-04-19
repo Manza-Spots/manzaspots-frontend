@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "379877290314",
+    "project_id": "manzaspot-477116",
+    "storage_bucket": "manzaspot-477116.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379877290314:android:9852b06c7e9fb1294f91b3",
+        "android_client_info": {
+          "package_name": "com.manzaspots.hiking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "379877290314-do39mjuq9ct2vri3mr31fnukeg5fn872.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.manzaspots.hiking",
+            "certificate_hash": "0c200aec9b0567f463e75faa234e28fb9f824f9c"
+          }
+        },
+        {
+          "client_id": "379877290314-kvk8ut45hmguf5t6tfk3hjrumr6cpn9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdlpk_Cv_tdUSE4o_NSJc7tqBSuhhHB1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "379877290314-kvk8ut45hmguf5t6tfk3hjrumr6cpn9c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "379877290314-0mmn3ir6kv32j5c031kecur0vmff6dtv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.manzaspots.hiking"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
