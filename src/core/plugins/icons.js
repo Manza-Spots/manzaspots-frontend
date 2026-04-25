@@ -77,6 +77,9 @@ import {
   Layers,
   Maximize,
   Minimize,
+  LocateFixed,
+  SlidersHorizontal,
+  List,
 } from 'lucide-vue-next'
 
 export const icons = {
@@ -158,4 +161,7 @@ export const icons = {
   Minimize,
   Mic,
   GalleryVerticalEnd,
+  LocateFixed,
+  SlidersHorizontal,
+  List,
 }
