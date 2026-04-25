@@ -5,11 +5,11 @@ const config: CapacitorConfig = {
   appName: 'Manzaspots',
   webDir: 'dist',
   server: {
-    url: 'http://192.168.3.7:5173', // para debugueo local
+    url: 'http://192.168.3.10:5173', // para debugueo local
     cleartext: true,
     androidScheme: 'https',
     // Permitir navegación a tu API
-    allowNavigation: ['http://192.168.3.7:5173', 'http://localhost:8000'],
+    allowNavigation: ['http://192.168.3.10:5173', 'http://localhost:8000'],
   },
   plugins: {
     SplashScreen: {

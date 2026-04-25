@@ -365,22 +365,6 @@ const handleFloatingAction = () => {
   transition: transform 0.25s ease;
 }
 
-.bottom-nav--gradient {
-  background: linear-gradient(
-    to top,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0.81) 19%,
-    rgba(255, 255, 255, 0.72) 34%,
-    rgba(255, 255, 255, 0.61) 47%,
-    rgba(255, 255, 255, 0.52) 60%,
-    rgba(255, 255, 255, 0.46) 73%,
-    rgba(255, 255, 255, 0.32) 80%,
-    rgba(255, 255, 255, 0.16) 86%,
-    rgba(255, 255, 255, 0.02) 92%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
 .nav-layout {
   position: relative;
   width: 100%;
@@ -408,6 +392,7 @@ const handleFloatingAction = () => {
   backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
   height: 56px;
   width: calc(100% - 56px - var(--space-2));
   overflow: hidden;
@@ -481,6 +466,7 @@ const handleFloatingAction = () => {
   backdrop-filter: saturate(180%) blur(2px);
   border-radius: 100px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
   height: 56px;
   width: 56px;
   padding: 0 16px;

@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
-import { BackgroundTask } from '@capacitor/background-task'
+// import { BackgroundTask } from '@capacitor/background-task'
 import { LocalNotifications } from '@capacitor/local-notifications'
 
 class LocationService {
@@ -14,10 +14,8 @@ class LocationService {
   async requestPermissions() {
     if (this.isNative) {
       try {
-        // Solicitar permisos de ubicación
         const locationPermission = await Geolocation.requestPermissions()
 
-        // Solicitar permisos de notificaciones (para alertas)
         const notificationPermission = await LocalNotifications.requestPermissions()
 
         return (
@@ -28,12 +26,11 @@ class LocationService {
         return false
       }
     } else {
-      // Web permissions
       try {
         const result = await navigator.permissions.query({ name: 'geolocation' })
         return result.state === 'granted' || result.state === 'prompt'
       } catch {
-        return true // Asumir que sí en caso de error
+        return true
       }
     }
   }
@@ -90,11 +87,12 @@ class LocationService {
 
   async startNativeTracking(callback, options) {
     try {
-      // Registrar tarea en background
+      // Registrar tarea en background (Temporalmente deshabilitado por falta del plugin)
+      /*
       this.backgroundTaskId = await BackgroundTask.beforeExit(async () => {
         console.log('Background task running...')
-        // Aquí puedes guardar datos antes de que la app se cierre
       })
+      */
 
       // Iniciar tracking
       this.watchId = await Geolocation.watchPosition(options, (position, err) => {
@@ -164,9 +162,11 @@ class LocationService {
         if (this.watchId) {
           await Geolocation.clearWatch({ id: this.watchId })
         }
+        /*
         if (this.backgroundTaskId) {
           BackgroundTask.finish({ taskId: this.backgroundTaskId })
         }
+        */
       } else {
         if (this.watchId) {
           navigator.geolocation.clearWatch(this.watchId)
@@ -255,7 +255,6 @@ class LocationService {
   handleTrackingError(error) {
     console.error('Tracking error:', error)
 
-    // Mostrar notificación si es nativo
     if (this.isNative) {
       this.showTrackingNotification('Error de GPS', 'Hubo un problema obteniendo tu ubicación')
     }
