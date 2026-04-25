@@ -1,10 +1,14 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import Icon from './Icon.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import SettingsMenu from '@/features/settings/components/SettingsMenu.vue'
+
+const { t } = useI18n()
+
 
 import { Keyboard } from '@capacitor/keyboard'
 
@@ -230,11 +234,8 @@ const closeSearch = () => {
 
 const openSettings = () => {
   bottomSheet.open(SettingsMenu,
-    // Props opcionales que quieras pasarle al SettingsMenu
-    { userId: 123 },
-    // Configuración propia del BottomSheet (opcional, sobreescribe los por defecto)
     {
-      title: 'Configuraciones',
+      title: computed(() => t('settings.title', 'Configuraciones')),
       closable: true,
       closeOnBackdrop: true
     }
