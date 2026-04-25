@@ -10,7 +10,6 @@ import { Preferences } from '@capacitor/preferences'
 const { t, locale } = useI18n()
 const emit = defineEmits(['close'])
 
-
 const { isAuthenticated, logout } = useAuth()
 
 const handleLogout = async () => {
@@ -27,7 +26,7 @@ const onThemeChange = (e) => {
 const onLanguageChange = async (e) => {
   const newLang = e.target.value
   locale.value = newLang
-  
+
   // Grabamos en nativo
   try {
     await Preferences.set({ key: 'manzaspots_language_preference', value: newLang })
