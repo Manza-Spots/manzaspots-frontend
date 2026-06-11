@@ -141,8 +141,8 @@ defineExpose({ focus })
 
 .input-label {
   font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  font-weight: var(--font-bold);
+  color: var(--color-text-secondary);
 }
 
 .input-container {
@@ -153,28 +153,28 @@ defineExpose({ focus })
 
 .input {
   width: 100%;
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background-color: var(--color-bg);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   font-family: var(--font-sans);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 4px var(--color-primary-tint);
 }
 
 .input:disabled {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-surface-2);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .input:read-only {
-  background-color: var(--color-gray-50);
+  background-color: var(--color-surface-2);
 }
 
 .input::placeholder {
@@ -190,13 +190,13 @@ defineExpose({ focus })
 .input-md {
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-base);
-  height: 44px;
+  height: 52px;
 }
 
 .input-lg {
   padding: var(--space-4) var(--space-5);
   font-size: var(--text-lg);
-  height: 52px;
+  height: 56px;
 }
 
 .input-with-icon {
@@ -233,7 +233,7 @@ defineExpose({ focus })
 
 .input-error:focus {
   border-color: var(--color-error);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 4px var(--color-coral-tint);
 }
 
 .input-error-message {

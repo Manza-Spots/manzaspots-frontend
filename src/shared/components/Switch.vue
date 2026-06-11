@@ -80,8 +80,8 @@ const switchClasses = computed(() => {
   position: relative;
   display: inline-block;
   border-radius: var(--radius-full);
-  background-color: var(--color-gray-300);
-  transition: background-color var(--transition-fast);
+  background-color: var(--color-surface-3);
+  transition: background-color var(--transition-base);
   flex-shrink: 0;
 }
 
@@ -91,15 +91,14 @@ const switchClasses = computed(() => {
 
 .switch-thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 3px;
+  left: 3px;
   background-color: white;
   border-radius: 50%;
-  transition: transform var(--transition-fast);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.22s var(--ease-spring);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-/* Sizes */
 .switch-sm .switch-track {
   width: 32px;
   height: 18px;
@@ -115,13 +114,13 @@ const switchClasses = computed(() => {
 }
 
 .switch-md .switch-track {
-  width: 44px;
-  height: 24px;
+  width: 52px;
+  height: 32px;
 }
 
 .switch-md .switch-thumb {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
 }
 
 .switch-md .switch-thumb-active {
@@ -129,17 +128,17 @@ const switchClasses = computed(() => {
 }
 
 .switch-lg .switch-track {
-  width: 56px;
-  height: 30px;
+  width: 60px;
+  height: 36px;
 }
 
 .switch-lg .switch-thumb {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
 }
 
 .switch-lg .switch-thumb-active {
-  transform: translateX(26px);
+  transform: translateX(24px);
 }
 
 .switch-sm .switch-label {
@@ -154,9 +153,8 @@ const switchClasses = computed(() => {
   font-size: var(--text-lg);
 }
 
-/* States */
-.switch-input:focus + .switch-track {
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+.switch-input:focus-visible + .switch-track {
+  box-shadow: 0 0 0 4px var(--color-primary-tint);
 }
 
 .switch-disabled {

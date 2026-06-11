@@ -33,13 +33,13 @@ defineProps({
 .spot-card {
   display: flex;
   background: var(--color-surface);
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s var(--ease-out), box-shadow 0.2s;
   cursor: pointer;
   border: 1px solid var(--color-border);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .spot-card:active {
@@ -62,12 +62,12 @@ defineProps({
   position: absolute;
   top: var(--space-2);
   left: var(--space-2);
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--font-bold);
   backdrop-filter: blur(4px);
 }
 
@@ -89,9 +89,10 @@ defineProps({
 .spot-title {
   margin: 0;
   font-size: var(--text-base);
-  font-weight: var(--font-bold);
+  font-weight: var(--font-extrabold);
   color: var(--color-text-primary);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .spot-distance {
@@ -100,10 +101,10 @@ defineProps({
   gap: 4px;
   font-size: var(--text-xs);
   color: var(--color-primary);
-  font-weight: var(--font-semibold);
-  background: var(--color-primary-light, rgba(0, 122, 255, 0.1));
+  font-weight: var(--font-bold);
+  background: var(--color-primary-tint);
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 

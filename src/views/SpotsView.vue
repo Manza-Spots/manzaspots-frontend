@@ -1,25 +1,49 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InteractiveMap from '@/features/map/components/InteractiveMap.vue'
-import SpotListCard from '@/features/spots/components/SpotListCard.vue'
+import ImmersiveSpotList from '@/features/spots/components/ImmersiveSpotList.vue'
 import SpotFiltersBottomSheet from '@/features/spots/components/FiltersMenu.vue'
 import SpotsHeader from '@/features/spots/components/SpotsHeader.vue'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
+import { DEFAULT_FILTERS, filterSpots, isFilterActive } from '@/features/spots/utils/spotFilters'
 
+import img1 from '@/assets/img/img1.jpeg'
+import img2 from '@/assets/img/img2.jpeg'
+import img3 from '@/assets/img/img3.jpeg'
+import img4 from '@/assets/img/img4.jpeg'
+import img5 from '@/assets/img/img5.jpeg'
+import img6 from '@/assets/img/img6.jpeg'
+
+const { t } = useI18n()
 const bottomSheet = useBottomSheet()
+const { isImmersive } = useImmersiveMode()
 const mapRef = ref(null)
 const currentView = ref('map')
 const isLocating = ref(false)
+const filters = ref({ ...DEFAULT_FILTERS })
+
+watch(currentView, (v) => { isImmersive.value = v === 'list' }, { immediate: true })
+onBeforeUnmount(() => { isImmersive.value = false })
 
 const mockSpots = [
-  { id: 1, name: 'Mirador de Playa Miramar', category: 'Mirador', distance: '1.2 km', imageUrl: 'https://images.unsplash.com/photo-1596395819057-e37f55a8516d?q=80&w=600&auto=format&fit=crop', description: 'Excelente vista a la bahía con fácil acceso pavimentado.' },
-  { id: 2, name: 'Cerro del Toro', category: 'Trekking', distance: '3.5 km', imageUrl: 'https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=600&auto=format&fit=crop', description: 'Ruta exigente con gran recompensa visual de la costa del Océano Pacífico.' },
-  { id: 3, name: 'Cascada de Juluapan', category: 'Cascadas', distance: '12 km', imageUrl: 'https://images.unsplash.com/photo-1432405972618-c600f4871656?q=80&w=600&auto=format&fit=crop', description: 'Lugar exótico con albercas naturales perfectas para un chapuzón fresco.' },
-  { id: 4, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
-  { id: 5, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
-  { id: 6, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
-  { id: 7, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' }
+  { id: 1, name: 'Mirador de Playa Miramar', category: 'Mirador', distance: '1.2 km', imageUrl: img1, description: 'Excelente vista a la bahía con fácil acceso pavimentado.' },
+  { id: 2, name: 'Cerro del Toro', category: 'Trekking', distance: '3.5 km', imageUrl: img2, description: 'Ruta exigente con gran recompensa visual de la costa del Océano Pacífico.' },
+  { id: 3, name: 'Cascada de Juluapan', category: 'Cascadas', distance: '12 km', imageUrl: img3, description: 'Lugar exótico con albercas naturales perfectas para un chapuzón fresco.' },
+  { id: 4, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: img4, description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
+  { id: 5, name: 'Playa de Oro', category: 'Playa', distance: '18 km', imageUrl: img5, description: 'Famosa por su muelle y puestas de sol espectaculares en el horizonte.' },
+  { id: 6, name: 'La Boquita', category: 'Playa', distance: '8 km', imageUrl: img6, description: 'Aguas tranquilas ideales para el snorkel y disfrutar con los más pequeños.' },
+  { id: 1, name: 'Mirador de Playa Miramar', category: 'Mirador', distance: '1.2 km', imageUrl: img1, description: 'Excelente vista a la bahía con fácil acceso pavimentado.' },
+  { id: 2, name: 'Cerro del Toro', category: 'Trekking', distance: '3.5 km', imageUrl: img2, description: 'Ruta exigente con gran recompensa visual de la costa del Océano Pacífico.' },
+  { id: 3, name: 'Cascada de Juluapan', category: 'Cascadas', distance: '12 km', imageUrl: img3, description: 'Lugar exótico con albercas naturales perfectas para un chapuzón fresco.' },
+  { id: 4, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: img4, description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
+  { id: 5, name: 'Playa de Oro', category: 'Playa', distance: '18 km', imageUrl: img5, description: 'Famosa por su muelle y puestas de sol espectaculares en el horizonte.' },
+  { id: 6, name: 'La Boquita', category: 'Playa', distance: '8 km', imageUrl: img6, description: 'Aguas tranquilas ideales para el snorkel y disfrutar con los más pequeños.' }
 ]
+
+const filteredSpots = computed(() => filterSpots(mockSpots, filters.value))
+const hasActiveFilters = computed(() => isFilterActive(filters.value))
 
 const handleLocate = async () => {
   if (isLocating.value || !mapRef.value) return
@@ -28,9 +52,18 @@ const handleLocate = async () => {
   isLocating.value = false
 }
 
+const applyFilters = (newFilters) => {
+  filters.value = newFilters
+  bottomSheet.close()
+}
+
 const openFilters = () => {
-  bottomSheet.open(SpotFiltersBottomSheet, {}, {
-    title: 'Filtros',
+  bottomSheet.open(SpotFiltersBottomSheet, {
+    spots: mockSpots,
+    filters: filters.value,
+    onApply: applyFilters,
+  }, {
+    title: t('spots.filters.title'),
     closable: true,
   })
 }
@@ -42,6 +75,7 @@ const openFilters = () => {
     <SpotsHeader
       v-model:current-view="currentView"
       :is-locating="isLocating"
+      :has-active-filters="hasActiveFilters"
       @locate="handleLocate"
       @filter="openFilters"
     />
@@ -49,20 +83,11 @@ const openFilters = () => {
     <InteractiveMap ref="mapRef" />
 
     <Transition name="slide-up">
-      <div v-show="currentView === 'list'" class="list-view-container">
-
-        <div class="list-fade-top"></div>
-        <div class="list-fade-bottom"></div>
-
-        <div class="cards-scroll-area">
-          <SpotListCard
-            v-for="spot in mockSpots"
-            :key="spot.id"
-            :spot="spot"
-          />
-          <div class="spacer-bottom"></div>
-        </div>
-      </div>
+      <ImmersiveSpotList
+        v-show="currentView === 'list'"
+        class="immersive-layer"
+        :spots="filteredSpots"
+      />
     </Transition>
 
   </div>
@@ -76,58 +101,8 @@ const openFilters = () => {
   overflow: hidden;
 }
 
-.list-view-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--color-bg);
+.immersive-layer {
   z-index: 10;
-  display: flex;
-  flex-direction: column;
-}
-
-.list-fade-top {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 140px;
-  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  z-index: 15;
-  pointer-events: none;
-}
-
-.list-fade-bottom {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 160px;
-  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to top, black 10%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 10%, transparent 100%);
-  z-index: 15;
-  pointer-events: none;
-}
-
-.cards-scroll-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 120px var(--space-4) var(--space-4);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.cards-scroll-area::-webkit-scrollbar {
-  display: none;
-}
-
-.spacer-bottom {
-  height: calc(100px + var(--safe-area-inset-bottom, 20px));
 }
 
 .slide-up-enter-active,

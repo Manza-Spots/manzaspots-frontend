@@ -1,63 +1,96 @@
+/* ============================================================
+   MANZA SPOTS — Design System · "Manzanillo" (mar + selva)
+   Inspirado en iOS 26 · Manrope · Claro + Oscuro
+   ============================================================ */
+
 :root {
+  /* Marca */
+  --color-selva: #1f7d4f;
+  /* Verde selva — primario */
+  --color-selva-deep: #135737;
+  /* Hover / pressed */
+  --color-selva-bright: #34c27a;
+  /* Primario en modo oscuro */
+  --color-mar: #1186a0;
+  /* Teal océano — secundario */
+  --color-mar-deep: #0c6478;
+  --color-arena: #d8954a;
+  /* Arena cálida — acento / sol */
+  --color-coral: #d9544d;
+  /* Peligro / alerta */
+
   /* Colores principales */
-  --color-primary: #10b981;
-  /* Verde hiking */
-  --color-primary-dark: #059669;
-  --color-primary-light: #98a29e;
+  --color-primary: var(--color-selva);
+  --color-primary-dark: var(--color-selva-deep);
+  --color-primary-light: #e6f3ec;
+  --color-on-primary: #ffffff;
 
-  --color-secondary: #3b82f6;
-  /* Azul */
-  --color-secondary-dark: #2563eb;
-  --color-secondary-light: #60a5fa;
+  --color-secondary: var(--color-mar);
+  --color-secondary-dark: var(--color-mar-deep);
+  --color-secondary-light: #e2f0f3;
 
-  --color-accent: #f59e0b;
-  /* Amarillo/naranja */
+  --color-accent: var(--color-arena);
 
   /* Colores de estado */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-success: var(--color-selva);
+  --color-warning: var(--color-arena);
+  --color-error: var(--color-coral);
+  --color-info: var(--color-mar);
 
-  /* Grises */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* Tints — fondos suaves por color de marca */
+  --color-primary-tint: #e6f3ec;
+  --color-ocean-tint: #e2f0f3;
+  --color-sand-tint: #f8edda;
+  --color-coral-tint: #fae6e4;
 
-  /* Background */
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-bg-tertiary: #f3f4f6;
+  /* Neutros (tinte cálido-verdoso) */
+  --color-gray-50: #f4f7f4;
+  --color-gray-100: #eef2ee;
+  --color-gray-200: #e3e8e3;
+  --color-gray-300: #d3dad3;
+  --color-gray-400: #8b948c;
+  --color-gray-500: #6b766e;
+  --color-gray-600: #586159;
+  --color-gray-700: #3c443e;
+  --color-gray-800: #242b26;
+  --color-gray-900: #141916;
+
+  /* Background / superficies */
+  --color-bg: #f4f7f4;
+  --color-bg-secondary: #eef2ee;
+  --color-bg-tertiary: #e6ebe6;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef2ee;
+  --color-surface-3: #e6ebe6;
 
   /* Text */
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
-  --color-text-tertiary: #9ca3af;
+  --color-text-primary: #141916;
+  --color-text-secondary: #586159;
+  --color-text-tertiary: #8b948c;
   --color-text-inverse: #ffffff;
 
   /* Borders */
-  --color-border: #e5e7eb;
-  --color-border-hover: #d1d5db;
+  --color-border: #e3e8e3;
+  --color-border-hover: #d3dad3;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* Materiales / blur (barras flotantes) */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --hairline: rgba(20, 40, 30, 0.08);
+  --blur: saturate(180%) blur(20px);
+
+  /* Shadows — tinte verde, no gris puro */
+  --shadow-sm: 0 1px 2px rgba(16, 32, 24, 0.06);
+  --shadow-md: 0 6px 20px rgba(16, 32, 24, 0.08), 0 2px 6px rgba(16, 32, 24, 0.05);
+  --shadow-lg: 0 18px 50px rgba(12, 28, 20, 0.16), 0 6px 16px rgba(12, 28, 20, 0.08);
+  --shadow-xl: 0 24px 60px rgba(12, 28, 20, 0.2), 0 8px 20px rgba(12, 28, 20, 0.1);
+  --shadow-primary: 0 6px 16px rgba(31, 125, 79, 0.28);
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Space Grotesk', var(--font-sans);
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 
-  /* Font sizes */
+  /* Font sizes (escala iOS-like) */
   --text-xs: 0.75rem;
   /* 12px */
   --text-sm: 0.875rem;
@@ -67,21 +100,22 @@
   --text-lg: 1.125rem;
   /* 18px */
   --text-xl: 1.25rem;
-  /* 20px */
+  /* 20px · Headline */
   --text-2xl: 1.5rem;
-  /* 24px */
+  /* 24px · Title 3 */
   --text-3xl: 1.875rem;
-  /* 30px */
-  --text-4xl: 2.25rem;
-  /* 36px */
-  --text-5xl: 3rem;
-  /* 48px */
+  /* 30px · Title 2 */
+  --text-4xl: 2.375rem;
+  /* 38px · Title 1 */
+  --text-5xl: 3.125rem;
+  /* 50px · Large Title */
 
   /* Font weights */
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+  --font-extrabold: 800;
 
   /* Line heights */
   --leading-none: 1;
@@ -91,7 +125,7 @@
   --leading-relaxed: 1.625;
   --leading-loose: 2;
 
-  /* Spacing */
+  /* Spacing (base 4) */
   --space-1: 0.25rem;
   /* 4px */
   --space-2: 0.5rem;
@@ -115,23 +149,29 @@
   --space-20: 5rem;
   /* 80px */
 
-  /* Border radius */
-  --radius-sm: 0.25rem;
-  /* 4px */
-  --radius-md: 0.375rem;
-  /* 6px */
-  --radius-lg: 0.5rem;
+  /* Border radius — concéntricos, generosos (iOS 26) */
+  --radius-xs: 0.5rem;
   /* 8px */
-  --radius-xl: 0.75rem;
+  --radius-sm: 0.75rem;
+  /* 12px · botones pequeños */
+  --radius-md: 0.75rem;
   /* 12px */
-  --radius-2xl: 1rem;
-  /* 16px */
+  --radius-lg: 1rem;
+  /* 16px · inputs, botones */
+  --radius-xl: 1.375rem;
+  /* 22px · tarjetas */
+  --radius-2xl: 1.75rem;
+  /* 28px · sheets, hero */
+  --radius-3xl: 2.25rem;
+  /* 36px */
   --radius-full: 9999px;
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Z-index layers */
   --z-dropdown: 1000;
@@ -145,16 +185,38 @@
 
 /* Dark mode */
 html.dark {
-  --color-bg: #111827;
-  --color-bg-secondary: #1f2937;
-  --color-bg-tertiary: #374151;
+  --color-primary: var(--color-selva-bright);
+  --color-primary-dark: #2aa869;
+  --color-primary-light: rgba(52, 194, 122, 0.16);
+  --color-on-primary: #06140d;
 
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #d1d5db;
-  --color-text-tertiary: #9ca3af;
+  --color-primary-tint: rgba(52, 194, 122, 0.16);
+  --color-ocean-tint: rgba(28, 160, 188, 0.18);
+  --color-sand-tint: rgba(216, 149, 74, 0.16);
+  --color-coral-tint: rgba(217, 84, 77, 0.18);
 
-  --color-border: #374151;
-  --color-border-hover: #4b5563;
+  --color-bg: #0c100e;
+  --color-bg-secondary: #161d1a;
+  --color-bg-tertiary: #1d2622;
+  --color-surface: #161d1a;
+  --color-surface-2: #1d2622;
+  --color-surface-3: #25302b;
+
+  --color-text-primary: #eef3ef;
+  --color-text-secondary: #9aa49d;
+  --color-text-tertiary: #6a746e;
+
+  --color-border: #28332e;
+  --color-border-hover: #344039;
+
+  --glass-bg: rgba(22, 29, 26, 0.7);
+  --hairline: rgba(255, 255, 255, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.65), 0 8px 20px rgba(0, 0, 0, 0.45);
+  --shadow-primary: 0 6px 16px rgba(52, 194, 122, 0.3);
 }
 
 /* iOS safe area */

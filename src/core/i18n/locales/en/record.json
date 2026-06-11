@@ -1,0 +1,19 @@
+{
+  "status": {
+    "ready": "Ready",
+    "recording": "Recording",
+    "paused": "Paused"
+  },
+  "stats": {
+    "distance": "Distance",
+    "time": "Time",
+    "elevation": "Elevation"
+  },
+  "controls": {
+    "start": "Start",
+    "photo": "Photo",
+    "finish": "Finish",
+    "pause": "Pause",
+    "resume": "Resume"
+  }
+}

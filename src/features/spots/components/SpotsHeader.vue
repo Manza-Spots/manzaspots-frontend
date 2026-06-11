@@ -1,5 +1,6 @@
 <script setup>
 import Icon from '@/shared/components/Icon.vue'
+import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 
 defineProps({
   currentView: {
@@ -9,8 +10,14 @@ defineProps({
   isLocating: {
     type: Boolean,
     default: false
+  },
+  hasActiveFilters: {
+    type: Boolean,
+    default: false
   }
 })
+
+const { isImmersive } = useImmersiveMode()
 
 const emit = defineEmits(['update:currentView', 'locate', 'filter'])
 </script>
@@ -20,6 +27,7 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
 
     <div class="header-col left-col">
       <button
+        v-if="!isImmersive"
         class="header-fab-btn"
         :class="{ 'is-loading': isLocating }"
         @click="emit('locate')"
@@ -52,6 +60,7 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
         @click="emit('filter')"
       >
         <Icon name="SlidersHorizontal" :size="24" class="icon-svg" />
+        <span v-if="hasActiveFilters" class="filter-dot"></span>
       </button>
     </div>
 
@@ -94,8 +103,9 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
 }
 
 .header-fab-btn {
-  width: 45px;
-  height: 45px;
+  position: relative;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--color-bg, #ffffff);
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -126,18 +136,13 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
 .toggle-pill {
   position: relative;
   display: flex;
-  background: rgb(255, 255, 255);
-  -webkit-backdrop-filter: saturate(180%) blur(2px);
-  backdrop-filter: saturate(180%) blur(2px);
-  border-radius: 100px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border-radius: var(--radius-full);
   padding: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-:global(html.dark) .toggle-pill {
-  background: rgba(28, 28, 30, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-md);
 }
 
 .toggle-slider {
@@ -146,9 +151,9 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   bottom: 4px;
   left: 4px;
   width: calc(50% - 4px);
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  border-radius: 100px;
-  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.3);
+  background: var(--color-primary-tint);
+  border-radius: var(--radius-full);
+  transition: transform 0.5s var(--ease-spring);
   z-index: 0;
 }
 
@@ -171,10 +176,10 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   padding: 8px 16px;
   border: none;
   background: transparent !important;
-  border-radius: 100px;
-  color: var(--color-text-primary);
-  font-weight: 600;
-  font-size: 14px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-bold);
+  font-size: 15px;
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -194,5 +199,48 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   45% { transform: scale(1.3); }
   70% { transform: scale(0.9); }
   100% { transform: scale(1); }
+}
+
+.filter-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-selva-bright);
+  border: 2px solid rgba(10, 20, 14, 0.35);
+}
+
+/* Vidrio sobre foto: la vista inmersiva (lista) renderiza el header sobre la imagen */
+.is-list-mode .header-fab-btn {
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: none;
+  color: #fff;
+}
+
+.is-list-mode .toggle-pill {
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: none;
+}
+
+.is-list-mode .toggle-slider {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.is-list-mode .toggle-btn {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.is-list-mode .toggle-btn.active,
+.is-list-mode .toggle-btn.active :deep(svg) {
+  color: var(--color-selva-deep);
 }
 </style>

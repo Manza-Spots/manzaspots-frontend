@@ -49,7 +49,7 @@ function toggleLocale() {
 }
 
 .lang-label {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
   color: #1c1c1e;

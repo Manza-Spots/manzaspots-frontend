@@ -242,18 +242,18 @@ const statusClasses = computed(() => {
 }
 
 .avatar-status-online {
-  background-color: #10b981;
+  background-color: var(--color-success);
 }
 
 .avatar-status-offline {
-  background-color: #6b7280;
+  background-color: var(--color-text-tertiary);
 }
 
 .avatar-status-away {
-  background-color: #f59e0b;
+  background-color: var(--color-warning);
 }
 
 .avatar-status-busy {
-  background-color: #ef4444;
+  background-color: var(--color-error);
 }
 </style>

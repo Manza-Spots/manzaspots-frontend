@@ -1,82 +1,126 @@
 <script setup>
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
+import ButtonComponent from '@/shared/components/ButtonComponent.vue'
+import {
+  CATEGORY_FILTERS,
+  DISTANCE_FILTERS,
+  filterSpots,
+} from '../utils/spotFilters'
 
-const categories = ['Miradores', 'Senderismo', 'MTB', 'Cascadas', 'Peligros']
+const props = defineProps({
+  spots: {
+    type: Array,
+    default: () => [],
+  },
+  filters: {
+    type: Object,
+    default: () => ({ category: 'all', distance: 'all' }),
+  },
+  onApply: {
+    type: Function,
+    default: null,
+  },
+})
+
+const { t } = useI18n()
+
+const pending = ref({ ...props.filters })
+
+const resultCount = computed(() => filterSpots(props.spots, pending.value).length)
+
+const apply = () => {
+  props.onApply?.({ ...pending.value })
+}
 </script>
 
 <template>
-  <div class="filters-bottom-sheet">
-    <div class="filters-header">
-      <Icon name="SlidersHorizontal" :size="24" class="icon-lucide" />
-      <h3>Filtrar Spots</h3>
+  <div class="filters-menu">
+    <p class="section-label">{{ t('spots.filters.category') }}</p>
+    <div class="chips-container">
+      <button
+        v-for="cat in CATEGORY_FILTERS"
+        :key="cat.key"
+        class="chip-btn"
+        :class="{ 'is-active': pending.category === cat.key }"
+        @click="pending.category = cat.key"
+      >
+        <Icon :name="cat.icon" :size="14" />
+        {{ t(`spots.filters.categories.${cat.key}`) }}
+      </button>
     </div>
-    <div class="filters-content">
-      <p class="subtitle">Categorías Temporales</p>
-      <div class="chips-container">
-        <button 
-          v-for="cat in categories" 
-          :key="cat"
-          class="chip-btn"
-        >
-          {{ cat }}
-        </button>
-      </div>
+
+    <p class="section-label">{{ t('spots.filters.distance') }}</p>
+    <div class="chips-container">
+      <button
+        v-for="dist in DISTANCE_FILTERS"
+        :key="dist.key"
+        class="chip-btn"
+        :class="{ 'is-active': pending.distance === dist.key }"
+        @click="pending.distance = dist.key"
+      >
+        {{ t(`spots.filters.distances.${dist.key}`) }}
+      </button>
     </div>
+
+    <ButtonComponent variant="primary" size="lg" full-width @click="apply">
+      {{ t('spots.filters.apply', { count: resultCount }) }}
+    </ButtonComponent>
   </div>
 </template>
 
 <style scoped>
-.filters-bottom-sheet {
-  padding: var(--space-4) var(--space-4) calc(var(--safe-area-inset-bottom) + var(--space-6));
-  background: var(--color-bg);
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+.filters-menu {
+  padding-bottom: var(--space-2);
 }
 
-.filters-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-  color: var(--color-text-primary);
-}
-
-.filters-header h3 {
-  margin: 0;
-  font-size: var(--text-xl);
-  font-weight: var(--font-bold);
-}
-
-.icon-lucide {
-  color: var(--color-primary);
-}
-
-.subtitle {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-3);
+.section-label {
+  font-size: 11px;
+  font-weight: var(--font-extrabold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin: var(--space-1) 0 var(--space-3);
 }
 
 .chips-container {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 9px;
+  margin-bottom: var(--space-5);
 }
 
 .chip-btn {
-  padding: var(--space-2) var(--space-4);
-  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 15px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  transition: all 0.2s ease;
+  color: var(--color-text-secondary);
+  font-size: 13.5px;
+  font-weight: var(--font-semibold);
+  transition: all 0.15s ease;
+  cursor: pointer;
 }
 
-.chip-btn:hover {
-  background: var(--color-primary-light);
+.chip-btn:active {
+  transform: scale(0.96);
+}
+
+.chip-btn.is-active {
+  background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+@media (hover: hover) {
+  .chip-btn:not(.is-active):hover {
+    background: var(--color-primary-tint);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
 }
 </style>
