@@ -52,12 +52,11 @@ const badgeClasses = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  font-weight: var(--font-medium);
-  border-radius: var(--radius-md);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 
-/* Sizes */
 .badge-sm {
   padding: 2px var(--space-2);
   font-size: var(--text-xs);
@@ -73,48 +72,45 @@ const badgeClasses = computed(() => {
   font-size: var(--text-base);
 }
 
-/* Variants */
 .badge-default {
-  background-color: var(--color-gray-100);
-  color: var(--color-gray-700);
+  background-color: var(--color-surface-2);
+  color: var(--color-text-secondary);
 }
 
 .badge-primary {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: var(--color-primary-tint);
   color: var(--color-primary);
 }
 
 .badge-secondary {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: var(--color-ocean-tint);
   color: var(--color-secondary);
 }
 
 .badge-success {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: var(--color-primary-tint);
   color: var(--color-success);
 }
 
 .badge-warning {
-  background-color: rgba(245, 158, 11, 0.1);
+  background-color: var(--color-sand-tint);
   color: var(--color-warning);
 }
 
 .badge-error {
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: var(--color-coral-tint);
   color: var(--color-error);
 }
 
 .badge-info {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: var(--color-ocean-tint);
   color: var(--color-info);
 }
 
-/* Rounded */
 .badge-rounded {
   border-radius: var(--radius-full);
 }
 
-/* Dot indicator */
 .badge-dot-indicator {
   width: 6px;
   height: 6px;

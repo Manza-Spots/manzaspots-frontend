@@ -1,0 +1,24 @@
+{
+  "filters": {
+    "title": "Filtrar spots",
+    "category": "Categoría",
+    "distance": "Distancia",
+    "apply": "Ver {count} spots",
+    "categories": {
+      "all": "Todos",
+      "miradores": "Miradores",
+      "trekking": "Trekking",
+      "cascadas": "Cascadas",
+      "playas": "Playas"
+    },
+    "distances": {
+      "near": "≤ 5 km",
+      "mid": "≤ 15 km",
+      "all": "Todo"
+    }
+  },
+  "immersive": {
+    "hint": "Desliza para explorar",
+    "empty": "No hay spots con estos filtros"
+  }
+}

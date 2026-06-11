@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import Icon from './Icon.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 import SettingsMenu from '@/features/settings/components/SettingsMenu.vue'
 
 const { t } = useI18n()
@@ -16,6 +17,7 @@ const router = useRouter()
 const route = useRoute()
 const { isAppReady } = useAppReady()
 const bottomSheet = useBottomSheet()
+const { isImmersive } = useImmersiveMode()
 
 const isSearching = ref(false)
 const searchQuery = ref('')
@@ -275,7 +277,7 @@ const handleFloatingAction = () => {
   @touchstart.passive="() => {}"
   :style="{ transform: `translateY(-${keyboardHeight}px)` }"
 >
-    <div class="nav-layout" :class="{ 'is-visible': isNavVisible }">
+    <div class="nav-layout" :class="{ 'is-visible': isNavVisible, 'is-immersive': isImmersive }">
       <div
         class="nav-pill"
         :class="{ 'is-compact': isSearching, 'is-zoomed': isDragging || isClicking }"
@@ -310,7 +312,7 @@ const handleFloatingAction = () => {
             :name="activeItem ? activeItem.icon : 'GalleryVerticalEnd'"
             :size="24"
             class="nav-item__icon nav-item--active"
-            style="color: var(--color-primary)"
+            :style="isImmersive ? 'color: var(--color-text-inverse)' : 'color: var(--color-primary)'"
           />
         </div>
       </div>
@@ -387,12 +389,12 @@ const handleFloatingAction = () => {
   top: 0;
   left: 0;
   display: flex;
-  background: rgb(255, 255, 255);
-  -webkit-backdrop-filter: saturate(180%) blur(2px);
-  backdrop-filter: saturate(180%) blur(2px);
-  border-radius: 100px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-md);
   height: 56px;
   width: calc(100% - 56px - var(--space-2));
   overflow: hidden;
@@ -461,12 +463,12 @@ const handleFloatingAction = () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  background: rgb(255, 255, 255);
-  -webkit-backdrop-filter: saturate(180%) blur(2px);
-  backdrop-filter: saturate(180%) blur(2px);
-  border-radius: 100px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-md);
   height: 56px;
   width: 56px;
   padding: 0 16px;
@@ -550,8 +552,8 @@ const handleFloatingAction = () => {
 .nav-slider-inner {
   height: 100%;
   width: 100%;
-  border-radius: 100px;
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-tint);
 }
 
 .nav-item {
@@ -568,7 +570,7 @@ const handleFloatingAction = () => {
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--color-text-primary);
+  color: var(--color-text-tertiary);
   flex: 1 0 0px;
   min-width: 72px;
   touch-action: manipulation;
@@ -603,7 +605,7 @@ const handleFloatingAction = () => {
 
 .nav-item__label {
   font-size: var(--text-xs);
-  font-weight: var(--font-medium);
+  font-weight: var(--font-bold);
   transition: color 0.3s ease;
   white-space: nowrap;
   margin-top: 2px;
@@ -661,8 +663,45 @@ const handleFloatingAction = () => {
   color: var(--color-text-tertiary);
 }
 
-:global(html.dark) .nav-pill,
-:global(html.dark) .action-pill {
-  background: rgba(28, 28, 30, 0.7);
+.is-immersive .nav-pill,
+.is-immersive .action-pill {
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: saturate(160%) blur(20px);
+  backdrop-filter: saturate(160%) blur(20px);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 }
+
+.is-immersive .nav-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.is-immersive .nav-item.nav-item--active,
+.is-immersive .nav-item--active .nav-item__icon,
+.is-immersive .nav-item--active .nav-item__label {
+  color: var(--color-selva-deep);
+  background: var(--color-primary-tint);
+}
+
+.is-immersive .nav-slider-inner {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.is-immersive .pill-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.is-immersive .search-input {
+  color: #fff;
+}
+
+.is-immersive .search-input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.is-immersive .clear-button,
+.is-immersive .mic-button {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 </style>

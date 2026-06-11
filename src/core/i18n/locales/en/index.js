@@ -4,6 +4,8 @@ import auth from './auth.json'
 import navigation from './navigation.json'
 import legal from './legal.json'
 import settings from './settings.json'
+import record from './record.json'
+import spots from './spots.json'
 
 export default {
   common,
@@ -11,5 +13,7 @@ export default {
   auth,
   navigation,
   legal,
-  settings
+  settings,
+  record,
+  spots
 }

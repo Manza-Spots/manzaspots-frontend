@@ -80,6 +80,9 @@ import {
   LocateFixed,
   SlidersHorizontal,
   List,
+  Ruler,
+  Droplets,
+  Waves,
 } from 'lucide-vue-next'
 
 export const icons = {
@@ -164,4 +167,7 @@ export const icons = {
   LocateFixed,
   SlidersHorizontal,
   List,
+  Ruler,
+  Droplets,
+  Waves,
 }

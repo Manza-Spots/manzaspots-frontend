@@ -248,18 +248,18 @@ const goToProfile = () => router.push('/profile')
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-primary);
+  background: var(--color-bg);
 }
 
 .back-button {
   position: absolute;
   top: calc(var(--safe-area-inset-top) + var(--space-4));
   left: calc(var(--safe-area-inset-left) + var(--space-4));
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,14 +292,15 @@ const goToProfile = () => router.push('/profile')
 }
 
 .title {
-  font-size: var(--text-4xl);
-  font-weight: var(--font-bold);
+  font-size: 1.625rem;
+  font-weight: var(--font-extrabold);
+  letter-spacing: -0.025em;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .subtitle {
-  font-size: var(--text-lg);
+  font-size: var(--text-sm);
   color: var(--color-text-secondary);
   margin: 0;
 }
@@ -323,7 +324,7 @@ const goToProfile = () => router.push('/profile')
 
 .terms-link {
   color: var(--color-primary);
-  font-weight: var(--font-medium);
+  font-weight: var(--font-bold);
   transition: color var(--transition-fast);
   font-size: var(--text-sm);
 }
@@ -359,9 +360,9 @@ const goToProfile = () => router.push('/profile')
 .divider span {
   display: inline-block;
   padding: 0 var(--space-4);
-  background: white;
+  background: var(--color-bg);
   color: var(--color-text-tertiary);
-  font-size: var(--text-sm);
+  font-size: 13px;
 }
 
 .social-register {
@@ -376,19 +377,19 @@ const goToProfile = () => router.push('/profile')
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+  font-size: 15px;
+  font-weight: var(--font-bold);
   color: var(--color-text-primary);
-  background: white;
+  background: var(--color-surface);
   transition: all var(--transition-fast);
-  min-height: 45px;
+  min-height: 46px;
 }
 
 .social-button:active {
   transform: scale(0.98);
-  background: var(--color-gray-50);
+  background: var(--color-surface-2);
 }
 
 .social-button svg {
@@ -408,7 +409,7 @@ const goToProfile = () => router.push('/profile')
 
 .link {
   color: var(--color-primary);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-extrabold);
   transition: color var(--transition-fast);
   font-size: var(--text-sm);
 }

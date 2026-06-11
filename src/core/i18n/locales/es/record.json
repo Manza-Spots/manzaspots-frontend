@@ -1,0 +1,19 @@
+{
+  "status": {
+    "ready": "Listo",
+    "recording": "Grabando",
+    "paused": "En pausa"
+  },
+  "stats": {
+    "distance": "Distancia",
+    "time": "Tiempo",
+    "elevation": "Desnivel"
+  },
+  "controls": {
+    "start": "Iniciar",
+    "photo": "Foto",
+    "finish": "Finalizar",
+    "pause": "Pausa",
+    "resume": "Reanudar"
+  }
+}
