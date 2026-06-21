@@ -1,29 +1,37 @@
 import { CapacitorConfig } from '@capacitor/cli'
 
+// El dev server (hot reload sobre el dispositivo) solo se usa cuando CAP_ENV=dev.
+// En producción se omite `server.url` para que la app cargue desde `dist/` (webDir).
+const isDev = process.env.CAP_ENV === 'dev'
+
 const config: CapacitorConfig = {
   appId: 'com.manzaspots.hiking',
   appName: 'Manzaspots',
   webDir: 'dist',
-  server: {
-    url: 'http://192.168.1.78:5173', // para debugueo local
-    cleartext: true,
-    androidScheme: 'https',
-    // Permitir navegación a tu API
-    allowNavigation: ['http://192.168.1.78:5173', 'http://localhost:8000'],
-  },
+  server: isDev
+    ? {
+        url: 'http://192.168.1.80:5173', // para debugueo local
+        cleartext: true,
+        androidScheme: 'https',
+        // Permitir navegación a tu API
+        allowNavigation: ['http://192.168.1.95:5173', 'http://localhost:8000'],
+      }
+    : {
+        androidScheme: 'https',
+      },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
-      launchAutoHide: false,
-      launchFadeOutDuration: 300,
-      backgroundColor: '#10b981',
+      launchShowDuration: 0,
+      launchAutoHide: true,
+      launchFadeOutDuration: 0,
+      backgroundColor: '#050c16ff',
       showSpinner: false,
       splashFullScreen: true,
-      splashImmersive: false,
+      splashImmersive: true,
     },
     LocalNotifications: {
       smallIcon: 'ic_stat_icon_config_sample',
-      iconColor: '#488AFF',
+      iconColor: '#364153ff',
     },
     StatusBar: {
     },

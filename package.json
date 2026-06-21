@@ -12,12 +12,15 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix",
     "format": "prettier --write src/",
+    "assets": "capacitor-assets generate --android --ios --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'",
     "cap:sync": "npm run build && npx cap sync",
     "cap:copy": "npm run build && npx cap copy",
     "cap:open:ios": "npx cap open ios",
     "cap:open:android": "npx cap open android",
     "cap:run:ios": "npm run cap:sync && npx cap run ios",
-    "cap:run:android": "npm run cap:sync && npx cap run android"
+    "cap:run:android": "npm run cap:sync && npx cap run android",
+    "cap:dev:android": "CAP_ENV=dev npx cap run android",
+    "cap:dev:ios": "CAP_ENV=dev npx cap run ios"
   },
   "dependencies": {
     "@capacitor/android": "^8.1.0",
@@ -44,6 +47,7 @@
     "vue3-google-login": "^2.0.37"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.37.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",

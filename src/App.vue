@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import PWAUpdatePrompt from '@/shared/components/PWAUpdatePrompt.vue'
@@ -7,6 +7,7 @@ import OfflineIndicator from '@/shared/components/OfflineIndicator.vue'
 import ToastContainer from '@/shared/components/ToastContainer.vue'
 import BottomSheet from '@/shared/components/BottomSheet.vue'
 import BottomNav from './shared/components/BottomNav.vue'
+import SplashScreen from '@/shared/components/SplashScreen.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useTheme } from '@/shared/composables/useTheme'
 import { useI18n } from 'vue-i18n'
@@ -17,6 +18,8 @@ const route = useRoute()
 const { markReady } = useAppReady()
 const { initializeTheme } = useTheme()
 const { locale } = useI18n()
+
+const showSplash = ref(true)
 
 const hideBottomNav = computed(() => {
   const hiddenRoutes = [
@@ -33,8 +36,6 @@ const hideBottomNav = computed(() => {
 })
 
 onMounted(async () => {
-  markReady()
-
   try {
     const { value } = await Preferences.get({ key: 'manzaspots_language_preference' })
     if (value) {
@@ -45,6 +46,7 @@ onMounted(async () => {
   }
 
   await initializeTheme()
+  markReady()
 
   document.addEventListener('touchend', (e) => {
     const activeElement = document.activeElement
@@ -64,6 +66,7 @@ onMounted(async () => {
 
 <template>
   <div id="app">
+    <SplashScreen v-if="showSplash" @done="showSplash = false" />
     <OfflineIndicator />
     <PWAUpdatePrompt />
     <ToastContainer />
