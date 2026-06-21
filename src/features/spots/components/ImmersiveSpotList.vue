@@ -162,7 +162,7 @@ const formatKm = (distance) => {
   right: 0;
   height: 34%;
   z-index: 2;
-  background: linear-gradient(to bottom, rgba(7, 18, 13, 0.5), transparent);
+  background: linear-gradient(to bottom, rgba(20, 25, 22, 0.5), transparent);
 }
 
 .scrim-bottom {
@@ -174,8 +174,8 @@ const formatKm = (distance) => {
   z-index: 2;
   background: linear-gradient(
     to top,
-    rgba(7, 18, 13, 0.86) 0%,
-    rgba(7, 18, 13, 0.35) 45%,
+    rgba(20, 25, 22, 0.86) 0%,
+    rgba(20, 25, 22, 0.35) 45%,
     transparent 100%
   );
 }
@@ -309,5 +309,27 @@ const formatKm = (distance) => {
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
   margin: 0;
+}
+
+/* Dark mode */
+:global(html.dark) .immersive-list {
+  background: var(--color-bg);
+}
+
+:global(html.dark) .scrim-top {
+  background: linear-gradient(to bottom, rgba(12, 16, 14, 0.55), transparent);
+}
+
+:global(html.dark) .scrim-bottom {
+  background: linear-gradient(
+    to top,
+    rgba(12, 16, 14, 0.90) 0%,
+    rgba(12, 16, 14, 0.40) 45%,
+    transparent 100%
+  );
+}
+
+:global(html.dark) .immersive-empty {
+  color: var(--color-text-secondary);
 }
 </style>

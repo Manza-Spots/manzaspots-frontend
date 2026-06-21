@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo del splash nativo: igual al <body> de la web para evitar el flash blanco
+         al arrancar. El splash de marca lo dibuja la app (SplashScreen.vue). -->
+    <color name="splash_background">#050c16</color>
+</resources>
