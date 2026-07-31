@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, onBeforeUnmount, onMounted } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InteractiveMap from '@/features/map/components/InteractiveMap.vue'
 import ImmersiveSpotList from '@/features/spots/components/ImmersiveSpotList.vue'
@@ -18,8 +18,11 @@ const currentView = ref('map')
 const isLocating = ref(false)
 const filters = ref({ ...DEFAULT_FILTERS })
 
-const { spots, load } = useSpots()
-onMounted(load)
+const { spots, loadInBounds } = useSpots()
+
+// El viewport del mapa dirige la carga: al mover/hacer zoom se piden solo los
+// spots del bounding box visible.
+const handleBoundsChange = (bounds) => loadInBounds(bounds)
 
 watch(currentView, (v) => { isImmersive.value = v === 'list' }, { immediate: true })
 onBeforeUnmount(() => { isImmersive.value = false })
@@ -62,7 +65,11 @@ const openFilters = () => {
       @filter="openFilters"
     />
 
-    <InteractiveMap ref="mapRef" />
+    <InteractiveMap
+      ref="mapRef"
+      :spots="filteredSpots"
+      @boundschange="handleBoundsChange"
+    />
 
     <Transition name="slide-up">
       <ImmersiveSpotList
