@@ -58,21 +58,35 @@ export function useSpots() {
   const loading = ref(false)
   const error = ref(null)
 
-  async function load() {
+  // La ubicación del usuario se resuelve una sola vez y se reutiliza entre cargas
+  // (evita re-pedir el GPS en cada cambio de viewport del mapa).
+  let userPos = null
+  let userPosResolved = false
+
+  async function ensureUserPos() {
+    if (userPosResolved) return userPos
+    userPosResolved = true
+    try {
+      const pos = await locationService.getCurrentPosition()
+      userPos = { lat: pos.latitude, lng: pos.longitude }
+    } catch {
+      userPos = null // Sin ubicación: se listan sin distancia.
+    }
+    return userPos
+  }
+
+  /**
+   * Carga spots desde la API. `params` se pasa como query string
+   * (p. ej. bounding box, name, radio…).
+   */
+  async function load(params = {}) {
     loading.value = true
     error.value = null
     try {
-      // Ubicación del usuario (opcional) para calcular/ordenar por distancia.
-      let userPos = null
-      try {
-        const pos = await locationService.getCurrentPosition()
-        userPos = { lat: pos.latitude, lng: pos.longitude }
-      } catch {
-        // Sin ubicación: se listan sin distancia.
-      }
+      await ensureUserPos()
 
-      const raw = await spotsApi.getSpots()
-      let mapped = raw.map((s) => mapSpot(s, userPos))
+      const raw = await spotsApi.getSpots(params)
+      const mapped = raw.map((s) => mapSpot(s, userPos))
 
       if (userPos) {
         mapped.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity))
@@ -87,5 +101,15 @@ export function useSpots() {
     }
   }
 
-  return { spots, loading, error, load }
+  /** Carga los spots dentro del bounding box (viewport) del mapa. */
+  function loadInBounds(bounds) {
+    return load({
+      sw_lat: bounds.sw_lat,
+      sw_lng: bounds.sw_lng,
+      ne_lat: bounds.ne_lat,
+      ne_lng: bounds.ne_lng,
+    })
+  }
+
+  return { spots, loading, error, load, loadInBounds }
 }
