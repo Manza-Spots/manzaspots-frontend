@@ -1,91 +1,46 @@
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
+import RecordMap from '@/features/map/components/RecordMap.vue'
+import { useRouteRecorder } from '@/features/tracking/composables/useRouteRecorder'
 
 const { t } = useI18n()
 
-const status = ref('idle') // idle | recording | paused
-const elapsedSeconds = ref(0)
-const distanceKm = ref(0)
-const elevationM = ref(0)
+const mapRef = ref(null)
+const {
+  status,
+  points,
+  distanceKm,
+  elevationM,
+  formattedTime,
+  lastTrack,
+  isSim,
+  start,
+  pause,
+  resume,
+  finish,
+  downloadTrack,
+} = useRouteRecorder()
 
-let timer = null
-
-const startTimer = () => {
-  timer = setInterval(() => {
-    elapsedSeconds.value += 1
-  }, 1000)
-}
-
-const stopTimer = () => {
-  clearInterval(timer)
-  timer = null
-}
-
-const startRecording = () => {
-  status.value = 'recording'
-  startTimer()
-}
-
-const togglePause = () => {
-  if (status.value === 'recording') {
-    status.value = 'paused'
-    stopTimer()
-  } else {
-    status.value = 'recording'
-    startTimer()
-  }
-}
-
-const finishRecording = () => {
-  status.value = 'idle'
-  stopTimer()
-  elapsedSeconds.value = 0
-  distanceKm.value = 0
-  elevationM.value = 0
-}
-
-onBeforeUnmount(stopTimer)
-
-const formattedTime = computed(() => {
-  const m = Math.floor(elapsedSeconds.value / 60)
-  const s = elapsedSeconds.value % 60
-  return { minutes: String(m), seconds: String(s).padStart(2, '0') }
-})
-
-const statusLabel = computed(() => {
+const statusLabel = () => {
   if (status.value === 'recording') return t('record.status.recording')
   if (status.value === 'paused') return t('record.status.paused')
   return t('record.status.ready')
-})
+}
+
+const togglePause = () => {
+  if (status.value === 'recording') pause()
+  else resume()
+}
+
+const recenter = () => mapRef.value?.recenter()
 </script>
 
 <template>
   <div class="record-view">
     <div class="record-map">
-      <div class="map-land map-land--a"></div>
-      <div class="map-land map-land--b"></div>
-      <div class="map-sea"></div>
-
-      <svg
-        v-if="status !== 'idle'"
-        class="record-trace"
-        viewBox="0 0 278 360"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M70 330 C 90 280, 60 230, 110 200 S 170 150, 150 110 S 120 70, 175 55"
-          fill="none"
-          stroke="var(--color-primary)"
-          stroke-width="5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          opacity="0.95"
-        />
-        <circle cx="70" cy="330" r="8" fill="var(--color-primary)" stroke="var(--color-bg)" stroke-width="3" />
-        <circle cx="175" cy="55" r="9" fill="#fff" stroke="var(--color-primary)" stroke-width="4" />
-      </svg>
+      <RecordMap ref="mapRef" :points="points" />
 
       <div class="record-head">
         <span
@@ -96,9 +51,10 @@ const statusLabel = computed(() => {
           }"
         >
           <span v-if="status === 'recording'" class="record-badge__dot"></span>
-          {{ statusLabel }}
+          {{ statusLabel() }}
         </span>
-        <button class="record-fab">
+        <span v-if="isSim" class="record-badge record-badge--sim">SIM</span>
+        <button class="record-fab" @click="recenter">
           <Icon name="LocateFixed" :size="22" />
         </button>
       </div>
@@ -139,7 +95,7 @@ const statusLabel = computed(() => {
 
       <div v-if="status === 'idle'" class="record-controls">
         <div class="record-ctrlwrap">
-          <button class="record-stop record-start" @click="startRecording">
+          <button class="record-stop record-start" @click="start">
             <Icon name="Play" :size="30" />
           </button>
           <div class="record-ctrl-label">{{ t('record.controls.start') }}</div>
@@ -154,7 +110,7 @@ const statusLabel = computed(() => {
           <div class="record-ctrl-label">{{ t('record.controls.photo') }}</div>
         </div>
         <div class="record-ctrlwrap">
-          <button class="record-stop" @click="finishRecording">
+          <button class="record-stop" @click="finish">
             <Icon name="Square" :size="28" />
           </button>
           <div class="record-ctrl-label">{{ t('record.controls.finish') }}</div>
@@ -167,6 +123,17 @@ const statusLabel = computed(() => {
             {{ status === 'paused' ? t('record.controls.resume') : t('record.controls.pause') }}
           </div>
         </div>
+      </div>
+
+      <div v-if="status === 'idle' && lastTrack" class="record-export">
+        <button class="record-export__btn" @click="downloadTrack('geojson')">
+          <Icon name="Download" :size="15" />
+          GeoJSON
+        </button>
+        <button class="record-export__btn" @click="downloadTrack('gpx')">
+          <Icon name="Download" :size="15" />
+          GPX
+        </button>
       </div>
     </div>
   </div>
@@ -182,70 +149,10 @@ const statusLabel = computed(() => {
   overflow: hidden;
 }
 
-/* Mapa estilizado (placeholder hasta integrar el mapa real con tracking) */
 .record-map {
   position: relative;
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(165deg, #cfe7d4 0%, #d7ead9 40%, #bfe0e6 100%);
-}
-
-:global(html.dark) .record-map {
-  background: linear-gradient(165deg, #16241d 0%, #142420 45%, #102a30 100%);
-}
-
-.map-sea {
-  position: absolute;
-  right: -10%;
-  bottom: -12%;
-  width: 92%;
-  height: 72%;
-  background: radial-gradient(120% 120% at 80% 90%, #6fc2d4 0%, #4aa9c2 55%, #2f93b0 100%);
-  border-radius: 60% 0 0 0 / 70% 0 0 0;
-  transform: rotate(-8deg);
-  opacity: 0.92;
-}
-
-:global(html.dark) .map-sea {
-  background: radial-gradient(120% 120% at 80% 90%, #155566 0%, #0e3d4c 60%, #0a2c38 100%);
-}
-
-.map-land {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(1px);
-}
-
-.map-land--a {
-  width: 180px;
-  height: 150px;
-  top: -40px;
-  left: -50px;
-  background: rgba(96, 165, 120, 0.55);
-}
-
-.map-land--b {
-  width: 120px;
-  height: 110px;
-  top: 120px;
-  left: -30px;
-  background: rgba(120, 182, 140, 0.45);
-}
-
-:global(html.dark) .map-land--a {
-  background: rgba(40, 90, 60, 0.5);
-}
-
-:global(html.dark) .map-land--b {
-  background: rgba(48, 100, 68, 0.4);
-}
-
-.record-trace {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 6;
 }
 
 .record-head {
@@ -283,6 +190,13 @@ const statusLabel = computed(() => {
 .record-badge--paused {
   background: var(--color-arena);
   color: #fff;
+}
+
+.record-badge--sim {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  margin-right: auto;
+  margin-left: var(--space-2);
 }
 
 .record-badge__dot {
@@ -445,5 +359,31 @@ const statusLabel = computed(() => {
   color: var(--color-text-tertiary);
   text-align: center;
   margin-top: 7px;
+}
+
+.record-export {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.record-export__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: var(--font-bold);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: transform 0.12s var(--ease-out);
+}
+
+.record-export__btn:active {
+  transform: scale(0.95);
 }
 </style>

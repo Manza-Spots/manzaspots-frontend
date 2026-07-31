@@ -10,11 +10,11 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: isDev
     ? {
-        url: 'http://192.168.1.80:5173', // para debugueo local
+        url: 'http://192.168.1.75:5173', // para debugueo local
         cleartext: true,
         androidScheme: 'https',
         // Permitir navegación a tu API
-        allowNavigation: ['http://192.168.1.95:5173', 'http://localhost:8000'],
+        allowNavigation: ['http://192.168.1.75:5173', 'http://localhost:8000'],
       }
     : {
         androidScheme: 'https',
