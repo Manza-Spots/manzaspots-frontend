@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InteractiveMap from '@/features/map/components/InteractiveMap.vue'
 import ImmersiveSpotList from '@/features/spots/components/ImmersiveSpotList.vue'
@@ -7,14 +7,8 @@ import SpotFiltersBottomSheet from '@/features/spots/components/FiltersMenu.vue'
 import SpotsHeader from '@/features/spots/components/SpotsHeader.vue'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
+import { useSpots } from '@/features/spots/composables/useSpots'
 import { DEFAULT_FILTERS, filterSpots, isFilterActive } from '@/features/spots/utils/spotFilters'
-
-import img1 from '@/assets/img/img1.jpeg'
-import img2 from '@/assets/img/img2.jpeg'
-import img3 from '@/assets/img/img3.jpeg'
-import img4 from '@/assets/img/img4.jpeg'
-import img5 from '@/assets/img/img5.jpeg'
-import img6 from '@/assets/img/img6.jpeg'
 
 const { t } = useI18n()
 const bottomSheet = useBottomSheet()
@@ -24,25 +18,13 @@ const currentView = ref('map')
 const isLocating = ref(false)
 const filters = ref({ ...DEFAULT_FILTERS })
 
+const { spots, load } = useSpots()
+onMounted(load)
+
 watch(currentView, (v) => { isImmersive.value = v === 'list' }, { immediate: true })
 onBeforeUnmount(() => { isImmersive.value = false })
 
-const mockSpots = [
-  { id: 1, name: 'Mirador de Playa Miramar', category: 'Mirador', distance: '1.2 km', imageUrl: img1, description: 'Excelente vista a la bahía con fácil acceso pavimentado.' },
-  { id: 2, name: 'Cerro del Toro', category: 'Trekking', distance: '3.5 km', imageUrl: img2, description: 'Ruta exigente con gran recompensa visual de la costa del Océano Pacífico.' },
-  { id: 3, name: 'Cascada de Juluapan', category: 'Cascadas', distance: '12 km', imageUrl: img3, description: 'Lugar exótico con albercas naturales perfectas para un chapuzón fresco.' },
-  { id: 4, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: img4, description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
-  { id: 5, name: 'Playa de Oro', category: 'Playa', distance: '18 km', imageUrl: img5, description: 'Famosa por su muelle y puestas de sol espectaculares en el horizonte.' },
-  { id: 6, name: 'La Boquita', category: 'Playa', distance: '8 km', imageUrl: img6, description: 'Aguas tranquilas ideales para el snorkel y disfrutar con los más pequeños.' },
-  { id: 1, name: 'Mirador de Playa Miramar', category: 'Mirador', distance: '1.2 km', imageUrl: img1, description: 'Excelente vista a la bahía con fácil acceso pavimentado.' },
-  { id: 2, name: 'Cerro del Toro', category: 'Trekking', distance: '3.5 km', imageUrl: img2, description: 'Ruta exigente con gran recompensa visual de la costa del Océano Pacífico.' },
-  { id: 3, name: 'Cascada de Juluapan', category: 'Cascadas', distance: '12 km', imageUrl: img3, description: 'Lugar exótico con albercas naturales perfectas para un chapuzón fresco.' },
-  { id: 4, name: 'Punta de Cuastecomates', category: 'Playa Inclusiva', distance: '15 km', imageUrl: img4, description: 'Bahía totalmente protegida con poco oleaje. Recomendable para familias.' },
-  { id: 5, name: 'Playa de Oro', category: 'Playa', distance: '18 km', imageUrl: img5, description: 'Famosa por su muelle y puestas de sol espectaculares en el horizonte.' },
-  { id: 6, name: 'La Boquita', category: 'Playa', distance: '8 km', imageUrl: img6, description: 'Aguas tranquilas ideales para el snorkel y disfrutar con los más pequeños.' }
-]
-
-const filteredSpots = computed(() => filterSpots(mockSpots, filters.value))
+const filteredSpots = computed(() => filterSpots(spots.value, filters.value))
 const hasActiveFilters = computed(() => isFilterActive(filters.value))
 
 const handleLocate = async () => {
@@ -59,7 +41,7 @@ const applyFilters = (newFilters) => {
 
 const openFilters = () => {
   bottomSheet.open(SpotFiltersBottomSheet, {
-    spots: mockSpots,
+    spots: spots.value,
     filters: filters.value,
     onApply: applyFilters,
   }, {

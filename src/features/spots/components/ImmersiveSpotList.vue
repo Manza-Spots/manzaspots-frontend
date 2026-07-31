@@ -80,13 +80,13 @@ const formatKm = (distance) => {
         <div class="scrim-bottom"></div>
 
         <div class="slide-info">
-          <div class="slide-cat">
+          <div v-if="spot.category" class="slide-cat">
             <span class="glass-chip">
               <Icon :name="categoryIcon(spot.category)" :size="13" />
               {{ spot.category }}
             </span>
           </div>
-          <div class="slide-km">
+          <div v-if="spot.distance" class="slide-km">
             {{ formatKm(spot.distance) }}<small> km</small>
           </div>
           <h2 class="slide-name">{{ spot.name }}</h2>
