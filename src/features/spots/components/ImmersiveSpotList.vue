@@ -2,7 +2,8 @@
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
-import { categoryIcon, parseKm } from '../utils/spotFilters'
+import { parseKm } from '../utils/spotFilters'
+import { useKeyboard } from '@/shared/composables/useKeyboard'
 
 const props = defineProps({
   spots: {
@@ -12,6 +13,14 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
+const { keyboardHeight } = useKeyboard()
+
+// Al abrir el teclado, el contenido (pager) sube por encima de él para no dejar
+// la info del spot tapada; el contenedor sigue a pantalla completa, así su fondo
+// oscuro rellena el hueco de abajo (en vez de dejar ver el mapa).
+const listStyle = computed(() =>
+  keyboardHeight.value > 0 ? { bottom: `calc(${keyboardHeight.value}px + 96px)` } : {},
+)
 
 const pagerRef = ref(null)
 const activeIndex = ref(0)
@@ -63,7 +72,7 @@ const formatKm = (distance) => {
 
 <template>
   <div class="immersive-list">
-    <div ref="pagerRef" class="immersive-pager" @scroll.passive="onScroll">
+    <div ref="pagerRef" class="immersive-pager" :style="listStyle" @scroll.passive="onScroll">
       <section
         v-for="spot in spots"
         :key="spot.id"
@@ -80,12 +89,6 @@ const formatKm = (distance) => {
         <div class="scrim-bottom"></div>
 
         <div class="slide-info">
-          <div v-if="spot.category" class="slide-cat">
-            <span class="glass-chip">
-              <Icon :name="categoryIcon(spot.category)" :size="13" />
-              {{ spot.category }}
-            </span>
-          </div>
           <div v-if="spot.distance" class="slide-km">
             {{ formatKm(spot.distance) }}<small> km</small>
           </div>
@@ -132,6 +135,7 @@ const formatKm = (distance) => {
   scroll-snap-type: y mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  transition: bottom 0.28s ease;
 }
 
 .immersive-pager::-webkit-scrollbar {

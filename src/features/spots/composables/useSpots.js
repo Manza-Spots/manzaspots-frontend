@@ -101,15 +101,5 @@ export function useSpots() {
     }
   }
 
-  /** Carga los spots dentro del bounding box (viewport) del mapa. */
-  function loadInBounds(bounds) {
-    return load({
-      sw_lat: bounds.sw_lat,
-      sw_lng: bounds.sw_lng,
-      ne_lat: bounds.ne_lat,
-      ne_lng: bounds.ne_lng,
-    })
-  }
-
-  return { spots, loading, error, load, loadInBounds }
+  return { spots, loading, error, load, ensureUserPos }
 }

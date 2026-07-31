@@ -1,22 +1,13 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Icon from '@/shared/components/Icon.vue'
 import ButtonComponent from '@/shared/components/ButtonComponent.vue'
-import {
-  CATEGORY_FILTERS,
-  DISTANCE_FILTERS,
-  filterSpots,
-} from '../utils/spotFilters'
+import { RADIUS_MIN_KM, RADIUS_MAX_KM, DEFAULT_RADIUS_KM } from '../utils/spotFilters'
 
 const props = defineProps({
-  spots: {
-    type: Array,
-    default: () => [],
-  },
   filters: {
     type: Object,
-    default: () => ({ category: 'all', distance: 'all' }),
+    default: () => ({ radiusKm: 15 }),
   },
   onApply: {
     type: Function,
@@ -28,8 +19,6 @@ const { t } = useI18n()
 
 const pending = ref({ ...props.filters })
 
-const resultCount = computed(() => filterSpots(props.spots, pending.value).length)
-
 const apply = () => {
   props.onApply?.({ ...pending.value })
 }
@@ -37,35 +26,35 @@ const apply = () => {
 
 <template>
   <div class="filters-menu">
-    <p class="section-label">{{ t('spots.filters.category') }}</p>
-    <div class="chips-container">
+    <div class="radius-head">
+      <span class="section-label">{{ t('spots.filters.radius') }}</span>
       <button
-        v-for="cat in CATEGORY_FILTERS"
-        :key="cat.key"
-        class="chip-btn"
-        :class="{ 'is-active': pending.category === cat.key }"
-        @click="pending.category = cat.key"
+        v-if="pending.radiusKm !== DEFAULT_RADIUS_KM"
+        type="button"
+        class="reset-link"
+        @click="pending.radiusKm = DEFAULT_RADIUS_KM"
       >
-        <Icon :name="cat.icon" :size="14" />
-        {{ t(`spots.filters.categories.${cat.key}`) }}
+        {{ t('spots.filters.reset') }}
       </button>
     </div>
+    <div class="radius-value">{{ pending.radiusKm }}<small> km</small></div>
 
-    <p class="section-label">{{ t('spots.filters.distance') }}</p>
-    <div class="chips-container">
-      <button
-        v-for="dist in DISTANCE_FILTERS"
-        :key="dist.key"
-        class="chip-btn"
-        :class="{ 'is-active': pending.distance === dist.key }"
-        @click="pending.distance = dist.key"
-      >
-        {{ t(`spots.filters.distances.${dist.key}`) }}
-      </button>
+    <input
+      type="range"
+      class="radius-slider"
+      :min="RADIUS_MIN_KM"
+      :max="RADIUS_MAX_KM"
+      step="1"
+      v-model.number="pending.radiusKm"
+    />
+
+    <div class="radius-scale">
+      <span>{{ RADIUS_MIN_KM }} km</span>
+      <span>{{ RADIUS_MAX_KM }} km</span>
     </div>
 
     <ButtonComponent variant="primary" size="lg" full-width @click="apply">
-      {{ t('spots.filters.apply', { count: resultCount }) }}
+      {{ t('spots.filters.apply') }}
     </ButtonComponent>
   </div>
 </template>
@@ -75,52 +64,64 @@ const apply = () => {
   padding-bottom: var(--space-2);
 }
 
+.radius-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  margin-bottom: var(--space-1);
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.reset-link:active {
+  opacity: 0.6;
+}
+
 .section-label {
   font-size: 11px;
   font-weight: var(--font-extrabold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-tertiary);
-  margin: var(--space-1) 0 var(--space-3);
 }
 
-.chips-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-bottom: var(--space-5);
+.radius-value {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-extrabold);
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
-.chip-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 15px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+.radius-value small {
+  font-size: 15px;
+  font-weight: var(--font-bold);
   color: var(--color-text-secondary);
-  font-size: 13.5px;
-  font-weight: var(--font-semibold);
-  transition: all 0.15s ease;
+  margin-left: 2px;
+}
+
+.radius-slider {
+  width: 100%;
+  height: 28px;
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
-.chip-btn:active {
-  transform: scale(0.96);
-}
-
-.chip-btn.is-active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-@media (hover: hover) {
-  .chip-btn:not(.is-active):hover {
-    background: var(--color-primary-tint);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
+.radius-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  color: var(--color-text-tertiary);
+  margin: var(--space-1) 0 var(--space-5);
 }
 </style>
