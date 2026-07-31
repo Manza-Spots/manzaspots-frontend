@@ -1,45 +1,14 @@
-export const CATEGORY_FILTERS = [
-  { key: 'all', icon: 'MapPin', match: null },
-  { key: 'miradores', icon: 'Mountain', match: ['Mirador'] },
-  { key: 'trekking', icon: 'Footprints', match: ['Trekking'] },
-  { key: 'cascadas', icon: 'Droplets', match: ['Cascadas'] },
-  { key: 'playas', icon: 'Waves', match: ['Playa Inclusiva', 'Playa'] },
-]
+// El mapa muestra spots por proximidad: un radio (km) alrededor del usuario,
+// ajustable con un slider. La lista, en cambio, es un catálogo global.
+export const RADIUS_MIN_KM = 1
+export const RADIUS_MAX_KM = 50
+export const DEFAULT_RADIUS_KM = 15
 
-export const DISTANCE_FILTERS = [
-  { key: 'near', max: 5 },
-  { key: 'mid', max: 15 },
-  { key: 'all', max: Infinity },
-]
+export const DEFAULT_FILTERS = { radiusKm: DEFAULT_RADIUS_KM }
 
-export const DEFAULT_FILTERS = { category: 'all', distance: 'all' }
-
-const CATEGORY_ICONS = {
-  Mirador: 'Mountain',
-  Trekking: 'Footprints',
-  Cascadas: 'Droplets',
-  'Playa Inclusiva': 'Waves',
-  Playa: 'Waves',
-}
-
-export const categoryIcon = (category) => CATEGORY_ICONS[category] ?? 'MapPin'
+export const isFilterActive = (filters) => filters.radiusKm !== DEFAULT_RADIUS_KM
 
 export const parseKm = (distance) => {
   const value = parseFloat(distance)
   return Number.isNaN(value) ? 0 : value
-}
-
-export const isFilterActive = (filters) =>
-  filters.category !== 'all' || filters.distance !== 'all'
-
-export const filterSpots = (spots, filters) => {
-  const category = CATEGORY_FILTERS.find((c) => c.key === filters.category)
-  const distance = DISTANCE_FILTERS.find((d) => d.key === filters.distance)
-
-  return spots.filter((spot) => {
-    // El backend aún no maneja categorías: los spots sin categoría no se filtran por ella.
-    const categoryOk = !category?.match || spot.category == null || category.match.includes(spot.category)
-    const distanceOk = !distance || parseKm(spot.distance) <= distance.max
-    return categoryOk && distanceOk
-  })
 }

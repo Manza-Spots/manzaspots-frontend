@@ -1,17 +1,18 @@
 <script setup>
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Icon from './Icon.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
+import { useSpotsSearch } from '@/features/spots/composables/useSpotsSearch'
+import { useKeyboard } from '@/shared/composables/useKeyboard'
 import SettingsMenu from '@/features/settings/components/SettingsMenu.vue'
 
 const { t } = useI18n()
-
-
-import { Keyboard } from '@capacitor/keyboard'
+const { query: spotsSearchQuery } = useSpotsSearch()
+const { keyboardHeight } = useKeyboard()
 
 const router = useRouter()
 const route = useRoute()
@@ -31,7 +32,6 @@ const currentFingerX = ref(0)
 const initialTouchX = ref(0)
 const hasMoved = ref(false)
 const isNavVisible = ref(false)
-const keyboardHeight = ref(0)
 
 watch(isAppReady, (ready) => {
   if (ready) {
@@ -47,18 +47,10 @@ watch(isSearching, (val) => {
   }
 })
 
-onMounted(() => {
-  Keyboard.addListener('keyboardWillShow', (info) => {
-    keyboardHeight.value = info.keyboardHeight
-  })
-
-  Keyboard.addListener('keyboardWillHide', () => {
-    keyboardHeight.value = 0
-  })
-})
-
-onBeforeUnmount(() => {
-  Keyboard.removeAllListeners()
+// El input de búsqueda vive aquí (global), pero solo aplica a la vista de Spots.
+// Sincroniza el término al estado compartido para filtrar mapa + lista.
+watch(searchQuery, (val) => {
+  if (route.path === '/spots') spotsSearchQuery.value = val
 })
 
 const clickStartTime = ref(0)
@@ -244,10 +236,6 @@ const openSettings = () => {
   )
 }
 
-const handleSearch = () => {
-  console.log('Buscando en', route.path, ':', searchQuery.value)
-}
-
 const handleBlur = () => {
   setTimeout(() => {
     if (!searchQuery.value && document.activeElement !== searchInput.value) {
@@ -338,7 +326,6 @@ const handleFloatingAction = () => {
             type="text"
             class="search-input"
             :placeholder="$t('common.placeholders.search')"
-            @input="handleSearch"
             @blur="handleBlur"
           />
           <button v-if="searchQuery" class="clear-button" @click.stop="clearSearch">

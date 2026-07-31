@@ -56,6 +56,7 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
 
     <div class="header-col right-col">
       <button
+        v-if="!isImmersive"
         class="header-fab-btn"
         @click="emit('filter')"
       >

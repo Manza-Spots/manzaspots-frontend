@@ -1,21 +1,15 @@
 {
   "filters": {
     "title": "Filtrar spots",
-    "category": "Categoría",
-    "distance": "Distancia",
-    "apply": "Ver {count} spots",
-    "categories": {
-      "all": "Todos",
-      "miradores": "Miradores",
-      "trekking": "Trekking",
-      "cascadas": "Cascadas",
-      "playas": "Playas"
-    },
-    "distances": {
-      "near": "≤ 5 km",
-      "mid": "≤ 15 km",
-      "all": "Todo"
-    }
+    "radius": "Radio de búsqueda",
+    "reset": "Restablecer",
+    "apply": "Aplicar"
+  },
+  "search": {
+    "one": "1 resultado",
+    "many": "{count} resultados",
+    "empty": "Sin resultados para “{query}”",
+    "loading": "Buscando…"
   },
   "immersive": {
     "hint": "Desliza para explorar",

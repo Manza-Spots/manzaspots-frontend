@@ -13,7 +13,6 @@ defineProps({
   <div class="spot-card">
     <div class="card-image-wrapper">
       <img :src="spot.imageUrl" :alt="spot.name" loading="lazy" />
-      <div v-if="spot.category" class="category-badge">{{ spot.category }}</div>
     </div>
 
     <div class="card-content">

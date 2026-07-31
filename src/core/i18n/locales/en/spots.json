@@ -1,21 +1,15 @@
 {
   "filters": {
     "title": "Filter spots",
-    "category": "Category",
-    "distance": "Distance",
-    "apply": "See {count} spots",
-    "categories": {
-      "all": "All",
-      "miradores": "Viewpoints",
-      "trekking": "Trekking",
-      "cascadas": "Waterfalls",
-      "playas": "Beaches"
-    },
-    "distances": {
-      "near": "≤ 5 km",
-      "mid": "≤ 15 km",
-      "all": "All"
-    }
+    "radius": "Search radius",
+    "reset": "Reset",
+    "apply": "Apply"
+  },
+  "search": {
+    "one": "1 result",
+    "many": "{count} results",
+    "empty": "No results for “{query}”",
+    "loading": "Searching…"
   },
   "immersive": {
     "hint": "Swipe to explore",
