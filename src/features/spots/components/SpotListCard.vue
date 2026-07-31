@@ -13,13 +13,13 @@ defineProps({
   <div class="spot-card">
     <div class="card-image-wrapper">
       <img :src="spot.imageUrl" :alt="spot.name" loading="lazy" />
-      <div class="category-badge">{{ spot.category }}</div>
+      <div v-if="spot.category" class="category-badge">{{ spot.category }}</div>
     </div>
 
     <div class="card-content">
       <div class="card-header">
         <h3 class="spot-title">{{ spot.name }}</h3>
-        <span class="spot-distance">
+        <span v-if="spot.distance" class="spot-distance">
           <Icon name="MapPin" :size="14" class="distance-icon" />
           {{ spot.distance }}
         </span>

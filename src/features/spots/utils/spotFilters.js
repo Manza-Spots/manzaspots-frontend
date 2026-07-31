@@ -37,7 +37,8 @@ export const filterSpots = (spots, filters) => {
   const distance = DISTANCE_FILTERS.find((d) => d.key === filters.distance)
 
   return spots.filter((spot) => {
-    const categoryOk = !category?.match || category.match.includes(spot.category)
+    // El backend aún no maneja categorías: los spots sin categoría no se filtran por ella.
+    const categoryOk = !category?.match || spot.category == null || category.match.includes(spot.category)
     const distanceOk = !distance || parseKm(spot.distance) <= distance.max
     return categoryOk && distanceOk
   })
