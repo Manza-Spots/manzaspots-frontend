@@ -1,6 +1,23 @@
 {
   "title": "Perfil",
   "logout": "Cerrar sesión",
+  "memberSince": "Miembro desde {date}",
+  "stats": {
+    "routes": "Rutas",
+    "spots": "Spots",
+    "km": "Km"
+  },
+  "favorites": "Favoritos",
+  "mySpots": "Mis spots",
+  "history": "Historial de recorridos",
+  "historyLocked": "Disponible al guardar rutas grabadas",
+  "tabs": {
+    "spots": "Spots",
+    "routes": "Rutas"
+  },
+  "emptySpots": "Aún no tienes spots",
+  "emptyRoutes": "Aún no tienes rutas favoritas",
+  "routeUnnamed": "Ruta sin nombre",
   "details": {
     "noName": "Sin nombre",
     "defaultUser": "Usuario"
