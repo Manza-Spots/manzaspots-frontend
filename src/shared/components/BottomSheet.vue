@@ -180,7 +180,7 @@ onUnmounted(() => {
 .drag-bar {
   width: 48px;
   height: 5px;
-  background-color: var(--color-gray-300);
+  background-color: var(--color-border-hover);
   border-radius: var(--radius-full);
 }
 
@@ -205,13 +205,18 @@ onUnmounted(() => {
   height: 32px;
   border-radius: var(--radius-full);
   color: var(--color-text-secondary);
-  background-color: var(--color-gray-100);
-  transition: all var(--transition-fast);
+  background-color: var(--color-surface-2);
+  transition: var(--press-transition), background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.bottom-sheet-close:active {
+  transform: scale(var(--press-scale-strong));
 }
 
 .bottom-sheet-close:active,
 .bottom-sheet-close:hover {
-  background-color: var(--color-gray-200);
+  background-color: var(--color-surface-3);
   color: var(--color-text-primary);
 }
 

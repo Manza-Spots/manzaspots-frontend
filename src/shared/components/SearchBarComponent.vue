@@ -80,22 +80,20 @@ watch(
   justify-content: center;
   width: 56px;
   height: 56px;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: none;
+  border-radius: var(--radius-full);
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
   cursor: pointer;
   color: var(--color-text-primary);
-  box-shadow:
-    0 -4px 20px rgba(0, 0, 0, 0.08),
-    0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: var(--press-transition);
 }
 
 .back-button:active {
-  transform: scale(0.95);
+  transform: scale(var(--press-scale));
 }
 
 .search-container {
@@ -103,14 +101,13 @@ watch(
   align-items: center;
   gap: var(--space-3);
   flex: 1;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 100px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-full);
   padding: var(--space-3) var(--space-4);
-  box-shadow:
-    0 -4px 20px rgba(0, 0, 0, 0.08),
-    0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   min-height: 56px;
 }
 
@@ -140,18 +137,18 @@ watch(
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 100px;
+  border-radius: var(--radius-full);
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--press-transition);
   flex-shrink: 0;
 }
 
 .clear-button:active,
 .mic-button:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 .mic-button {

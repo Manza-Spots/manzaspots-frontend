@@ -63,7 +63,7 @@ const buttonClasses = computed(() => {
   gap: var(--space-2);
   font-weight: var(--font-bold);
   border-radius: var(--radius-lg);
-  transition: transform 0.12s var(--ease-out), background var(--transition-fast),
+  transition: var(--press-transition), background var(--transition-fast),
     color var(--transition-fast), box-shadow var(--transition-fast);
   cursor: pointer;
   user-select: none;
@@ -72,7 +72,12 @@ const buttonClasses = computed(() => {
 }
 
 .btn:active:not(.btn-disabled) {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .btn-sm {
@@ -115,6 +120,10 @@ const buttonClasses = computed(() => {
   color: var(--color-text-primary);
 }
 
+.btn-secondary:active:not(.btn-disabled) {
+  background-color: var(--color-surface-3);
+}
+
 @media (hover: hover) {
   .btn-secondary:hover:not(.btn-disabled) {
     background-color: var(--color-surface-3);
@@ -125,6 +134,15 @@ const buttonClasses = computed(() => {
   background-color: transparent;
   color: var(--color-primary);
   box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+
+.btn-outline:active:not(.btn-disabled) {
+  background-color: var(--color-primary-tint);
+}
+
+/* El outline dibuja su borde con box-shadow inset: al enfocar, combinamos ambos. */
+.btn-outline:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--color-primary), var(--focus-ring);
 }
 
 @media (hover: hover) {
@@ -138,6 +156,10 @@ const buttonClasses = computed(() => {
   color: var(--color-text-primary);
 }
 
+.btn-ghost:active:not(.btn-disabled) {
+  background-color: var(--color-surface-2);
+}
+
 @media (hover: hover) {
   .btn-ghost:hover:not(.btn-disabled) {
     background-color: var(--color-surface-2);
@@ -149,9 +171,13 @@ const buttonClasses = computed(() => {
   color: #fff;
 }
 
+.btn-danger:active:not(.btn-disabled) {
+  background-color: var(--color-coral-deep);
+}
+
 @media (hover: hover) {
   .btn-danger:hover:not(.btn-disabled) {
-    background-color: #c2433c;
+    background-color: var(--color-coral-deep);
   }
 }
 

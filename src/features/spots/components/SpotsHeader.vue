@@ -108,19 +108,19 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: var(--color-bg, #ffffff);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--color-bg);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-md);
   color: var(--color-text-primary);
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: var(--press-transition);
 }
 
 .header-fab-btn:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 .is-loading .icon-svg {
@@ -189,17 +189,10 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   color: var(--color-primary);
 }
 
-/* Animación elástica del BottomNav */
+/* Rebote compartido (definido en main.css), igual que el del BottomNav */
 .toggle-btn.active :deep(svg) {
   color: var(--color-primary);
-  animation: pop-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-@keyframes pop-bounce {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.3); }
-  70% { transform: scale(0.9); }
-  100% { transform: scale(1); }
+  animation: pop-bounce 0.6s var(--ease-spring) forwards;
 }
 
 .filter-dot {

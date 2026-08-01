@@ -125,11 +125,11 @@ const goToLogin = () => router.push('/login')
   cursor: pointer;
   z-index: 10;
   color: var(--color-text-primary);
-  transition: transform 0.2s ease;
+  transition: var(--press-transition);
 }
 
 .back-button:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 .forgot-container {

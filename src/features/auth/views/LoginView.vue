@@ -198,11 +198,11 @@ const goToProfile = () => router.push('/profile')
   cursor: pointer;
   z-index: 10;
   color: var(--color-text-primary);
-  transition: transform 0.2s ease;
+  transition: var(--press-transition);
 }
 
 .back-button:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 .login-container {
@@ -322,7 +322,7 @@ const goToProfile = () => router.push('/profile')
 }
 
 .social-button:active {
-  transform: scale(0.98);
+  transform: scale(var(--press-scale));
   background: var(--color-surface-2);
 }
 
