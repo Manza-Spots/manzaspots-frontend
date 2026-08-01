@@ -5,16 +5,26 @@ import Icon from '@/shared/components/Icon.vue'
 import ButtonComponent from '@/shared/components/ButtonComponent.vue'
 import { useAuth } from '@/features/auth/composables/useAuth'
 import { useTheme } from '@/shared/composables/useTheme'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { Preferences } from '@capacitor/preferences'
+import EditProfileSheet from '@/features/profile/components/EditProfileSheet.vue'
+import ChangePasswordSheet from '@/features/profile/components/ChangePasswordSheet.vue'
+import ChangeEmailSheet from '@/features/profile/components/ChangeEmailSheet.vue'
 
 const { t, locale } = useI18n()
 const emit = defineEmits(['close'])
 
 const { isAuthenticated, logout } = useAuth()
+const bottomSheet = useBottomSheet()
 
 const handleLogout = async () => {
   emit('close')
   await logout()
+}
+
+// Reemplaza el contenido del bottom sheet global por el formulario indicado.
+const openSheet = (component, title) => {
+  bottomSheet.open(component, {}, { title, closable: true })
 }
 
 const { currentTheme, setTheme } = useTheme()
@@ -88,6 +98,39 @@ const onLanguageChange = async (e) => {
     <div v-if="isAuthenticated" class="settings-section">
       <h4 class="section-title">{{ t('settings.account', 'Cuenta') }}</h4>
 
+      <button
+        class="setting-item clickable"
+        @click="openSheet(EditProfileSheet, t('profile.edit.editProfile'))"
+      >
+        <div class="setting-info">
+          <Icon name="UserPen" :size="20" class="setting-icon" />
+          <span>{{ t('profile.edit.editProfile') }}</span>
+        </div>
+        <Icon name="ChevronRight" :size="20" class="setting-icon-action" />
+      </button>
+
+      <button
+        class="setting-item clickable"
+        @click="openSheet(ChangePasswordSheet, t('profile.edit.changePassword'))"
+      >
+        <div class="setting-info">
+          <Icon name="Lock" :size="20" class="setting-icon" />
+          <span>{{ t('profile.edit.changePassword') }}</span>
+        </div>
+        <Icon name="ChevronRight" :size="20" class="setting-icon-action" />
+      </button>
+
+      <button
+        class="setting-item clickable"
+        @click="openSheet(ChangeEmailSheet, t('profile.edit.changeEmail'))"
+      >
+        <div class="setting-info">
+          <Icon name="Mail" :size="20" class="setting-icon" />
+          <span>{{ t('profile.edit.changeEmail') }}</span>
+        </div>
+        <Icon name="ChevronRight" :size="20" class="setting-icon-action" />
+      </button>
+
       <div class="actions-section">
         <ButtonComponent variant="danger" size="sm" fullWidth @click="handleLogout">
           <Icon name="LogOut" :size="18" />
@@ -138,6 +181,14 @@ const onLanguageChange = async (e) => {
   padding: var(--space-3) 0;
   text-decoration: none;
   color: inherit;
+}
+
+button.setting-item {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
 }
 
 .setting-item.clickable {
