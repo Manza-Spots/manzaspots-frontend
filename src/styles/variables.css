@@ -183,15 +183,26 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Feedback táctil unificado (pressed)
-     Usa el mismo spring del rebote del nav: al soltar, la escala sobrepasa
-     el destino y se asienta. El rebote es proporcional al hundimiento, así
-     que los botones de icono (más hundidos) rebotan más, como el nav. */
+  /* ── Sistema de rebote ──────────────────────────────────────────────
+     REGLA: todo rebote de la app usa UNA sola curva (--ease-spring) y la
+     duración de su rol. No inventar curvas ni duraciones nuevas.
+
+       press → hundir y soltar          (feedback táctil de un control)
+       pop   → un elemento pasa a activo (keyframe pop-bounce, main.css)
+       slide → un indicador viaja        (thumb de tabs, nav, switch)
+
+     El pop se aplica siempre al CONTENIDO del elemento activado (icono
+     y/o etiqueta juntos), nunca al contenedor, para que su magnitud se
+     lea igual en todos los componentes. */
+  --bounce-press: 0.28s;
+  --bounce-pop: 0.45s;
+  --bounce-slide: 0.45s;
+
   --press-scale: 0.96;
   /* Botones estándar */
   --press-scale-strong: 0.9;
   /* Botones de icono pequeños (32–46px), necesitan más recorrido */
-  --press-transition: transform 0.28s var(--ease-spring);
+  --press-transition: transform var(--bounce-press) var(--ease-spring);
 
   /* Accesibilidad — anillo de foco por teclado */
   --focus-ring: 0 0 0 3px var(--color-primary-tint);

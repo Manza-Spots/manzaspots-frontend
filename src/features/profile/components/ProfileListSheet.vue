@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from '@/shared/composables/useToast'
 import { profileApi } from '@/features/profile/api/profileApi'
 import Icon from '@/shared/components/Icon.vue'
+import SegmentedControl from '@/shared/components/SegmentedControl.vue'
 import SwipeToDelete from '@/shared/components/SwipeToDelete.vue'
 import SpotListCard from '@/features/spots/components/SpotListCard.vue'
 import RouteCard from './RouteCard.vue'
@@ -33,6 +34,11 @@ const localSpots = ref([...props.spots])
 
 const hasTabs = computed(() => Array.isArray(props.routes))
 const tab = ref('spots')
+
+const tabOptions = computed(() => [
+  { value: 'spots', label: `${t('profile.tabs.spots')} (${localSpots.value.length})` },
+  { value: 'routes', label: `${t('profile.tabs.routes')} (${props.routes?.length ?? 0})` },
+])
 
 async function removeSpot(spot) {
   const index = localSpots.value.findIndex((s) => s.id === spot.id)
@@ -98,14 +104,7 @@ function onEnter(el, done) {
 <template>
   <div class="list-sheet">
     <div v-if="hasTabs" class="list-header">
-      <div class="tabs">
-        <button class="tab" :class="{ active: tab === 'spots' }" @click="tab = 'spots'">
-          {{ t('profile.tabs.spots') }} ({{ localSpots.length }})
-        </button>
-        <button class="tab" :class="{ active: tab === 'routes' }" @click="tab = 'routes'">
-          {{ t('profile.tabs.routes') }} ({{ routes.length }})
-        </button>
-      </div>
+      <SegmentedControl v-model="tab" :options="tabOptions" size="sm" />
     </div>
 
     <div class="list">
@@ -154,33 +153,6 @@ function onEnter(el, done) {
   z-index: 2;
   background: var(--color-bg);
   padding-bottom: var(--space-3);
-}
-
-.tabs {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--color-surface-2);
-  border-radius: var(--radius-full);
-}
-
-.tab {
-  flex: 1;
-  padding: 9px 12px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-full);
-  font-size: 13.5px;
-  font-weight: var(--font-bold);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.tab.active {
-  background: var(--color-surface);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
 }
 
 

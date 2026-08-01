@@ -14,5 +14,9 @@
   "immersive": {
     "hint": "Desliza para explorar",
     "empty": "No hay spots con estos filtros"
+  },
+  "view": {
+    "map": "Mapa",
+    "list": "Lista"
   }
 }

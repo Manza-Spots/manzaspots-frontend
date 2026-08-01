@@ -14,5 +14,9 @@
   "immersive": {
     "hint": "Swipe to explore",
     "empty": "No spots match these filters"
+  },
+  "view": {
+    "map": "Map",
+    "list": "List"
   }
 }
