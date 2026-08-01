@@ -81,7 +81,7 @@ const openFavorites = async () => {
     ])
     bottomSheet.open(
       ProfileListSheet,
-      { spots: rawSpots.map((s) => mapSpot(s, null)), routes },
+      { spots: rawSpots.map((s) => mapSpot(s, null)), routes, removable: true },
       { title: t('profile.favorites'), closable: true },
     )
   } catch (error) {

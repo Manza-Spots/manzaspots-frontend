@@ -21,42 +21,28 @@ const handleEscape = (e) => {
   }
 }
 
-const sheetBodyRef = ref(null)
 const startY = ref(0)
 const currentY = ref(0)
 const isDragging = ref(false)
 
 const dragStyle = computed(() => {
   if (!isDragging.value) return {}
-  const y = currentY.value > 0 ? currentY.value : currentY.value * 0.15
-  return { '--drag-y': `${y}px` }
+  return { '--drag-y': `${currentY.value}px` }
 })
 
+// El arrastre para cerrar solo se activa desde el header (barra + título),
+// nunca desde el cuerpo. Así el scroll de la lista y el swipe-to-delete de
+// cada fila quedan totalmente libres de conflicto con el cierre del sheet.
 const onTouchStart = (e) => {
-  const target = e.target
-  const bodyEl = sheetBodyRef.value
-
-  if (bodyEl && bodyEl.contains(target) && bodyEl.scrollTop > 0) {
-    return
-  }
-
   startY.value = e.touches[0].clientY
-  isDragging.value = true
   currentY.value = 0
+  isDragging.value = true
 }
 
 const onTouchMove = (e) => {
   if (!isDragging.value) return
-
   const deltaY = e.touches[0].clientY - startY.value
-
-  if (deltaY < 0 && sheetBodyRef.value && sheetBodyRef.value.contains(e.target)) {
-    isDragging.value = false
-    currentY.value = 0
-    return
-  }
-
-  currentY.value = deltaY
+  currentY.value = deltaY > 0 ? deltaY : 0
 }
 
 const onTouchEnd = () => {
@@ -103,26 +89,30 @@ onUnmounted(() => {
           class="bottom-sheet-content"
           :class="{ 'is-dragging': isDragging }"
           :style="dragStyle"
-          @touchstart="onTouchStart"
-          @touchmove="onTouchMove"
-          @touchend="onTouchEnd"
           @click.stop
         >
 
-          <div class="bottom-sheet-drag-handle" @click="close" aria-label="Cerrar al tocar barra">
-            <div class="drag-bar"></div>
+          <div
+            class="bottom-sheet-grab"
+            @touchstart="onTouchStart"
+            @touchmove="onTouchMove"
+            @touchend="onTouchEnd"
+          >
+            <div class="bottom-sheet-drag-handle" @click="close" aria-label="Cerrar al tocar barra">
+              <div class="drag-bar"></div>
+            </div>
+
+            <div v-if="config.title || config.closable" class="bottom-sheet-header">
+              <h3 v-if="config.title" class="bottom-sheet-title">{{ config.title }}</h3>
+              <div v-else></div>
+
+              <button v-if="config.closable" class="bottom-sheet-close" @click="close" aria-label="Cerrar">
+                <Icon name="X" :size="20" />
+              </button>
+            </div>
           </div>
 
-          <div v-if="config.title || config.closable" class="bottom-sheet-header">
-            <h3 v-if="config.title" class="bottom-sheet-title">{{ config.title }}</h3>
-            <div v-else></div>
-
-            <button v-if="config.closable" class="bottom-sheet-close" @click="close" aria-label="Cerrar">
-              <Icon name="X" :size="20" />
-            </button>
-          </div>
-
-          <div ref="sheetBodyRef" class="bottom-sheet-body">
+          <div class="bottom-sheet-body">
             <component
               v-if="component"
               :is="component"
@@ -170,6 +160,13 @@ onUnmounted(() => {
 
 .bottom-sheet-content.is-dragging {
   transition: transform 0s !important;
+}
+
+/* Única zona desde donde se puede arrastrar el sheet para cerrarlo. */
+.bottom-sheet-grab {
+  flex-shrink: 0;
+  touch-action: none;
+  cursor: grab;
 }
 
 .bottom-sheet-drag-handle {

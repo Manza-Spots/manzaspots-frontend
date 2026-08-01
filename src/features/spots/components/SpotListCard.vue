@@ -35,14 +35,10 @@ defineProps({
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.12s var(--ease-out), box-shadow 0.2s;
+  transition: box-shadow 0.2s;
   cursor: pointer;
   border: 1px solid var(--color-border);
   margin-bottom: var(--space-3);
-}
-
-.spot-card:active {
-  transform: scale(0.98);
 }
 
 .card-image-wrapper {
