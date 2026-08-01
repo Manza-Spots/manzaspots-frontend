@@ -1,6 +1,23 @@
 {
   "title": "Profile",
   "logout": "Log Out",
+  "memberSince": "Member since {date}",
+  "stats": {
+    "routes": "Routes",
+    "spots": "Spots",
+    "km": "Km"
+  },
+  "favorites": "Favorites",
+  "mySpots": "My spots",
+  "history": "Route history",
+  "historyLocked": "Available once you save recorded routes",
+  "tabs": {
+    "spots": "Spots",
+    "routes": "Routes"
+  },
+  "emptySpots": "You don't have spots yet",
+  "emptyRoutes": "No favorite routes yet",
+  "routeUnnamed": "Unnamed route",
   "details": {
     "noName": "No name",
     "defaultUser": "User"

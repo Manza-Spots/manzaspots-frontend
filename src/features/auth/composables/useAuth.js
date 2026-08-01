@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store'
+import { authApi } from '../api/authApi'
 import { useToast } from '@/shared/composables/useToast'
 import { Capacitor } from '@capacitor/core'
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
@@ -184,6 +185,18 @@ export function useAuth() {
     }
   }
 
+  // Refresca los datos del usuario (/me) de forma segura: ante un error
+  // transitorio NO cierra sesión (a diferencia del fetchUser del store).
+  async function refreshUser() {
+    try {
+      const data = await authApi.getCurrentUser()
+      await authStore.setUser(data)
+      return data
+    } catch (error) {
+      console.warn('No se pudo refrescar el perfil:', error)
+    }
+  }
+
   function hasRole(role) {
     return user.value?.role === role
   }
@@ -212,6 +225,7 @@ export function useAuth() {
     verifyEmail,
     resendVerificationEmail,
     logout,
+    refreshUser,
     hasPermission,
     hasRole,
     isEmailVerified

@@ -85,17 +85,15 @@ const onLanguageChange = async (e) => {
       </RouterLink>
     </div>
 
-    <div class="actions-section">
-      <ButtonComponent
-        v-if="isAuthenticated"
-        variant="danger"
-        size="sm"
-        fullWidth
-        @click="handleLogout"
-      >
-        <Icon name="LogOut" :size="18" />
-        {{ t('common.buttons.logout', 'Cerrar Sesión') }}
-      </ButtonComponent>
+    <div v-if="isAuthenticated" class="settings-section">
+      <h4 class="section-title">{{ t('settings.account', 'Cuenta') }}</h4>
+
+      <div class="actions-section">
+        <ButtonComponent variant="danger" size="sm" fullWidth @click="handleLogout">
+          <Icon name="LogOut" :size="18" />
+          {{ t('common.buttons.logout', 'Cerrar Sesión') }}
+        </ButtonComponent>
+      </div>
     </div>
   </div>
 </template>
