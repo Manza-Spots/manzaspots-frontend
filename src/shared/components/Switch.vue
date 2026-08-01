@@ -154,7 +154,7 @@ const switchClasses = computed(() => {
 }
 
 .switch-input:focus-visible + .switch-track {
-  box-shadow: 0 0 0 4px var(--color-primary-tint);
+  box-shadow: var(--focus-ring);
 }
 
 .switch-disabled {

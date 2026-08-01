@@ -76,7 +76,7 @@ const apply = () => {
   background: none;
   border: none;
   padding: 4px 6px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: var(--font-bold);
   color: var(--color-primary);
   cursor: pointer;

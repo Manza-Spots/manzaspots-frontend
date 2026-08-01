@@ -567,27 +567,12 @@ const handleFloatingAction = () => {
 }
 
 .nav-item__icon {
-  transition: color 0.4s ease;
+  transition: color 0.4s ease, var(--press-transition);
   transform: scale(1);
 }
 
-@keyframes pop-bounce {
-  0% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.3);
-  }
-  70% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
 .nav-item:active .nav-item__icon {
-  transform: scale(0.95);
+  transform: scale(var(--press-scale));
 }
 
 .nav-item__label {
@@ -604,7 +589,7 @@ const handleFloatingAction = () => {
 
 .nav-item--active .nav-item__icon {
   color: var(--color-primary);
-  animation: pop-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: pop-bounce 0.6s var(--ease-spring) forwards;
 }
 
 .nav-item--active .nav-item__label {
@@ -632,18 +617,18 @@ const handleFloatingAction = () => {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 100px;
+  border-radius: var(--radius-full);
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--press-transition);
   flex-shrink: 0;
 }
 
 .clear-button:active,
 .mic-button:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 .mic-button {

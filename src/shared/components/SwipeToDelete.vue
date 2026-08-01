@@ -157,13 +157,13 @@ function commit() {
   align-items: center;
   justify-content: flex-end;
   padding-right: var(--space-5);
-  background: var(--color-coral, #ef4444);
+  background: var(--color-coral);
   color: #fff;
-  transition: background 0.15s ease;
+  transition: background var(--transition-fast);
 }
 
 .s2d-bg.armed {
-  background: #dc2626;
+  background: var(--color-coral-deep);
 }
 
 .s2d-bg-inner {
@@ -173,7 +173,7 @@ function commit() {
   font-size: var(--text-sm);
   font-weight: var(--font-bold);
   transform: scale(1);
-  transition: transform 0.15s ease;
+  transition: transform var(--transition-fast);
 }
 
 .s2d-bg.armed .s2d-bg-inner {

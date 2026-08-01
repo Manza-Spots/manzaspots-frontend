@@ -253,11 +253,11 @@ const openFavorites = async () => {
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform 0.15s ease;
+  transition: var(--press-transition);
 }
 
 .fav-btn:active {
-  transform: scale(0.92);
+  transform: scale(var(--press-scale-strong));
 }
 
 .stats {
@@ -329,6 +329,13 @@ const openFavorites = async () => {
   background: var(--color-surface-2);
   padding: 0;
   cursor: pointer;
+  transition: filter var(--transition-fast), border-color var(--transition-fast);
+}
+
+/* Tarjetas grandes: feedback sutil sin redimensionar (dim + borde), nada de scale. */
+.mini-map-card:active {
+  filter: brightness(0.96);
+  border-color: var(--color-border-hover);
 }
 
 .mini-map-empty {

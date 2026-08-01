@@ -153,17 +153,17 @@ defineExpose({ focus })
 .textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: var(--focus-ring);
 }
 
 .textarea:disabled {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-surface-2);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .textarea:read-only {
-  background-color: var(--color-gray-50);
+  background-color: var(--color-surface-2);
 }
 
 .textarea::placeholder {

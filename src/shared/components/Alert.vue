@@ -102,28 +102,28 @@ const displayIcon = props.icon || variantIcons[props.variant]
   opacity: 1;
 }
 
-/* Variants */
+/* Variants — tints y deeps de la paleta manzanillo */
 .alert-info {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: var(--color-ocean-tint);
   border-left-color: var(--color-info);
-  color: #1e40af;
+  color: var(--color-mar-deep);
 }
 
 .alert-success {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: var(--color-primary-tint);
   border-left-color: var(--color-success);
-  color: #065f46;
+  color: var(--color-selva-deep);
 }
 
 .alert-warning {
-  background-color: rgba(245, 158, 11, 0.1);
+  background-color: var(--color-sand-tint);
   border-left-color: var(--color-warning);
-  color: #92400e;
+  color: var(--color-arena-deep);
 }
 
 .alert-error {
-  background-color: rgba(239, 68, 68, 0.1);
+  background-color: var(--color-coral-tint);
   border-left-color: var(--color-error);
-  color: #991b1b;
+  color: var(--color-coral-deep);
 }
 </style>

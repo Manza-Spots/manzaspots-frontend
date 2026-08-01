@@ -162,8 +162,8 @@ const handleChange = () => {
   border-color: var(--color-primary);
 }
 
-.radio-input:focus + .radio-circle {
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+.radio-input:focus-visible + .radio-circle {
+  box-shadow: var(--focus-ring);
 }
 
 @media (hover: hover) {
@@ -173,7 +173,7 @@ const handleChange = () => {
 }
 
 .radio-wrapper:active .radio-circle {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-surface-2);
 }
 
 .radio-disabled {

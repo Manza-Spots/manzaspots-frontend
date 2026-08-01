@@ -53,19 +53,6 @@ defineProps({
   object-fit: cover;
 }
 
-.category-badge {
-  position: absolute;
-  top: var(--space-2);
-  left: var(--space-2);
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  padding: 4px 9px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: var(--font-bold);
-  backdrop-filter: blur(4px);
-}
-
 .card-content {
   padding: var(--space-3);
   flex-grow: 1;

@@ -171,7 +171,7 @@ const onLanguageChange = async (e) => {
   letter-spacing: 0.05em;
   padding-bottom: var(--space-2);
   margin-bottom: var(--space-1);
-  border-bottom: 1px solid var(--color-gray-100);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .setting-item {
@@ -209,17 +209,17 @@ button.setting-item {
 }
 
 .setting-icon {
-  color: var(--color-gray-500);
+  color: var(--color-text-secondary);
 }
 
 .setting-icon-action {
-  color: var(--color-gray-400);
+  color: var(--color-text-tertiary);
 }
 
 .setting-select {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--color-border);
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   font-family: inherit;
@@ -230,9 +230,5 @@ button.setting-item {
 
 .setting-select:focus {
   border-color: var(--color-primary);
-}
-
-@media (prefers-color-scheme: dark) {
-  /* Si el sistema es dark o se fuerza la clase .dark, var(--color-gray-100) cambiaría si está definida adaptativamente en variables.css. */
 }
 </style>

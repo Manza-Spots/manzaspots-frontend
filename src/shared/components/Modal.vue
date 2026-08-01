@@ -165,7 +165,7 @@ onUnmounted(() => {
 }
 
 .modal-close:hover {
-  background-color: var(--color-gray-100);
+  background-color: var(--color-surface-2);
   color: var(--color-text-primary);
 }
 

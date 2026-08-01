@@ -31,7 +31,7 @@ function toggleLocale() {
   backdrop-filter: saturate(180%) blur(12px);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 100px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
               background 0.2s ease;
@@ -40,7 +40,7 @@ function toggleLocale() {
 }
 
 .lang-switcher:active {
-  transform: scale(0.92);
+  transform: scale(var(--press-scale-strong));
 }
 
 .lang-flag {

@@ -231,11 +231,11 @@ const recenter = () => mapRef.value?.recenter()
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: var(--press-transition);
 }
 
 .record-fab:active {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale-strong));
 }
 
 /* Sheet inferior con métricas y controles */
@@ -325,7 +325,7 @@ const recenter = () => mapRef.value?.recenter()
 }
 
 .record-ctrl:active {
-  transform: scale(0.94);
+  transform: scale(var(--press-scale));
 }
 
 .record-stop {
@@ -344,7 +344,7 @@ const recenter = () => mapRef.value?.recenter()
 }
 
 .record-stop:active {
-  transform: scale(0.94);
+  transform: scale(var(--press-scale));
 }
 
 .record-start {
@@ -384,6 +384,6 @@ const recenter = () => mapRef.value?.recenter()
 }
 
 .record-export__btn:active {
-  transform: scale(0.95);
+  transform: scale(var(--press-scale));
 }
 </style>
