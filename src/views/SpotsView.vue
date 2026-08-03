@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onActivated, onBeforeUnmount, onDeactivated } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InteractiveMap from '@/features/map/components/InteractiveMap.vue'
 import ImmersiveSpotList from '@/features/spots/components/ImmersiveSpotList.vue'
@@ -11,6 +11,9 @@ import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 import { useSpots } from '@/features/spots/composables/useSpots'
 import { useSpotsSearch } from '@/features/spots/composables/useSpotsSearch'
 import { DEFAULT_FILTERS, isFilterActive } from '@/features/spots/utils/spotFilters'
+
+// Nombre explícito: <KeepAlive :include> resuelve por nombre de componente.
+defineOptions({ name: 'SpotsView' })
 
 const { t } = useI18n()
 const bottomSheet = useBottomSheet()
@@ -79,10 +82,20 @@ watch(searchQuery, () => {
   debouncedRefetch()
 })
 
-onBeforeUnmount(() => {
+// La vista queda cacheada (KeepAlive), así que la limpieza va en
+// onDeactivated: si no, al salir en modo lista el nav se quedaría inmersivo.
+const releaseView = () => {
   isImmersive.value = false
   searchQuery.value = ''
   clearTimeout(refetchTimer)
+}
+
+onDeactivated(releaseView)
+onBeforeUnmount(releaseView)
+
+// Al volver, el mapa sigue montado: sólo re-sincronizamos el modo inmersivo.
+onActivated(() => {
+  isImmersive.value = currentView.value === 'list'
 })
 
 const handleLocate = async () => {
