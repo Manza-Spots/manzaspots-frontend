@@ -383,7 +383,8 @@ const goToProfile = () => router.push('/profile')
   font-weight: var(--font-bold);
   color: var(--color-text-primary);
   background: var(--color-surface);
-  transition: all var(--transition-fast);
+  transition: var(--press-transition), background var(--transition-fast),
+    border-color var(--transition-fast);
   min-height: 46px;
 }
 

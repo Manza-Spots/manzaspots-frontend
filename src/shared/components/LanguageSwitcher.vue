@@ -33,8 +33,7 @@ function toggleLocale() {
   border-radius: 100px;
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-              background 0.2s ease;
+  transition: var(--press-transition), background var(--transition-base);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }

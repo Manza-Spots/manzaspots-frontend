@@ -96,11 +96,11 @@ const sliderStyle = computed(() => {
     let translatePx = fingerLocalX - sliderWidth / 2
     translatePx = Math.max(0, Math.min(rect.width - sliderWidth, translatePx))
 
+    // La curva del seguimiento vive en CSS (.nav-slider.is-following).
     return {
       width: `${100 / navItems.length}%`,
       transform: `translateX(${translatePx}px)`,
       opacity: 1,
-      transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)',
     }
   }
 
@@ -280,8 +280,16 @@ const handleFloatingAction = () => {
             @touchend="endDrag"
             @touchcancel="endDrag"
           >
-            <div class="nav-slider" :style="sliderStyle">
-              <div class="nav-slider-inner"></div>
+            <!-- El riel recorta el slider con la misma forma que él: el rebote
+                 sobrepasa su destino sin salirse del pill. -->
+            <div class="nav-slider-track">
+              <div
+                class="nav-slider"
+                :class="{ 'is-following': isDragging }"
+                :style="sliderStyle"
+              >
+                <div class="nav-slider-inner"></div>
+              </div>
             </div>
             <button
               v-for="item in navItems"
@@ -290,8 +298,10 @@ const handleFloatingAction = () => {
               :class="{ 'nav-item--active': route.path === item.path }"
               @click.stop="!isSearching && navigateTo(item.path)"
             >
-              <Icon :name="item.icon" :size="24" class="nav-item__icon" />
-              <span class="nav-item__label">{{ $t(item.labelKey) }}</span>
+              <span class="nav-item__content">
+                <Icon :name="item.icon" :size="24" class="nav-item__icon" />
+                <span class="nav-item__label">{{ $t(item.labelKey) }}</span>
+              </span>
             </button>
           </div>
         </div>
@@ -521,19 +531,34 @@ const handleFloatingAction = () => {
   height: 100%;
 }
 
+.nav-slider-track {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .nav-slider {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  z-index: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition:
-    transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.3),
+    transform var(--bounce-slide) var(--ease-spring),
     opacity 0.3s ease;
   pointer-events: none;
+}
+
+/* Mientras sigue al dedo el recorrido debe ser inmediato, no un rebote. */
+.nav-slider.is-following {
+  transition:
+    transform 0.15s var(--ease-out),
+    opacity 0.3s ease;
 }
 
 .nav-slider-inner {
@@ -566,12 +591,21 @@ const handleFloatingAction = () => {
   -webkit-touch-callout: none;
 }
 
-.nav-item__icon {
-  transition: color 0.4s ease, var(--press-transition);
-  transform: scale(1);
+/* Envoltorio del contenido: el pop y el press se aplican aquí (icono +
+   etiqueta juntos), igual que en SegmentedControl. */
+.nav-item__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: var(--press-transition);
 }
 
-.nav-item:active .nav-item__icon {
+.nav-item__icon {
+  transition: color 0.4s ease;
+}
+
+.nav-item:active .nav-item__content {
   transform: scale(var(--press-scale));
 }
 
@@ -589,7 +623,10 @@ const handleFloatingAction = () => {
 
 .nav-item--active .nav-item__icon {
   color: var(--color-primary);
-  animation: pop-bounce 0.6s var(--ease-spring) forwards;
+}
+
+.nav-item--active .nav-item__content {
+  animation: pop-bounce var(--bounce-pop) var(--ease-spring) forwards;
 }
 
 .nav-item--active .nav-item__label {

@@ -95,7 +95,7 @@ const switchClasses = computed(() => {
   left: 3px;
   background-color: white;
   border-radius: 50%;
-  transition: transform 0.22s var(--ease-spring);
+  transition: transform var(--bounce-slide) var(--ease-spring);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 

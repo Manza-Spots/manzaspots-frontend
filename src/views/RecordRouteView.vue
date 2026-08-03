@@ -321,7 +321,7 @@ const recenter = () => mapRef.value?.recenter()
   justify-content: center;
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: transform 0.12s var(--ease-out);
+  transition: var(--press-transition);
 }
 
 .record-ctrl:active {
@@ -340,7 +340,7 @@ const recenter = () => mapRef.value?.recenter()
   justify-content: center;
   box-shadow: 0 10px 26px rgba(217, 84, 77, 0.4);
   cursor: pointer;
-  transition: transform 0.12s var(--ease-out);
+  transition: var(--press-transition);
 }
 
 .record-stop:active {
@@ -380,7 +380,7 @@ const recenter = () => mapRef.value?.recenter()
   border-radius: var(--radius-full);
   padding: 8px 16px;
   cursor: pointer;
-  transition: transform 0.12s var(--ease-out);
+  transition: var(--press-transition);
 }
 
 .record-export__btn:active {

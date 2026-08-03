@@ -1,8 +1,11 @@
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
+import SegmentedControl from '@/shared/components/SegmentedControl.vue'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 
-defineProps({
+const props = defineProps({
   currentView: {
     type: String,
     required: true
@@ -17,9 +20,18 @@ defineProps({
   }
 })
 
+const { t } = useI18n()
 const { isImmersive } = useImmersiveMode()
 
 const emit = defineEmits(['update:currentView', 'locate', 'filter'])
+
+const viewOptions = computed(() => [
+  { value: 'map', icon: 'Map', ariaLabel: t('spots.view.map') },
+  { value: 'list', icon: 'List', ariaLabel: t('spots.view.list') },
+])
+
+// Sobre la foto (modo lista inmersivo) el control cambia a vidrio claro.
+const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' : 'glass'))
 </script>
 
 <template>
@@ -37,21 +49,12 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
     </div>
 
     <div class="header-col center-col">
-      <div class="toggle-pill">
-        <div class="toggle-slider" :class="currentView"></div>
-        <button
-          :class="['toggle-btn', { active: currentView === 'map' }]"
-          @click="emit('update:currentView', 'map')"
-        >
-          <Icon name="Map" :size="18" />
-        </button>
-        <button
-          :class="['toggle-btn', { active: currentView === 'list' }]"
-          @click="emit('update:currentView', 'list')"
-        >
-          <Icon name="List" :size="18" />
-        </button>
-      </div>
+      <SegmentedControl
+        :model-value="currentView"
+        :options="viewOptions"
+        :variant="toggleVariant"
+        @update:model-value="emit('update:currentView', $event)"
+      />
     </div>
 
     <div class="header-col right-col">
@@ -134,67 +137,6 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   100% { transform: scale(1); opacity: 0.5; }
 }
 
-.toggle-pill {
-  position: relative;
-  display: flex;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
-  border-radius: var(--radius-full);
-  padding: 4px;
-  border: 1px solid var(--hairline);
-  box-shadow: var(--shadow-md);
-}
-
-.toggle-slider {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  background: var(--color-primary-tint);
-  border-radius: var(--radius-full);
-  transition: transform 0.5s var(--ease-spring);
-  z-index: 0;
-}
-
-.toggle-slider.map {
-  transform: translateX(0);
-}
-
-.toggle-slider.list {
-  transform: translateX(100%);
-}
-
-.toggle-btn {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  background: transparent !important;
-  border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-bold);
-  font-size: 15px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.toggle-btn.active {
-  color: var(--color-primary);
-}
-
-/* Rebote compartido (definido en main.css), igual que el del BottomNav */
-.toggle-btn.active :deep(svg) {
-  color: var(--color-primary);
-  animation: pop-bounce 0.6s var(--ease-spring) forwards;
-}
-
 .filter-dot {
   position: absolute;
   top: 7px;
@@ -216,25 +158,5 @@ const emit = defineEmits(['update:currentView', 'locate', 'filter'])
   color: #fff;
 }
 
-.is-list-mode .toggle-pill {
-  background: rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: none;
-}
-
-.is-list-mode .toggle-slider {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
-}
-
-.is-list-mode .toggle-btn {
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.is-list-mode .toggle-btn.active,
-.is-list-mode .toggle-btn.active :deep(svg) {
-  color: var(--color-selva-deep);
-}
+/* El control segmentado cambia a su variante `on-photo` vía prop, no por CSS. */
 </style>
