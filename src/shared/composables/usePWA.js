@@ -8,9 +8,6 @@ export function usePWA() {
   const deferredPrompt = ref(null)
 
   const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegistered() {
-      console.log('Service Worker registrado')
-    },
     onRegisterError(error) {
       console.error('Error al registrar el Service Worker: ', error)
     },

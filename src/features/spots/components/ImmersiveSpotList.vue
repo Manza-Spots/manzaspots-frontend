@@ -193,24 +193,7 @@ const formatKm = (distance) => {
   color: var(--color-text-inverse);
 }
 
-.slide-cat {
-  margin-bottom: 14px;
-}
 
-.glass-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: var(--font-bold);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: saturate(160%) blur(8px);
-  backdrop-filter: saturate(160%) blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  padding: 5px 10px;
-  border-radius: var(--radius-full);
-}
 
 .slide-km {
   font-size: 46px;
@@ -282,21 +265,6 @@ const formatKm = (distance) => {
   opacity: 0.35;
 }
 
-.swipe-hint {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(80px + var(--safe-area-inset-bottom));
-  z-index: 6;
-  font-size: 11px;
-  font-weight: var(--font-bold);
-  color: rgba(255, 255, 255, 0.85);
-  letter-spacing: 0.04em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  pointer-events: none;
-}
 
 .immersive-empty {
   position: absolute;

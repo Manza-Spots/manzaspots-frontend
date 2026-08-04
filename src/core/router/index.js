@@ -59,15 +59,4 @@ router.afterEach((to, from) => {
   }
 })
 
-if (isNative && platform === 'Android') {
-  App.addListener('backButton', ({ canGoBack }) => {
-    console.log('Android back button presset. Can go back:', canGoBack)
-    if (canGoBack) {
-      router.back()
-    } else {
-      App.exitApp
-    }
-  })
-}
-
 export default router

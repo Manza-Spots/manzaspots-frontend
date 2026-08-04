@@ -58,8 +58,8 @@ export function useTheme() {
         currentTheme.value = value
         localStorage.setItem(storageKey, value) // Sincronizar el fallback
       }
-    } catch (e) {
-      // Usar silencio; si falla (e.g. entorno web sin soporte completo) conservamos el localStorage original
+    } catch {
+      // Sin Preferences (web sin soporte completo) conservamos el localStorage.
     }
 
     applyTheme(currentTheme.value)

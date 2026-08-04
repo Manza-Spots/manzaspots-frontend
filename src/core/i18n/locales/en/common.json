@@ -20,10 +20,6 @@
     "password": "••••••••",
     "search": "Search..."
   },
-  "status": {
-    "pendingContent": "Implementation pending",
-    "loading": "Loading..."
-  },
   "errors": {
     "required": "This field is required",
     "email": "Enter a valid email",

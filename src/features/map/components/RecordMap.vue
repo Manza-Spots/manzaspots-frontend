@@ -209,14 +209,4 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
 </style>

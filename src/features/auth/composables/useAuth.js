@@ -42,7 +42,6 @@ export function useAuth() {
   async function webGoogleLogin(redirectTo = '/') {
     try {
       const response = await googleOneTap()
-      console.log('[webGoogleLogin response]', response)
 
       const idToken = response?.credential
 

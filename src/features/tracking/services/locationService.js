@@ -1,6 +1,5 @@
 import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
-// import { BackgroundTask } from '@capacitor/background-task'
 import { LocalNotifications } from '@capacitor/local-notifications'
 
 class LocationService {
@@ -87,14 +86,8 @@ class LocationService {
 
   async startNativeTracking(callback, options) {
     try {
-      // Registrar tarea en background (Temporalmente deshabilitado por falta del plugin)
-      /*
-      this.backgroundTaskId = await BackgroundTask.beforeExit(async () => {
-        console.log('Background task running...')
-      })
-      */
-
-      // Iniciar tracking
+      // Sin @capacitor/background-task el seguimiento se detiene al pasar
+      // la app a segundo plano.
       this.watchId = await Geolocation.watchPosition(options, (position, err) => {
         if (err) {
           console.error('Geolocation error:', err)
@@ -116,7 +109,6 @@ class LocationService {
         }
       })
 
-      console.log('Native tracking started with watchId:', this.watchId)
     } catch (error) {
       console.error('Error starting native tracking:', error)
       this.isTracking = false
@@ -146,7 +138,6 @@ class LocationService {
         options
       )
 
-      console.log('Web tracking started')
     } catch (error) {
       console.error('Error starting web tracking:', error)
       this.isTracking = false
@@ -162,11 +153,6 @@ class LocationService {
         if (this.watchId) {
           await Geolocation.clearWatch({ id: this.watchId })
         }
-        /*
-        if (this.backgroundTaskId) {
-          BackgroundTask.finish({ taskId: this.backgroundTaskId })
-        }
-        */
       } else {
         if (this.watchId) {
           navigator.geolocation.clearWatch(this.watchId)
@@ -177,7 +163,6 @@ class LocationService {
       this.backgroundTaskId = null
       this.isTracking = false
 
-      console.log('Tracking stopped')
     } catch (error) {
       console.error('Error stopping tracking:', error)
     }

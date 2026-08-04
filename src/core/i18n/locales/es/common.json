@@ -20,10 +20,6 @@
     "password": "••••••••",
     "search": "Buscar..."
   },
-  "status": {
-    "pendingContent": "Contenido pendiente de implementación",
-    "loading": "Cargando..."
-  },
   "errors": {
     "required": "Este campo es requerido",
     "email": "Ingresa un email válido",

@@ -53,6 +53,12 @@ watch(searchQuery, (val) => {
   if (route.path === '/spots') spotsSearchQuery.value = val
 })
 
+// La búsqueda pertenece a Spots: si se sale de ahí (botón atrás de Android,
+// redirección), el buscador no debe quedarse abierto sobre otra vista.
+watch(() => route.path, () => {
+  if (isSearching.value) isSearching.value = false
+})
+
 const clickStartTime = ref(0)
 let clickTimeout = null
 

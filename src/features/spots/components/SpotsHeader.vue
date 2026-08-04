@@ -158,5 +158,4 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
   color: #fff;
 }
 
-/* El control segmentado cambia a su variante `on-photo` vía prop, no por CSS. */
 </style>
