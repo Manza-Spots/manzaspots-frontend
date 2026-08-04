@@ -82,6 +82,18 @@
   --hairline: rgba(20, 40, 30, 0.08);
   --blur: saturate(180%) blur(20px);
 
+  /* Barras flotantes sobre foto (modo inmersivo).
+     Detrás hay una foto arbitraria, así que el contraste no puede depender
+     de ella: el vidrio se aclara y el indicador es casi opaco. */
+  --on-photo-bg: rgba(255, 255, 255, 0.16);
+  --on-photo-border: rgba(255, 255, 255, 0.28);
+  --on-photo-blur: saturate(160%) blur(20px);
+  --on-photo-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  /* Indicador del elemento activo y color del texto sobre él. */
+  --on-photo-indicator: rgba(255, 255, 255, 0.95);
+  --on-photo-text: rgba(255, 255, 255, 0.85);
+  --on-photo-text-active: var(--color-selva-deep);
+
   /* Shadows — tinte verde, no gris puro */
   --shadow-sm: 0 1px 2px rgba(16, 32, 24, 0.06);
   --shadow-md: 0 6px 20px rgba(16, 32, 24, 0.08), 0 2px 6px rgba(16, 32, 24, 0.05);
@@ -243,6 +255,17 @@ html.dark {
 
   --glass-bg: rgba(22, 29, 26, 0.7);
   --hairline: rgba(255, 255, 255, 0.08);
+
+  /* Sobre foto: el vidrio se ahúma en vez de aclararse, y el indicador deja de
+     ser blanco (se veía idéntico al modo claro). Su color es el mismo par que
+     usa el nav fuera del modo inmersivo —tint verde + texto verde brillante—
+     pero casi opaco, para que la foto no lo atraviese ni le baje el contraste. */
+  --on-photo-bg: rgba(12, 16, 14, 0.42);
+  --on-photo-border: rgba(255, 255, 255, 0.14);
+  --on-photo-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --on-photo-indicator: rgba(15, 44, 31, 0.92);
+  --on-photo-text: rgba(255, 255, 255, 0.72);
+  --on-photo-text-active: var(--color-selva-bright);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);

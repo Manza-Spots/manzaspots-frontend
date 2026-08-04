@@ -148,14 +148,16 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
   border: 2px solid rgba(10, 20, 14, 0.35);
 }
 
-/* Vidrio sobre foto: la vista inmersiva (lista) renderiza el header sobre la imagen */
+/* Vidrio sobre foto: la vista inmersiva (lista) renderiza el header sobre la
+   imagen. Los tokens --on-photo-* lo mantienen igual al toggle y al navbar, y
+   son los que cambian con el tema. */
 .is-list-mode .header-fab-btn {
-  background: rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--on-photo-bg);
+  -webkit-backdrop-filter: var(--on-photo-blur);
+  backdrop-filter: var(--on-photo-blur);
+  border-color: var(--on-photo-border);
   box-shadow: none;
-  color: #fff;
+  color: var(--on-photo-text);
 }
 
 </style>

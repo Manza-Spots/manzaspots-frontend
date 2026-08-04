@@ -184,11 +184,15 @@ const formatKm = (distance) => {
   );
 }
 
+/* El navbar se ancla con un offset fijo (24px de padding + 56px de alto), sin
+   safe-area. Anclar aquí con safe-area separaba el texto del navbar según el
+   dispositivo: en iPhone quedaba holgado y en web caía bajo su borde. Mismo
+   offset que el panel de resultados de búsqueda. */
 .slide-info {
   position: absolute;
   left: var(--space-5);
   right: 56px;
-  bottom: calc(76px + var(--safe-area-inset-bottom));
+  bottom: 96px;
   z-index: 6;
   color: var(--color-text-inverse);
 }
@@ -238,7 +242,7 @@ const formatKm = (distance) => {
 .pager-dots {
   position: absolute;
   right: 14px;
-  bottom: calc(150px + var(--safe-area-inset-bottom));
+  bottom: 170px;
   z-index: 6;
   display: flex;
   flex-direction: column;
