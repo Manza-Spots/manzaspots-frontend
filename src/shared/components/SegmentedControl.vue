@@ -188,22 +188,22 @@ const select = (value) => {
 
 /* Variante: sobre foto (modo inmersivo) */
 .seg--on-photo {
-  background: rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  backdrop-filter: saturate(160%) blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: var(--on-photo-bg);
+  -webkit-backdrop-filter: var(--on-photo-blur);
+  backdrop-filter: var(--on-photo-blur);
+  border: 1px solid var(--on-photo-border);
+  box-shadow: var(--on-photo-shadow);
 }
 
 .seg--on-photo .seg-thumb {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: var(--shadow-sm);
+  background: var(--on-photo-indicator);
 }
 
 .seg--on-photo .seg-btn {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--on-photo-text);
 }
 
 .seg--on-photo .seg-btn.is-active {
-  color: var(--color-selva-deep);
+  color: var(--on-photo-text-active);
 }
 </style>

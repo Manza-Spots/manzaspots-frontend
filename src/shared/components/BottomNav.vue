@@ -23,14 +23,9 @@ const { isImmersive } = useImmersiveMode()
 const isSearching = ref(false)
 const searchQuery = ref('')
 const searchInput = ref(null)
-const wrapperRef = ref(null)
 
-const isDragging = ref(false)
 const isClicking = ref(false)
 const isActionClicking = ref(false)
-const currentFingerX = ref(0)
-const initialTouchX = ref(0)
-const hasMoved = ref(false)
 const isNavVisible = ref(false)
 
 watch(isAppReady, (ready) => {
@@ -93,84 +88,21 @@ const navigateTo = (path) => {
 const activeIndex = computed(() => navItems.findIndex((i) => i.path === route.path))
 const activeItem = computed(() => navItems[activeIndex.value])
 
-const sliderStyle = computed(() => {
-  if (isDragging.value && wrapperRef.value) {
-    const rect = wrapperRef.value.getBoundingClientRect()
-    const sliderWidth = rect.width / navItems.length
-    let fingerLocalX = currentFingerX.value - rect.left
+const sliderStyle = computed(() => ({
+  width: `${100 / navItems.length}%`,
+  transform: `translateX(${activeIndex.value * 100}%)`,
+  opacity: activeIndex.value === -1 ? 0 : 1,
+}))
 
-    let translatePx = fingerLocalX - sliderWidth / 2
-    translatePx = Math.max(0, Math.min(rect.width - sliderWidth, translatePx))
-
-    // La curva del seguimiento vive en CSS (.nav-slider.is-following).
-    return {
-      width: `${100 / navItems.length}%`,
-      transform: `translateX(${translatePx}px)`,
-      opacity: 1,
-    }
-  }
-
-  return {
-    width: `${100 / navItems.length}%`,
-    transform: `translateX(${activeIndex.value * 100}%)`,
-    opacity: activeIndex.value === -1 ? 0 : 1,
-  }
-})
-
-const startDrag = (e) => {
-  if (isSearching.value || !wrapperRef.value) return
-
+// Solo feedback táctil: la navegación va en el @click de cada item.
+const startNavPress = () => {
+  if (isSearching.value) return
   isClicking.value = true
   clickStartTime.value = Date.now()
-  const currentX = e.touches[0].clientX
-  initialTouchX.value = currentX
-  currentFingerX.value = currentX
-  hasMoved.value = false
-
-  const rect = wrapperRef.value.getBoundingClientRect()
-  const sliderWidth = rect.width / navItems.length
-  const touchXInsideWrapper = currentX - rect.left
-
-  let touchedIndex = Math.floor(touchXInsideWrapper / sliderWidth)
-  touchedIndex = Math.max(0, Math.min(navItems.length - 1, touchedIndex))
-
-  if (touchedIndex !== activeIndex.value) {
-    navigateTo(navItems[touchedIndex].path)
-  }
 }
 
-const onDrag = (e) => {
-  if (isSearching.value || !wrapperRef.value) return
-  const currentX = e.touches[0].clientX
-
-  if (!hasMoved.value && Math.abs(currentX - initialTouchX.value) > 8) {
-    hasMoved.value = true
-    isDragging.value = true
-  }
-
-  if (isDragging.value) {
-    currentFingerX.value = currentX
-  }
-}
-
-const endDrag = () => {
+const endNavPress = () => {
   if (isSearching.value) return
-
-  if (isDragging.value && wrapperRef.value) {
-    const rect = wrapperRef.value.getBoundingClientRect()
-    const sliderWidth = rect.width / navItems.length
-    const fingerLocalX = currentFingerX.value - rect.left
-
-    let finalIndex = Math.floor(fingerLocalX / sliderWidth)
-    finalIndex = Math.max(0, Math.min(navItems.length - 1, finalIndex))
-
-    if (finalIndex !== activeIndex.value) {
-      navigateTo(navItems[finalIndex].path)
-    }
-  }
-
-  isDragging.value = false
-  hasMoved.value = false
 
   const elapsed = Date.now() - clickStartTime.value
   if (elapsed < 200) {
@@ -274,26 +206,20 @@ const handleFloatingAction = () => {
     <div class="nav-layout" :class="{ 'is-visible': isNavVisible, 'is-immersive': isImmersive }">
       <div
         class="nav-pill"
-        :class="{ 'is-compact': isSearching, 'is-zoomed': isDragging || isClicking }"
+        :class="{ 'is-compact': isSearching, 'is-zoomed': isClicking }"
         @click="isSearching && closeSearch()"
       >
         <div class="nav-pill-content" :class="{ 'is-hidden': isSearching }">
           <div
             class="nav-items-wrapper"
-            ref="wrapperRef"
-            @touchstart="startDrag"
-            @touchmove="onDrag"
-            @touchend="endDrag"
-            @touchcancel="endDrag"
+            @touchstart.passive="startNavPress"
+            @touchend.passive="endNavPress"
+            @touchcancel.passive="endNavPress"
           >
             <!-- El riel recorta el slider con la misma forma que él: el rebote
                  sobrepasa su destino sin salirse del pill. -->
             <div class="nav-slider-track">
-              <div
-                class="nav-slider"
-                :class="{ 'is-following': isDragging }"
-                :style="sliderStyle"
-              >
+              <div class="nav-slider" :style="sliderStyle">
                 <div class="nav-slider-inner"></div>
               </div>
             </div>
@@ -560,13 +486,6 @@ const handleFloatingAction = () => {
   pointer-events: none;
 }
 
-/* Mientras sigue al dedo el recorrido debe ser inmediato, no un rebote. */
-.nav-slider.is-following {
-  transition:
-    transform 0.15s var(--ease-out),
-    opacity 0.3s ease;
-}
-
 .nav-slider-inner {
   height: 100%;
   width: 100%;
@@ -680,30 +599,32 @@ const handleFloatingAction = () => {
 
 .is-immersive .nav-pill,
 .is-immersive .action-pill {
-  background: rgba(255, 255, 255, 0.16);
-  -webkit-backdrop-filter: saturate(160%) blur(20px);
-  backdrop-filter: saturate(160%) blur(20px);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  background: var(--on-photo-bg);
+  -webkit-backdrop-filter: var(--on-photo-blur);
+  backdrop-filter: var(--on-photo-blur);
+  border-color: var(--on-photo-border);
+  box-shadow: var(--on-photo-shadow);
 }
 
 .is-immersive .nav-item {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--on-photo-text);
 }
 
+/* El indicador del elemento activo es el slider, igual que en el control
+   segmentado del header. Pintarlo además de fondo sobre el item teñía
+   también su icono y su etiqueta, y con un tint que cambia según el tema. */
 .is-immersive .nav-item.nav-item--active,
 .is-immersive .nav-item--active .nav-item__icon,
 .is-immersive .nav-item--active .nav-item__label {
-  color: var(--color-selva-deep);
-  background: var(--color-primary-tint);
+  color: var(--on-photo-text-active);
 }
 
 .is-immersive .nav-slider-inner {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--on-photo-indicator);
 }
 
 .is-immersive .pill-icon {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--on-photo-text);
 }
 
 .is-immersive .search-input {
@@ -716,7 +637,7 @@ const handleFloatingAction = () => {
 
 .is-immersive .clear-button,
 .is-immersive .mic-button {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--on-photo-text);
 }
 
 </style>
