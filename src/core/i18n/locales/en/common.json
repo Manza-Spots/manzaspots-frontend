@@ -6,7 +6,8 @@
     "logout": "Sign out",
     "confirm": "Confirm",
     "save": "Save",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "retry": "Retry"
   },
   "labels": {
     "email": "Email",
@@ -27,6 +28,7 @@
     "required": "This field is required",
     "email": "Enter a valid email",
     "minLength": "Minimum {count} characters",
-    "generic": "Something went wrong, please try again"
+    "generic": "Something went wrong, please try again",
+    "loadFailed": "Couldn't load"
   }
 }

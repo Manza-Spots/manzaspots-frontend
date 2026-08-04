@@ -9,6 +9,7 @@ import BottomSheet from '@/shared/components/BottomSheet.vue'
 import BottomNav from './shared/components/BottomNav.vue'
 import SplashScreen from '@/shared/components/SplashScreen.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
+import { useAutoRefresh } from '@/shared/composables/useAutoRefresh'
 import { useTheme } from '@/shared/composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import { Preferences } from '@capacitor/preferences'
@@ -18,6 +19,9 @@ const route = useRoute()
 const { markReady } = useAppReady()
 const { initializeTheme } = useTheme()
 const { locale } = useI18n()
+
+// Recarga la vista activa al volver del segundo plano y al reconectar.
+useAutoRefresh()
 
 const showSplash = ref(true)
 
