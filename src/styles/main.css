@@ -262,6 +262,19 @@ input[type="number"] {
   }
 }
 
+/* Halo que late bajo la posición del usuario, compartido por los dos mapas. */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
 /* Ocultar scrollbar pero mantener funcionalidad de scroll */
 
 /* Para navegadores webkit (Chrome, Safari, Edge) */

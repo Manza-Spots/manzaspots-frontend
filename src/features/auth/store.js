@@ -146,7 +146,6 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       const response = await authApi.verifyEmail(tokenStr)
-      // Cleanup after success
       registrationEmail.value = null
       await storage.remove(REGISTRATION_EMAIL_KEY)
       return response
@@ -264,7 +263,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return exp - now < fiveMinutes
     } catch (error) {
-      console.log('Error isTokenExpirationSoon: ', error)
+      console.warn('No se pudo leer la expiración del token:', error)
       return false
     }
   }

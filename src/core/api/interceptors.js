@@ -54,7 +54,6 @@ export const setupInterceptors = (axiosInstance) => {
         console.error('Response error:', error.response?.status, error.response?.data)
       }
 
-      // Si es error 401 y no es la ruta de login/refresh
       if (
         error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
         !originalRequest._retry &&

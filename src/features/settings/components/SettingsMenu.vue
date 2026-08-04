@@ -22,7 +22,6 @@ const handleLogout = async () => {
   await logout()
 }
 
-// Reemplaza el contenido del bottom sheet global por el formulario indicado.
 const openSheet = (component, title) => {
   bottomSheet.open(component, {}, { title, closable: true })
 }
@@ -37,7 +36,6 @@ const onLanguageChange = async (e) => {
   const newLang = e.target.value
   locale.value = newLang
 
-  // Grabamos en nativo
   try {
     await Preferences.set({ key: 'manzaspots_language_preference', value: newLang })
   } catch (error) {

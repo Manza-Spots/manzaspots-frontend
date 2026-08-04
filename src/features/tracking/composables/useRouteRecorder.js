@@ -89,7 +89,6 @@ export function useRouteRecorder() {
 
     const track = buildTrack()
     lastTrack.value = track
-    console.log('[RouteRecorder] Ruta finalizada (GeoJSON):', track.geojson)
 
     try {
       await storage.set(LAST_ROUTE_KEY, track)

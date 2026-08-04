@@ -38,13 +38,10 @@
     "emailHint": "We'll send a link to the new email. The change applies once you confirm it there.",
     "emailRequested": "Check your new email to confirm the change",
     "sendLink": "Send link",
-    "favoriteRemove": "Remove from favorites",
-    "favoriteRemoved": "Removed from favorites",
     "swipeDelete": "Delete",
     "swipeRelease": "Release to delete"
   },
   "details": {
-    "noName": "No name",
     "defaultUser": "User"
   },
   "welcome": {

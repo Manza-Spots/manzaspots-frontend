@@ -151,8 +151,7 @@ onUnmounted(() => {
   overflow: hidden;
   z-index: var(--z-modal, 1010);
   padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, var(--space-4)));
-  
-  /* Lógica de transform y transición base permanente */
+
   transform: translateY(var(--drag-y, 0px));
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: transform;
@@ -237,7 +236,6 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* La transición principal ahora es dominada por la clase base .bottom-sheet-content */
 
 .bottom-sheet-leave-active .bottom-sheet-content {
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
