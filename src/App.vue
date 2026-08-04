@@ -72,7 +72,13 @@ onMounted(async () => {
     <ToastContainer />
     <BottomSheet />
 
-    <RouterView />
+    <RouterView v-slot="{ Component }">
+      <!-- El mapa se conserva vivo entre pestañas: recrearlo obliga a
+           reinicializar MapLibre y a volver a pedir tiles y spots. -->
+      <KeepAlive :include="['SpotsView']">
+        <component :is="Component" />
+      </KeepAlive>
+    </RouterView>
 
     <BottomNav v-if="!hideBottomNav" />
   </div>
