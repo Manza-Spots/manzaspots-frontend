@@ -4,11 +4,15 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/features/auth/composables/useAuth'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { usePullToRefresh } from '@/shared/composables/usePullToRefresh'
+import { useRefreshable } from '@/shared/composables/useRefreshable'
+import { useToast } from '@/shared/composables/useToast'
 import { profileApi } from '@/features/profile/api/profileApi'
 import { mapSpot } from '@/features/spots/utils/spotMapper'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Avatar from '@/shared/components/Avatar.vue'
 import Icon from '@/shared/components/Icon.vue'
+import PullToRefreshIndicator from '@/shared/components/PullToRefreshIndicator.vue'
 import SpotsMiniMap from '@/features/profile/components/SpotsMiniMap.vue'
 import ProfileListSheet from '@/features/profile/components/ProfileListSheet.vue'
 
@@ -16,6 +20,7 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const { isAuthenticated, user, refreshUser } = useAuth()
 const bottomSheet = useBottomSheet()
+const toast = useToast()
 
 const goToLogin = () => router.push('/login')
 const goToRegister = () => router.push('/register')
@@ -46,23 +51,40 @@ const memberSince = computed(() => {
 })
 
 const mySpots = ref([])
+const mySpotsError = ref(false)
+const loadingMySpots = ref(false)
 
 async function loadMySpots() {
+  loadingMySpots.value = true
   try {
     const raw = await profileApi.getMySpots()
     mySpots.value = raw.map((s) => mapSpot(s, null))
+    mySpotsError.value = false
   } catch (error) {
+    // El error deja de ser silencioso: la sección ofrece reintentar.
     console.warn('No se pudieron cargar mis spots:', error)
+    mySpotsError.value = true
+  } finally {
+    loadingMySpots.value = false
   }
 }
 
-onMounted(() => {
-  if (isAuthenticated.value) {
-    // Asegura stats/avatar frescos desde /me (login puede traer un usuario ligero).
-    refreshUser()
-    loadMySpots()
-  }
+// Recarga completa del perfil: es lo que ejecutan el tirón hacia abajo, la
+// vuelta del segundo plano y la reconexión.
+async function reloadProfile() {
+  if (!isAuthenticated.value) return
+  // Stats y avatar salen de /me (el login puede traer un usuario ligero).
+  await Promise.all([refreshUser(), loadMySpots()])
+}
+
+useRefreshable(reloadProfile)
+
+const pullToRefresh = usePullToRefresh({
+  onRefresh: reloadProfile,
+  disabled: computed(() => !isAuthenticated.value),
 })
+
+onMounted(reloadProfile)
 
 const openMySpots = () => {
   if (!mySpots.value.length) return
@@ -85,13 +107,29 @@ const openFavorites = async () => {
       { title: t('profile.favorites'), closable: true },
     )
   } catch (error) {
+    // Antes fallaba en silencio y el sheet simplemente no abría.
     console.warn('No se pudieron cargar los favoritos:', error)
+    toast.error(error.message || t('common.errors.generic'))
   }
 }
 </script>
 
 <template>
-  <div class="profile-view" :class="{ 'profile-view--welcome': !isAuthenticated }">
+  <div
+    class="profile-view"
+    :class="{ 'profile-view--welcome': !isAuthenticated }"
+    @touchstart="pullToRefresh.handlers.touchstart"
+    @touchmove="pullToRefresh.handlers.touchmove"
+    @touchend="pullToRefresh.handlers.touchend"
+    @touchcancel="pullToRefresh.handlers.touchcancel"
+  >
+    <PullToRefreshIndicator
+      :distance="pullToRefresh.distance.value"
+      :progress="pullToRefresh.progress.value"
+      :armed="pullToRefresh.armed.value"
+      :refreshing="pullToRefresh.refreshing.value"
+    />
+
     <template v-if="isAuthenticated">
       <div class="profile-content">
         <div class="identity">
@@ -132,7 +170,16 @@ const openFavorites = async () => {
               <Icon name="ChevronRight" :size="14" />
             </span>
           </div>
-          <button class="mini-map-card" @click="openMySpots">
+          <div v-if="mySpotsError" class="mini-map-card mini-map-card--error">
+            <div class="mini-map-empty">
+              <Icon name="AlertCircle" :size="28" />
+              <span>{{ t('common.errors.loadFailed') }}</span>
+              <Button variant="outline" size="sm" :loading="loadingMySpots" @click="loadMySpots">
+                {{ t('common.buttons.retry') }}
+              </Button>
+            </div>
+          </div>
+          <button v-else class="mini-map-card" @click="openMySpots">
             <SpotsMiniMap v-if="mySpots.length" :spots="mySpots" />
             <div v-else class="mini-map-empty">
               <Icon name="MapPinned" :size="28" />
@@ -336,6 +383,12 @@ const openFavorites = async () => {
 .mini-map-card:active {
   filter: brightness(0.96);
   border-color: var(--color-border-hover);
+}
+
+.mini-map-card--error {
+  border-style: dashed;
+  border-color: var(--color-border-hover);
+  cursor: default;
 }
 
 .mini-map-empty {

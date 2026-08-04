@@ -7,6 +7,7 @@ import SpotSearchResults from '@/features/spots/components/SpotSearchResults.vue
 import SpotFiltersBottomSheet from '@/features/spots/components/FiltersMenu.vue'
 import SpotsHeader from '@/features/spots/components/SpotsHeader.vue'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useRefreshable } from '@/shared/composables/useRefreshable'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 import { useSpots } from '@/features/spots/composables/useSpots'
 import { useSpotsSearch } from '@/features/spots/composables/useSpotsSearch'
@@ -68,6 +69,10 @@ const debouncedRefetch = () => {
 }
 
 const onMapReady = () => refetch()
+
+// Sin tirón aquí (el mapa se queda el gesto), pero sí recarga automática al
+// volver del segundo plano o al reconectar.
+useRefreshable(() => refetch({ fit: false }))
 
 const selectResult = (id) => {
   focusedSpotId.value = id
