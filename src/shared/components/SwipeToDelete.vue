@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import Icon from './Icon.vue'
 
 const props = defineProps({
@@ -41,6 +41,19 @@ let locked = false
 let axisDecided = false
 let pointerId = null
 
+/**
+ * Umbrales del reparto de gestos con el scroll de la lista.
+ *
+ * `touch-action: pan-y` deja el eje vertical al navegador y el horizontal a
+ * nosotros, pero cada uno decide por su cuenta y con su propio criterio. Si los
+ * dos se dan por aludidos —lo que pasa en cualquier diagonal— la lista scrollea
+ * y la fila se desliza a la vez. Por eso quedarnos el gesto exige bastante más
+ * que soltarlo: recorrido mayor y una dominancia horizontal clara. En la duda
+ * gana el scroll, que es el gesto que el usuario hace mil veces más.
+ */
+const AXIS_SLOP = 10
+const H_DOMINANCE = 1.4
+
 const thresholdPx = () => Math.min(Math.max(width * props.threshold, 90), width * 0.8)
 
 const armed = computed(() => -translateX.value >= thresholdPx())
@@ -50,14 +63,31 @@ const fgStyle = computed(() => ({
   transition: dragging.value ? 'none' : 'transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1)',
 }))
 
+// Si algo scrollea mientras creíamos tener el gesto, nos equivocamos al
+// repartirlo: el usuario estaba scrolleando. `scroll` no burbujea, pero en fase
+// de captura llegan también los de los ancestros.
+function watchScroll() {
+  document.addEventListener('scroll', abort, true)
+}
+
+function unwatchScroll() {
+  document.removeEventListener('scroll', abort, true)
+}
+
 function onDown(e) {
   if (props.disabled || committing.value) return
+  // Un segundo dedo no secuestra un arrastre en curso. Solo se ignora si el
+  // primero llegó a capturar el gesto; si no, el anterior nunca fue nuestro y
+  // este pointerdown lo sustituye (el `pointerup` de un gesto sin capturar
+  // puede caer fuera de la fila y no llegar nunca aquí).
+  if (locked) return
   width = rootEl.value?.offsetWidth || 0
   startX = e.clientX
   startY = e.clientY
   locked = false
   axisDecided = false
   pointerId = e.pointerId
+  translateX.value = 0
 }
 
 function onMove(e) {
@@ -67,20 +97,23 @@ function onMove(e) {
   const dy = e.clientY - startY
 
   if (!axisDecided) {
-    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return
+    const adx = Math.abs(dx)
+    const ady = Math.abs(dy)
+    if (adx < AXIS_SLOP && ady < AXIS_SLOP) return
+
     axisDecided = true
-    // Solo capturamos el gesto si es predominantemente horizontal hacia la izquierda.
-    if (Math.abs(dx) > Math.abs(dy)) {
-      locked = true
-      dragging.value = true
-      try {
-        fgEl.value?.setPointerCapture(pointerId)
-      } catch {
-        // Ignorado: algunos navegadores rechazan capturar si el puntero ya se soltó.
-      }
-    } else {
-      // Gesto vertical: dejamos que la lista haga scroll.
-      locked = false
+    // Solo hacia la izquierda: un arrastre a la derecha no descubre nada, así
+    // que no hay razón para quedárselo.
+    locked = dx <= -AXIS_SLOP && adx > ady * H_DOMINANCE
+
+    if (!locked) return
+
+    dragging.value = true
+    watchScroll()
+    try {
+      fgEl.value?.setPointerCapture(pointerId)
+    } catch {
+      // Ignorado: algunos navegadores rechazan capturar si el puntero ya se soltó.
     }
   }
 
@@ -96,6 +129,14 @@ function reset() {
   locked = false
   axisDecided = false
   pointerId = null
+  unwatchScroll()
+}
+
+/** Devuelve la fila a su sitio sin borrar nada. */
+function abort() {
+  dragging.value = false
+  translateX.value = 0
+  reset()
 }
 
 function onUp() {
@@ -107,10 +148,11 @@ function onUp() {
 
   if (-translateX.value >= thresholdPx()) {
     commit()
-  } else {
-    translateX.value = 0
+    reset()
+    return
   }
-  reset()
+
+  abort()
 }
 
 function commit() {
@@ -118,6 +160,8 @@ function commit() {
   translateX.value = -width
   window.setTimeout(() => emit('delete'), 200)
 }
+
+onUnmounted(unwatchScroll)
 </script>
 
 <template>
@@ -136,7 +180,7 @@ function commit() {
       @pointerdown="onDown"
       @pointermove="onMove"
       @pointerup="onUp"
-      @pointercancel="onUp"
+      @pointercancel="abort"
     >
       <slot />
     </div>
