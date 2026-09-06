@@ -23,7 +23,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'open'])
 
 const { t } = useI18n()
 const { keyboardHeight } = useKeyboard()
@@ -72,6 +72,14 @@ const countLabel = computed(() =>
             {{ spot.distance }}
           </span>
         </div>
+        <button
+          type="button"
+          class="result-open"
+          :aria-label="spot.name"
+          @click.stop="emit('open', spot.id)"
+        >
+          <Icon name="ChevronRight" :size="18" />
+        </button>
       </li>
     </ul>
   </div>
@@ -152,6 +160,24 @@ const countLabel = computed(() =>
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
+}
+
+.result-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  transition: var(--press-transition), background-color var(--transition-fast);
+}
+
+.result-open:active {
+  transform: scale(var(--press-scale-strong));
 }
 
 .result-name {

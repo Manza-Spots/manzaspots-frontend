@@ -1,9 +1,11 @@
 <script setup>
 import { computed, ref, watch, onActivated, onBeforeUnmount, onDeactivated } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InteractiveMap from '@/features/map/components/InteractiveMap.vue'
 import ImmersiveSpotList from '@/features/spots/components/ImmersiveSpotList.vue'
 import SpotSearchResults from '@/features/spots/components/SpotSearchResults.vue'
+import SpotPeekCard from '@/features/spots/components/SpotPeekCard.vue'
 import SpotFiltersBottomSheet from '@/features/spots/components/FiltersMenu.vue'
 import SpotsHeader from '@/features/spots/components/SpotsHeader.vue'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
@@ -11,16 +13,19 @@ import { useRefreshable } from '@/shared/composables/useRefreshable'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 import { useSpots } from '@/features/spots/composables/useSpots'
 import { useSpotsSearch } from '@/features/spots/composables/useSpotsSearch'
+import { useFavoriteSync } from '@/features/spots/composables/useFavoriteSync'
 import { DEFAULT_FILTERS, isFilterActive } from '@/features/spots/utils/spotFilters'
 
 // Nombre explícito: <KeepAlive :include> resuelve por nombre de componente.
 defineOptions({ name: 'SpotsView' })
 
 const { t } = useI18n()
+const router = useRouter()
 const bottomSheet = useBottomSheet()
 const { isImmersive } = useImmersiveMode()
 const { spots, loading, load, ensureUserPos } = useSpots()
 const { query: searchQuery } = useSpotsSearch()
+const { lastChange, applyChange } = useFavoriteSync()
 
 const mapRef = ref(null)
 const currentView = ref('map')
@@ -33,6 +38,13 @@ let refetchTimer = null
 const isSearching = computed(() => !!searchQuery.value.trim())
 const showResults = computed(() => currentView.value === 'map' && isSearching.value)
 const hasActiveFilters = computed(() => isFilterActive(filters.value))
+
+const focusedSpot = computed(() =>
+  focusedSpotId.value == null ? null : spots.value.find((s) => s.id === focusedSpotId.value),
+)
+const showPeek = computed(
+  () => currentView.value === 'map' && !isSearching.value && !!focusedSpot.value,
+)
 
 // Alcance del fetch según la vista:
 // - LISTA -> catálogo global (todos, o todos los que coinciden por nombre).
@@ -77,6 +89,12 @@ useRefreshable(() => refetch({ fit: false }))
 const selectResult = (id) => {
   focusedSpotId.value = id
 }
+
+const openSpot = (id) => router.push({ name: 'SpotDetail', params: { id } })
+
+watch(lastChange, (change) => {
+  spots.value = applyChange(spots.value, change)
+})
 
 watch(currentView, (v) => {
   isImmersive.value = v === 'list'
@@ -161,6 +179,16 @@ const openFilters = () => {
         :loading="loading"
         :focused-id="focusedSpotId"
         @select="selectResult"
+        @open="openSpot"
+      />
+    </Transition>
+
+    <Transition name="slide-up">
+      <SpotPeekCard
+        v-if="showPeek"
+        :spot="focusedSpot"
+        @open="openSpot"
+        @close="focusedSpotId = null"
       />
     </Transition>
 
@@ -169,6 +197,7 @@ const openFilters = () => {
         v-show="currentView === 'list'"
         class="immersive-layer"
         :spots="spots"
+        @open="openSpot"
       />
     </Transition>
 

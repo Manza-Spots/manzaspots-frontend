@@ -17,4 +17,24 @@ export const spotsApi = {
     // Paginado -> { results: [...] }; fallback a array directo por robustez.
     return payload?.results ?? (Array.isArray(payload) ? payload : [])
   },
+
+  async getSpot(id) {
+    const response = await api.get(API_ENDPOINTS.SPOTS.DETAIL(id))
+    return response.data?.data ?? response.data
+  },
+
+  async getSpotRoutes(id) {
+    const response = await api.get(API_ENDPOINTS.SPOTS.ROUTES(id))
+    const payload = response.data?.data
+    const all = payload?.results ?? (Array.isArray(payload) ? payload : [])
+    return all.filter((route) => String(route.spot) === String(id))
+  },
+
+  async addFavorite(id) {
+    await api.post(API_ENDPOINTS.SPOTS.FAVORITE(id))
+  },
+
+  async removeFavorite(id) {
+    await api.delete(API_ENDPOINTS.SPOTS.FAVORITE(id))
+  },
 }

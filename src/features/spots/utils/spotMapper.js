@@ -45,3 +45,40 @@ export function mapSpot(spot, userPos) {
     isFavorite: spot.is_favorite ?? false,
   }
 }
+
+export function mapSpotDetail(spot, userPos) {
+  const base = mapSpot(spot, userPos)
+
+  const captions = (spot.spot_caption ?? [])
+    .map((caption) => ({
+      id: caption.id,
+      url: resolveMediaUrl(caption.img_path),
+      description: caption.description ?? '',
+      userName: caption.user_name ?? '',
+    }))
+    .filter((photo) => photo.url)
+
+  return {
+    ...base,
+    gallery: base.imageUrl
+      ? [{ id: 'thumb', url: base.imageUrl, description: '', userName: '' }, ...captions]
+      : captions,
+  }
+}
+
+export function mapRoute(route) {
+  return {
+    id: route.id,
+    spotId: route.spot,
+    description: route.description,
+    distanceKm: route.distance ?? null,
+    difficultyName: route.difficulty_name ?? '',
+    travelModeName: route.travel_mode_name ?? '',
+    userName: route.user_name ?? '',
+    isFavorite: route.is_favorite ?? false,
+    path: route.path ?? null,
+    photos: (route.route_photos ?? [])
+      .map((photo) => resolveMediaUrl(photo.img_path))
+      .filter(Boolean),
+  }
+}

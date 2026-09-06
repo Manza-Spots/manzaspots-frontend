@@ -34,6 +34,8 @@ export const API_ENDPOINTS = {
     DETAIL: (id) => `/spots/${id}/`,
     CREATE: '/spots/',
     FAVORITES: '/spots/favorites/',
+    FAVORITE: (id) => `/spots/${id}/favorites/`,
+    ROUTES: (id) => `/spots/${id}/routes/`,
   },
 
   ROUTES: {

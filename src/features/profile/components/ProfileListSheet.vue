@@ -7,7 +7,7 @@ import Icon from '@/shared/components/Icon.vue'
 import SegmentedControl from '@/shared/components/SegmentedControl.vue'
 import SwipeToDelete from '@/shared/components/SwipeToDelete.vue'
 import SpotListCard from '@/features/spots/components/SpotListCard.vue'
-import RouteCard from './RouteCard.vue'
+import RouteCard from '@/features/spots/components/RouteCard.vue'
 
 const props = defineProps({
   spots: {

@@ -9,6 +9,15 @@ export default [
     },
   },
   {
+    path: '/spots/:id',
+    name: 'SpotDetail',
+    component: () => import('@/views/SpotDetailView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Detalle del spot',
+    },
+  },
+  {
     path: '/record-route',
     name: 'RecordRoute',
     component: () => import('@/views/RecordRouteView.vue'),
