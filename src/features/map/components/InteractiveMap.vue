@@ -1,5 +1,14 @@
 <script setup>
-import { ref, onMounted, onUnmounted, shallowRef, computed, watch } from 'vue'
+import {
+  ref,
+  onMounted,
+  onUnmounted,
+  onActivated,
+  onDeactivated,
+  shallowRef,
+  computed,
+  watch,
+} from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { locationService } from '@/features/tracking/services/locationService'
@@ -34,6 +43,7 @@ const defaultCenter = [-104.316111, 19.053333]
 const isDarkMode = ref(false)
 let observer = null
 let radiusTimer = null
+let userMarker = null
 
 const mapStyle = computed(() => {
   return isDarkMode.value
@@ -145,6 +155,19 @@ const updateSpots = () => {
   if (source) source.setData(spotsToFeatureCollection(props.spots))
 }
 
+const followUser = () => {
+  if (!userMarker) return
+  locationService
+    .startTracking((pos) => {
+      userMarker?.setLngLat([pos.longitude, pos.latitude])
+    })
+    .catch((err) => {
+      console.warn('Ubicación predeterminada usada', err)
+      userMarker?.remove()
+      userMarker = null
+    })
+}
+
 onMounted(() => {
   isDarkMode.value = document.documentElement.classList.contains('dark')
 
@@ -169,19 +192,9 @@ onMounted(() => {
     const el = document.createElement('div')
     el.className = 'user-location-pulse'
 
-    const userMarker = new maplibregl.Marker({ element: el })
-      .setLngLat(defaultCenter)
-      .addTo(map.value)
+    userMarker = new maplibregl.Marker({ element: el }).setLngLat(defaultCenter).addTo(map.value)
 
-    locationService
-      .startTracking((pos) => {
-        userMarker.setLngLat([pos.longitude, pos.latitude])
-      })
-      .catch((err) => {
-        console.warn('Ubicación predeterminada usada', err)
-        userMarker.remove()
-      })
-
+    followUser()
     ensureSpotsLayer()
     emit('ready')
   })
@@ -320,6 +333,17 @@ defineExpose({
   centerOnUser,
   fitToSpots,
   showRadius,
+})
+
+// `SpotsView` está cacheada por <KeepAlive>, así que al salir de ella no se
+// desmonta nada: `onUnmounted` no llegaba nunca y el GPS seguía corriendo de
+// fondo mientras se navegaba por el detalle o el perfil.
+onDeactivated(() => {
+  locationService.stopTracking()
+})
+
+onActivated(() => {
+  followUser()
 })
 
 onUnmounted(() => {
