@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
+import IconButton from '@/shared/components/IconButton.vue'
 import SegmentedControl from '@/shared/components/SegmentedControl.vue'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
 
@@ -38,14 +39,16 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
   <div class="spots-header-overlay" :class="{ 'is-list-mode': currentView === 'list' }">
 
     <div class="header-col left-col">
-      <button
+      <IconButton
         v-if="!isImmersive"
         class="header-fab-btn"
         :class="{ 'is-loading': isLocating }"
+        :variant="currentView === 'list' ? 'on-photo' : 'surface'"
+        :label="t('spots.actions.locate')"
         @click="emit('locate')"
       >
         <Icon name="LocateFixed" :size="24" class="icon-svg" />
-      </button>
+      </IconButton>
     </div>
 
     <div class="header-col center-col">
@@ -58,14 +61,16 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
     </div>
 
     <div class="header-col right-col">
-      <button
+      <IconButton
         v-if="!isImmersive"
         class="header-fab-btn"
+        :variant="currentView === 'list' ? 'on-photo' : 'surface'"
+        :label="t('spots.filters.title')"
         @click="emit('filter')"
       >
         <Icon name="SlidersHorizontal" :size="24" class="icon-svg" />
         <span v-if="hasActiveFilters" class="filter-dot"></span>
-      </button>
+      </IconButton>
     </div>
 
   </div>
@@ -106,26 +111,6 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
   justify-content: flex-end;
 }
 
-.header-fab-btn {
-  position: relative;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--color-bg);
-  border: 1px solid var(--hairline);
-  box-shadow: var(--shadow-md);
-  color: var(--color-text-primary);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: var(--press-transition);
-}
-
-.header-fab-btn:active {
-  transform: scale(var(--press-scale-strong));
-}
-
 .is-loading .icon-svg {
   animation: pulse 1s infinite cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--color-primary);
@@ -148,16 +133,8 @@ const toggleVariant = computed(() => (props.currentView === 'list' ? 'on-photo' 
   border: 2px solid rgba(10, 20, 14, 0.35);
 }
 
-/* Vidrio sobre foto: la vista inmersiva (lista) renderiza el header sobre la
-   imagen. Los tokens --on-photo-* lo mantienen igual al toggle y al navbar, y
-   son los que cambian con el tema. */
 .is-list-mode .header-fab-btn {
-  background: var(--on-photo-bg);
-  -webkit-backdrop-filter: var(--on-photo-blur);
-  backdrop-filter: var(--on-photo-blur);
-  border-color: var(--on-photo-border);
   box-shadow: none;
-  color: var(--on-photo-text);
 }
 
 </style>

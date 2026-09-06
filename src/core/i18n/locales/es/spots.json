@@ -1,4 +1,7 @@
 {
+  "actions": {
+    "locate": "Ir a mi ubicación"
+  },
   "filters": {
     "title": "Filtrar spots",
     "radius": "Radio de búsqueda",
@@ -18,5 +21,20 @@
   "view": {
     "map": "Mapa",
     "list": "Lista"
+  },
+  "detail": {
+    "gallery": "Galería",
+    "galleryEmpty": "Este spot aún no tiene fotos",
+    "tabRoutes": "Rutas",
+    "tabGallery": "Galería",
+    "startRoute": "Iniciar {name}",
+    "pickRoute": "Elige una ruta",
+    "directions": "Cómo llegar",
+    "routeCount": "Sin rutas registradas | 1 ruta registrada | {count} rutas registradas",
+    "routes": "Rutas para llegar",
+    "routesEmpty": "Todavía no hay rutas registradas",
+    "favorite": "Agregar a favoritos",
+    "unfavorite": "Quitar de favoritos",
+    "notFound": "No se encontró el spot"
   }
 }

@@ -1,4 +1,7 @@
 {
+  "actions": {
+    "locate": "Go to my location"
+  },
   "filters": {
     "title": "Filter spots",
     "radius": "Search radius",
@@ -18,5 +21,20 @@
   "view": {
     "map": "Map",
     "list": "List"
+  },
+  "detail": {
+    "gallery": "Gallery",
+    "galleryEmpty": "This spot has no photos yet",
+    "tabRoutes": "Routes",
+    "tabGallery": "Gallery",
+    "startRoute": "Start {name}",
+    "pickRoute": "Pick a route",
+    "directions": "Directions",
+    "routeCount": "No routes registered | 1 route registered | {count} routes registered",
+    "routes": "Routes to get there",
+    "routesEmpty": "No routes registered yet",
+    "favorite": "Add to favorites",
+    "unfavorite": "Remove from favorites",
+    "notFound": "Spot not found"
   }
 }

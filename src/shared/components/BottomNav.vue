@@ -6,6 +6,7 @@ import Icon from './Icon.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
+import { useNavVisibility } from '@/shared/composables/useNavVisibility'
 import { useSpotsSearch } from '@/features/spots/composables/useSpotsSearch'
 import { useKeyboard } from '@/shared/composables/useKeyboard'
 import SettingsMenu from '@/features/settings/components/SettingsMenu.vue'
@@ -19,6 +20,7 @@ const route = useRoute()
 const { isAppReady } = useAppReady()
 const bottomSheet = useBottomSheet()
 const { isImmersive } = useImmersiveMode()
+const { isNavHidden } = useNavVisibility()
 
 const isSearching = ref(false)
 const searchQuery = ref('')
@@ -203,7 +205,10 @@ const handleFloatingAction = () => {
   @touchstart.passive="() => {}"
   :style="{ transform: `translateY(-${keyboardHeight}px)` }"
 >
-    <div class="nav-layout" :class="{ 'is-visible': isNavVisible, 'is-immersive': isImmersive }">
+    <div
+      class="nav-layout"
+      :class="{ 'is-visible': isNavVisible && !isNavHidden, 'is-immersive': isImmersive }"
+    >
       <div
         class="nav-pill"
         :class="{ 'is-compact': isSearching, 'is-zoomed': isClicking }"

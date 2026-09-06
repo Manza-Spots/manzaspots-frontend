@@ -12,6 +12,8 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['open'])
+
 const { t } = useI18n()
 const { keyboardHeight } = useKeyboard()
 
@@ -88,7 +90,7 @@ const formatKm = (distance) => {
         <div class="scrim-top"></div>
         <div class="scrim-bottom"></div>
 
-        <div class="slide-info">
+        <div class="slide-info" role="button" @click="emit('open', spot.id)">
           <div v-if="spot.distance" class="slide-km">
             {{ formatKm(spot.distance) }}<small> km</small>
           </div>
@@ -197,8 +199,6 @@ const formatKm = (distance) => {
   color: var(--color-text-inverse);
 }
 
-
-
 .slide-km {
   font-size: 46px;
   font-weight: var(--font-extrabold);
@@ -268,7 +268,6 @@ const formatKm = (distance) => {
   transform: scale(0.65);
   opacity: 0.35;
 }
-
 
 .immersive-empty {
   position: absolute;

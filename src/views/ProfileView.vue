@@ -8,7 +8,7 @@ import { usePullToRefresh } from '@/shared/composables/usePullToRefresh'
 import { useRefreshable } from '@/shared/composables/useRefreshable'
 import { useToast } from '@/shared/composables/useToast'
 import { profileApi } from '@/features/profile/api/profileApi'
-import { mapSpot } from '@/features/spots/utils/spotMapper'
+import { mapSpot, mapRoute } from '@/features/spots/utils/spotMapper'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Avatar from '@/shared/components/Avatar.vue'
 import Icon from '@/shared/components/Icon.vue'
@@ -103,7 +103,7 @@ const openFavorites = async () => {
     ])
     bottomSheet.open(
       ProfileListSheet,
-      { spots: rawSpots.map((s) => mapSpot(s, null)), routes, removable: true },
+      { spots: rawSpots.map((s) => mapSpot(s, null)), routes: routes.map(mapRoute), removable: true },
       { title: t('profile.favorites'), closable: true },
     )
   } catch (error) {
