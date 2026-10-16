@@ -14,6 +14,30 @@
     "photo": "Photo",
     "finish": "Finish",
     "pause": "Pause",
-    "resume": "Resume"
+    "resume": "Resume",
+    "save": "Save route"
+  },
+  "photoAdded": "Photo added to the trip",
+  "tooShort": "The route is too short to save",
+  "towards": "Towards {name}",
+  "photoNoLocation": "Couldn't locate the photo, try again",
+  "save": {
+    "title": "Save route",
+    "spot": "Which spot does this route lead to?",
+    "spotsLoading": "Looking for nearby spots…",
+    "noSpots": "There are no published spots near the end of your route",
+    "createSpot": "Suggest a spot here",
+    "difficulty": "Difficulty",
+    "travelMode": "How did you get there?",
+    "description": "Name or description",
+    "descriptionPlaceholder": "e.g. Along the river trail",
+    "photos": "No photos | 1 photo | {count} photos",
+    "submit": "Save route",
+    "saved": "Route saved",
+    "photosFailed": "Route saved, but {count} photo(s) could not be uploaded",
+    "loginRequired": "Log in to save your routes. Your trip is kept.",
+    "login": "Log in",
+    "pickSpot": "Pick the destination spot",
+    "catalogsFailed": "Couldn't load the options"
   }
 }

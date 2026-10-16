@@ -10,30 +10,48 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // Sin rutas registradas, el botón principal invita a grabar la primera.
+  hasRoutes: {
+    type: Boolean,
+    default: false,
+  },
+  canNavigate: {
+    type: Boolean,
+    default: true,
+  },
 })
+
+const emit = defineEmits(['start', 'directions'])
 
 const { t } = useI18n()
 
 const hasRoute = computed(() => !!props.routeName)
+const canStart = computed(() => hasRoute.value || !props.hasRoutes)
+const label = computed(() => {
+  if (hasRoute.value) return t('spots.detail.startRoute', { name: props.routeName })
+  return props.hasRoutes ? t('spots.detail.pickRoute') : t('spots.detail.recordFirst')
+})
 </script>
 
 <template>
   <div class="action-bar">
     <div class="action-row">
-
       <ButtonComponent
         class="action-start"
-        :variant="hasRoute ? 'primary' : 'secondary'"
+        :variant="canStart ? 'primary' : 'secondary'"
         size="lg"
-        :disabled="!hasRoute"
+        :disabled="!canStart"
+        @click="emit('start')"
       >
-        <Icon name="Play" :size="18" />
-        <span class="action-label">
-          {{ hasRoute ? t('spots.detail.startRoute', { name: routeName }) : t('spots.detail.pickRoute') }}
-        </span>
+        <Icon :name="hasRoute ? 'Play' : 'Radio'" :size="18" />
+        <span class="action-label">{{ label }}</span>
       </ButtonComponent>
 
-      <IconButton :label="t('spots.detail.directions')" :disabled="!hasRoute">
+      <IconButton
+        :label="t('spots.detail.directions')"
+        :disabled="!canNavigate"
+        @click="emit('directions')"
+      >
         <Icon name="Navigation2" :size="20" />
       </IconButton>
     </div>

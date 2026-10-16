@@ -1,0 +1,13 @@
+{
+  "title": "Moderar spots",
+  "empty": "No hay spots pendientes de revisión",
+  "approve": "Aprobar",
+  "reject": "Rechazar",
+  "reasonLabel": "Motivo del rechazo",
+  "reasonPlaceholder": "Ej. Ubicación incorrecta o foto inapropiada",
+  "reasonRequired": "Escribe el motivo",
+  "approved": "Spot aprobado",
+  "rejected": "Spot rechazado",
+  "by": "Propuesto por {name}",
+  "openMap": "Ver en el mapa"
+}

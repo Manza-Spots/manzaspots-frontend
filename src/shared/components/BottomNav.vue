@@ -143,7 +143,7 @@ const floatingButton = computed(() => {
     },
     '/record-route': {
       icon: 'Plus',
-      action: 'record',
+      action: 'createSpot',
       show: true,
     },
     '/profile': {
@@ -194,6 +194,8 @@ const handleFloatingAction = () => {
     openSearch()
   }else if(floatingButton.value.action === 'settings') {
     openSettings()
+  } else if (floatingButton.value.action === 'createSpot') {
+    router.push({ name: 'CreateSpot' })
   }
 }
 </script>

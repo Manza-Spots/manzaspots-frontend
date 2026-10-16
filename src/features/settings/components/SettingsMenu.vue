@@ -10,11 +10,12 @@ import { Preferences } from '@capacitor/preferences'
 import EditProfileSheet from '@/features/profile/components/EditProfileSheet.vue'
 import ChangePasswordSheet from '@/features/profile/components/ChangePasswordSheet.vue'
 import ChangeEmailSheet from '@/features/profile/components/ChangeEmailSheet.vue'
+import ModerationSheet from '@/features/moderation/components/ModerationSheet.vue'
 
 const { t, locale } = useI18n()
 const emit = defineEmits(['close'])
 
-const { isAuthenticated, logout } = useAuth()
+const { isAuthenticated, user, logout } = useAuth()
 const bottomSheet = useBottomSheet()
 
 const handleLogout = async () => {
@@ -91,6 +92,21 @@ const onLanguageChange = async (e) => {
         </div>
         <Icon name="ChevronRight" :size="20" class="setting-icon-action" />
       </RouterLink>
+    </div>
+
+    <div v-if="isAuthenticated && user?.is_staff" class="settings-section">
+      <h4 class="section-title">{{ t('settings.admin') }}</h4>
+
+      <button
+        class="setting-item clickable"
+        @click="openSheet(ModerationSheet, t('moderation.title'))"
+      >
+        <div class="setting-info">
+          <Icon name="Shield" :size="20" class="setting-icon" />
+          <span>{{ t('settings.moderation') }}</span>
+        </div>
+        <Icon name="ChevronRight" :size="20" class="setting-icon-action" />
+      </button>
     </div>
 
     <div v-if="isAuthenticated" class="settings-section">

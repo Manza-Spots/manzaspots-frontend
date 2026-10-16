@@ -1,23 +1,19 @@
-import { api } from '@/core/api'
-
-// Desenvuelve la envoltura StandardJSONRenderer ({ data }) y, si viene
-// paginado, extrae `results`. Devuelve siempre un array.
-function unwrapList(response) {
-  const payload = response.data?.data
-  if (Array.isArray(payload)) return payload
-  return payload?.results ?? []
-}
+import { api, unwrap, unwrapList } from '@/core/api'
+import { API_ENDPOINTS } from '@/core/config/api.config'
 
 export const profileApi = {
-  /** Spots creados por el usuario. `/spots/my_spots/` responde un array plano. */
+  /**
+   * Spots creados por el usuario, incluidos los pendientes de revisión o
+   * rechazados (traen `status_name` e `is_active`). Responde un array plano.
+   */
   async getMySpots() {
-    const response = await api.get('/spots/my_spots/')
+    const response = await api.get(API_ENDPOINTS.SPOTS.MINE)
     return unwrapList(response)
   },
 
   /** Spots favoritos. Paginado; cada item envuelve el spot en `spot`. */
   async getFavoriteSpots() {
-    const response = await api.get('/spots/favorites/')
+    const response = await api.get(API_ENDPOINTS.SPOTS.FAVORITES)
     return unwrapList(response)
       .map((item) => item.spot)
       .filter(Boolean)
@@ -25,15 +21,28 @@ export const profileApi = {
 
   /** Rutas favoritas. Paginado; cada item envuelve la ruta en `route`. */
   async getFavoriteRoutes() {
-    const response = await api.get('/routes/favorites/')
+    const response = await api.get(API_ENDPOINTS.ROUTES.FAVORITES)
     return unwrapList(response)
       .map((item) => item.route)
       .filter(Boolean)
   },
 
+  /** Quita una ruta de favoritos. */
+  async removeFavoriteRoute(spotId, routeId) {
+    await api.post(API_ENDPOINTS.ROUTES.REMOVE_FAVORITE(spotId, routeId))
+  },
+
+  /** Cambia la foto de perfil del usuario autenticado. */
+  async updateAvatar(file) {
+    const form = new FormData()
+    form.append('profile_thum_path', file)
+    const response = await api.patchForm(API_ENDPOINTS.USERS.PROFILE_THUMB, form)
+    return unwrap(response)
+  },
+
   /** Quita un spot de favoritos (soft delete en backend). */
   async removeFavoriteSpot(spotId) {
-    await api.delete(`/spots/${spotId}/favorites/`)
+    await api.delete(API_ENDPOINTS.SPOTS.FAVORITE(spotId))
   },
 
   /**
@@ -42,8 +51,8 @@ export const profileApi = {
    * @param {{ first_name?: string, last_name?: string, username?: string }} payload
    */
   async updateProfile(userId, payload) {
-    const response = await api.patch(`/users/${userId}/`, payload)
-    return response.data?.data ?? response.data
+    const response = await api.patch(API_ENDPOINTS.USERS.PROFILE(userId), payload)
+    return unwrap(response)
   },
 
   /**
@@ -52,7 +61,7 @@ export const profileApi = {
    * @param {{ email: string, password: string }} payload
    */
   async requestEmailChange(payload) {
-    const response = await api.post('/users/me/email/request-change', payload)
-    return response.data?.data ?? response.data
+    const response = await api.post(API_ENDPOINTS.USERS.EMAIL_CHANGE, payload)
+    return unwrap(response)
   },
 }

@@ -13,7 +13,20 @@ const props = defineProps({
     type: Number,
     default: 6,
   },
+
+  // Muestra la acción para agregar una foto a la galería.
+  canAdd: {
+    type: Boolean,
+    default: false,
+  },
+
+  adding: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const emit = defineEmits(['add'])
 
 const { t } = useI18n()
 
@@ -26,6 +39,10 @@ const overflow = computed(() => Math.max(0, props.photos.length - props.max))
     <header class="gallery-head">
       <span class="gallery-title">{{ t('spots.detail.gallery') }}</span>
       <span class="gallery-count">{{ photos.length }}</span>
+      <button v-if="canAdd" type="button" class="gallery-add" :disabled="adding" @click="emit('add')">
+        <Icon name="Camera" :size="14" />
+        {{ t('spots.detail.addPhoto') }}
+      </button>
     </header>
 
     <div class="gallery-strip">
@@ -45,10 +62,48 @@ const overflow = computed(() => Math.max(0, props.photos.length - props.max))
   <section v-else class="gallery-empty">
     <Icon name="Camera" :size="26" />
     <p>{{ t('spots.detail.galleryEmpty') }}</p>
+    <button v-if="canAdd" type="button" class="gallery-add" :disabled="adding" @click="emit('add')">
+      <Icon name="Plus" :size="14" />
+      {{ t('spots.detail.addPhoto') }}
+    </button>
   </section>
 </template>
 
 <style scoped>
+.gallery-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  letter-spacing: 0;
+  text-transform: none;
+  transition: var(--press-transition);
+}
+
+.gallery-add:active {
+  transform: scale(var(--press-scale));
+}
+
+.gallery-add:disabled {
+  opacity: 0.6;
+}
+
+.gallery-head:has(.gallery-add) {
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gallery-empty .gallery-add {
+  margin-left: 0;
+}
+
 .gallery {
   margin-top: var(--space-6);
 }

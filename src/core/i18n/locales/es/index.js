@@ -6,6 +6,7 @@ import legal from './legal.json'
 import settings from './settings.json'
 import record from './record.json'
 import spots from './spots.json'
+import moderation from './moderation.json'
 
 export default {
   common,
@@ -15,5 +16,6 @@ export default {
   legal,
   settings,
   record,
-  spots
+  spots,
+  moderation,
 }

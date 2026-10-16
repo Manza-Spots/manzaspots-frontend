@@ -35,6 +35,35 @@
     "routesEmpty": "No routes registered yet",
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
-    "notFound": "Spot not found"
+    "notFound": "Spot not found",
+    "addPhoto": "Add photo",
+    "photoAdded": "Photo added to the gallery",
+    "photoDescription": "Description (optional)",
+    "photoDescriptionPlaceholder": "Tell us something about this photo",
+    "uploadPhoto": "Upload photo",
+    "recordFirst": "Record the first route",
+    "routeFavorite": "Save route to favorites",
+    "routeUnfavorite": "Remove route from favorites"
+  },
+  "create": {
+    "title": "New spot",
+    "photo": "Spot photo",
+    "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
+    "name": "Name",
+    "namePlaceholder": "e.g. El Salto waterfall",
+    "description": "Description",
+    "descriptionPlaceholder": "What makes it special? What is the place like?",
+    "location": "Location",
+    "locationHint": "Move the map to place the pin on the spot",
+    "useMyLocation": "Use my location",
+    "submit": "Submit for review",
+    "photoRequired": "Add a photo of the spot",
+    "submitted": "Thanks! Your spot is pending review",
+    "reviewNote": "An admin will review your spot before it is published."
+  },
+  "status": {
+    "pending": "In review",
+    "rejected": "Rejected"
   }
 }

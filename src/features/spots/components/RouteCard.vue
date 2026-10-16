@@ -17,7 +17,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Muestra el corazón para guardar/quitar la ruta de favoritos.
+  favoritable: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const emit = defineEmits(['toggle-favorite'])
 
 const { t } = useI18n()
 
@@ -40,6 +47,17 @@ const distance = computed(() => {
     </div>
 
     <div class="route-body">
+      <button
+        v-if="favoritable"
+        type="button"
+        class="route-fav"
+        :class="{ 'is-active': route.isFavorite }"
+        :aria-pressed="route.isFavorite"
+        :aria-label="route.isFavorite ? t('spots.detail.routeUnfavorite') : t('spots.detail.routeFavorite')"
+        @click.stop="emit('toggle-favorite')"
+      >
+        <Icon name="Heart" :size="18" />
+      </button>
       <p class="route-title">
         <span v-if="selectable" class="route-dot" :class="{ 'is-on': selected }"></span>
         {{ title }}
@@ -124,6 +142,7 @@ const distance = computed(() => {
 }
 
 .route-body {
+  position: relative;
   padding: var(--space-3);
   flex-grow: 1;
   display: flex;
@@ -145,6 +164,36 @@ const distance = computed(() => {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.route-fav {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  transition: var(--press-transition), color var(--transition-fast);
+}
+
+.route-fav:active {
+  transform: scale(var(--press-scale-strong));
+}
+
+.route-fav.is-active {
+  color: var(--color-coral);
+}
+
+.route-fav.is-active :deep(svg) {
+  fill: currentColor;
+}
+
+.route-card:has(.route-fav) .route-title {
+  padding-right: 32px;
 }
 
 .route-badges {

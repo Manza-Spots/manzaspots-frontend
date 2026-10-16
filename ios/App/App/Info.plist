@@ -60,6 +60,12 @@
     <true/>
     <key>UIRequiresFullScreen</key>
     <false/>
+    <key>NSCameraUsageDescription</key>
+    <string>Usamos la cámara para que tomes fotos de los spots y de tus rutas.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Accedemos a tus fotos para que elijas imágenes de los spots, tus rutas o tu perfil.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Guardamos en tu galería las fotos que tomes desde la app si así lo eliges.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Necesitamos tu ubicación para trackear tus rutas de hiking incluso cuando la app está en segundo plano.</string>
     <key>NSLocationWhenInUseUsageDescription</key>

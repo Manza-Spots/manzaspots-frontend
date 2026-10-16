@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from '@/shared/composables/useToast'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { profileApi } from '@/features/profile/api/profileApi'
 import Icon from '@/shared/components/Icon.vue'
 import SegmentedControl from '@/shared/components/SegmentedControl.vue'
@@ -10,16 +12,17 @@ import SpotListCard from '@/features/spots/components/SpotListCard.vue'
 import RouteCard from '@/features/spots/components/RouteCard.vue'
 
 const props = defineProps({
+  // null => no se muestra el tab de spots (p. ej. "Historial").
   spots: {
     type: Array,
-    default: () => [],
+    default: null,
   },
   // null => no se muestra el tab de rutas (p. ej. "Mis spots").
   routes: {
     type: Array,
     default: null,
   },
-  // Muestra el botón para quitar spots de favoritos.
+  // Permite quitar spots y rutas de favoritos deslizando.
   removable: {
     type: Boolean,
     default: false,
@@ -28,17 +31,48 @@ const props = defineProps({
 
 const { t } = useI18n()
 const toast = useToast()
+const router = useRouter()
+const bottomSheet = useBottomSheet()
 
-// Copia local para poder quitar filas de forma optimista sin mutar los props.
-const localSpots = ref([...props.spots])
+// Copias locales para poder quitar filas de forma optimista sin mutar los props.
+const localSpots = ref([...(props.spots ?? [])])
+const localRoutes = ref([...(props.routes ?? [])])
 
-const hasTabs = computed(() => Array.isArray(props.routes))
-const tab = ref('spots')
+const hasSpots = computed(() => Array.isArray(props.spots))
+const hasRoutes = computed(() => Array.isArray(props.routes))
+const hasTabs = computed(() => hasSpots.value && hasRoutes.value)
+const tab = ref(hasSpots.value ? 'spots' : 'routes')
 
 const tabOptions = computed(() => [
   { value: 'spots', label: `${t('profile.tabs.spots')} (${localSpots.value.length})` },
-  { value: 'routes', label: `${t('profile.tabs.routes')} (${props.routes?.length ?? 0})` },
+  { value: 'routes', label: `${t('profile.tabs.routes')} (${localRoutes.value.length})` },
 ])
+
+// Los spots en revisión o rechazados aún no tienen página pública.
+function openSpot(spot) {
+  if (spot.isApproved === false) return
+  bottomSheet.close()
+  router.push({ name: 'SpotDetail', params: { id: spot.id } })
+}
+
+function openRoute(route) {
+  bottomSheet.close()
+  router.push({ name: 'SpotDetail', params: { id: route.spotId }, query: { route: route.id } })
+}
+
+async function removeRoute(route) {
+  const index = localRoutes.value.findIndex((r) => r.id === route.id)
+  if (index === -1) return
+
+  const [removed] = localRoutes.value.splice(index, 1) // optimista
+
+  try {
+    await profileApi.removeFavoriteRoute(route.spotId, route.id)
+  } catch (error) {
+    localRoutes.value.splice(index, 0, removed)
+    toast.error(error.message || t('common.errors.generic'))
+  }
+}
 
 async function removeSpot(spot) {
   const index = localSpots.value.findIndex((s) => s.id === spot.id)
@@ -108,9 +142,9 @@ function onEnter(el, done) {
     </div>
 
     <div class="list">
-      <template v-if="!hasTabs || tab === 'spots'">
+      <template v-if="tab === 'spots'">
         <TransitionGroup name="fav-list" tag="div" @enter="onEnter" @leave="onLeave">
-          <div v-for="s in localSpots" :key="s.id" class="fav-item">
+          <div v-for="s in localSpots" :key="s.id" class="fav-item" @click="openSpot(s)">
             <SwipeToDelete
               v-if="removable"
               :label="t('profile.edit.swipeDelete')"
@@ -129,10 +163,22 @@ function onEnter(el, done) {
       </template>
 
       <template v-else>
-        <RouteCard v-for="r in routes" :key="r.id" :route="r" />
-        <div v-if="!routes.length" class="empty">
+        <TransitionGroup name="fav-list" tag="div" @enter="onEnter" @leave="onLeave">
+          <div v-for="r in localRoutes" :key="r.id" class="fav-item" @click="openRoute(r)">
+            <SwipeToDelete
+              v-if="removable"
+              :label="t('profile.edit.swipeDelete')"
+              :armed-label="t('profile.edit.swipeRelease')"
+              @delete="removeRoute(r)"
+            >
+              <RouteCard :route="r" />
+            </SwipeToDelete>
+            <RouteCard v-else :route="r" />
+          </div>
+        </TransitionGroup>
+        <div v-if="!localRoutes.length" class="empty">
           <Icon name="Route" :size="34" />
-          <p>{{ t('profile.emptyRoutes') }}</p>
+          <p>{{ removable ? t('profile.emptyRoutes') : t('profile.historyEmpty') }}</p>
         </div>
       </template>
     </div>
@@ -161,7 +207,8 @@ function onEnter(el, done) {
 }
 
 /* La tarjeta ya no aporta su propio margen dentro del contenedor. */
-.fav-item :deep(.spot-card) {
+.fav-item :deep(.spot-card),
+.fav-item :deep(.route-card) {
   margin-bottom: 0;
 }
 

@@ -84,3 +84,22 @@ ${pts}
   </trk>
 </gpx>`
 }
+
+/**
+ * Geometría LineString 2D para el backend (la columna no admite Z). Descarta
+ * puntos consecutivos repetidos; devuelve null si no quedan al menos 2.
+ */
+export function toLineString(points) {
+  const coordinates = []
+  for (const p of points || []) {
+    const coord = [Number(p.lng.toFixed(6)), Number(p.lat.toFixed(6))]
+    const prev = coordinates.at(-1)
+    if (!prev || prev[0] !== coord[0] || prev[1] !== coord[1]) coordinates.push(coord)
+  }
+  return coordinates.length >= 2 ? { type: 'LineString', coordinates } : null
+}
+
+/** GeoJSON Point ([lng, lat]) a partir de { lat, lng }. */
+export function toPoint({ lat, lng }) {
+  return { type: 'Point', coordinates: [Number(lng.toFixed(6)), Number(lat.toFixed(6))] }
+}

@@ -25,6 +25,14 @@
     "email": "Enter a valid email",
     "minLength": "Minimum {count} characters",
     "generic": "Something went wrong, please try again",
-    "loadFailed": "Couldn't load"
+    "loadFailed": "Couldn't load",
+    "loginRequired": "Log in to continue",
+    "maxLength": "Maximum {count} characters"
+  },
+  "photo": {
+    "header": "Photo",
+    "fromGallery": "Choose from gallery",
+    "takePicture": "Take photo",
+    "failed": "Couldn't open the camera. Check the camera and photos permissions in Settings."
   }
 }
