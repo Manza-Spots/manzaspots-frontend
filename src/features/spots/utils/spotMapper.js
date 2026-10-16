@@ -43,6 +43,11 @@ export function mapSpot(spot, userPos) {
     distanceKm,
     distance: distanceKm != null ? `${distanceKm.toFixed(1)} km` : '',
     isFavorite: spot.is_favorite ?? false,
+    // Solo vienen en "mis spots" (dueño) y para staff: estado de revisión.
+    isApproved: spot.is_active ?? true,
+    statusName: spot.status_name ?? '',
+    rejectReason: spot.reject_reason ?? '',
+    userName: spot.user_name ?? '',
   }
 }
 

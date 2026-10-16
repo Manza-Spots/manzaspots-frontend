@@ -1,11 +1,21 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, markRaw, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
 import RecordMap from '@/features/map/components/RecordMap.vue'
+import SaveRouteSheet from '@/features/routes/components/SaveRouteSheet.vue'
 import { useRouteRecorder } from '@/features/tracking/composables/useRouteRecorder'
+import { spotsApi } from '@/features/spots/api/spotsApi'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useToast } from '@/shared/composables/useToast'
+import { compressImage, pickImage } from '@/shared/utils/image'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const bottomSheet = useBottomSheet()
+const toast = useToast()
 
 const mapRef = ref(null)
 const {
@@ -15,13 +25,23 @@ const {
   elevationM,
   formattedTime,
   lastTrack,
+  photos,
   isSim,
   start,
   pause,
   resume,
   finish,
+  addPhoto,
+  markSaved,
   downloadTrack,
 } = useRouteRecorder()
+
+// Al grabar desde el detalle de un spot: destino preseleccionado y, si se
+// eligió una ruta, su trazo como guía en el mapa.
+const targetSpotId = route.query.spot ?? null
+const targetSpot = ref(null)
+const guidePath = ref(null)
+const addingPhoto = ref(false)
 
 const statusLabel = () => {
   if (status.value === 'recording') return t('record.status.recording')
@@ -35,12 +55,70 @@ const togglePause = () => {
 }
 
 const recenter = () => mapRef.value?.recenter()
+
+const takePhoto = async () => {
+  if (addingPhoto.value) return
+  // Se bloquea antes de abrir la cámara: un doble toque abría dos selectores.
+  addingPhoto.value = true
+  try {
+    const file = await pickImage({ capture: true })
+    if (!file) return
+    await addPhoto(await compressImage(file))
+    toast.success(t('record.photoAdded'))
+  } catch (error) {
+    console.warn('No se pudo agregar la foto', error)
+    toast.error(t('record.photoNoLocation'))
+  } finally {
+    addingPhoto.value = false
+  }
+}
+
+const onSaved = (savedRoute, spotId) => {
+  markSaved()
+  router.push({ name: 'SpotDetail', params: { id: spotId }, query: { route: savedRoute.id } })
+}
+
+const openSave = (track) => {
+  bottomSheet.open(
+    SaveRouteSheet,
+    // markRaw: el sheet guarda sus props en un ref y volvería reactivos los
+    // miles de puntos de la ruta.
+    { track: markRaw(track), photos: photos.value, spotId: targetSpotId, onSaved },
+    { title: t('record.save.title'), closable: true },
+  )
+}
+
+const onFinish = () => {
+  const track = finish()
+  if (!track) return
+  if ((track.points?.length ?? 0) < 2) {
+    toast.warning(t('record.tooShort'))
+    return
+  }
+  openSave(track)
+}
+
+async function loadTarget() {
+  if (!targetSpotId) return
+  try {
+    const [spot, routes] = await Promise.all([
+      spotsApi.getSpot(targetSpotId),
+      route.query.route ? spotsApi.getSpotRoutes(targetSpotId) : Promise.resolve([]),
+    ])
+    targetSpot.value = spot
+    guidePath.value = routes.find((r) => String(r.id) === String(route.query.route))?.path ?? null
+  } catch (error) {
+    console.warn('No se pudo cargar el spot de destino', error)
+  }
+}
+
+onMounted(loadTarget)
 </script>
 
 <template>
   <div class="record-view">
     <div class="record-map">
-      <RecordMap ref="mapRef" :points="points" />
+      <RecordMap ref="mapRef" :points="points" :guide="guidePath" />
 
       <div class="record-head">
         <span
@@ -54,6 +132,10 @@ const recenter = () => mapRef.value?.recenter()
           {{ statusLabel() }}
         </span>
         <span v-if="isSim" class="record-badge record-badge--sim">SIM</span>
+        <span v-if="targetSpot" class="record-badge record-badge--target">
+          <Icon name="MapPin" :size="13" />
+          {{ t('record.towards', { name: targetSpot.name }) }}
+        </span>
         <button class="record-fab" @click="recenter">
           <Icon name="LocateFixed" :size="22" />
         </button>
@@ -104,13 +186,14 @@ const recenter = () => mapRef.value?.recenter()
 
       <div v-else class="record-controls">
         <div class="record-ctrlwrap">
-          <button class="record-ctrl">
+          <button class="record-ctrl" :disabled="addingPhoto" @click="takePhoto">
             <Icon name="Camera" :size="24" />
+            <span v-if="photos.length" class="record-ctrl__count">{{ photos.length }}</span>
           </button>
           <div class="record-ctrl-label">{{ t('record.controls.photo') }}</div>
         </div>
         <div class="record-ctrlwrap">
-          <button class="record-stop" @click="finish">
+          <button class="record-stop" @click="onFinish">
             <Icon name="Square" :size="28" />
           </button>
           <div class="record-ctrl-label">{{ t('record.controls.finish') }}</div>
@@ -126,6 +209,14 @@ const recenter = () => mapRef.value?.recenter()
       </div>
 
       <div v-if="status === 'idle' && lastTrack" class="record-export">
+        <button
+          v-if="!lastTrack.saved"
+          class="record-export__btn record-export__btn--primary"
+          @click="openSave(lastTrack)"
+        >
+          <Icon name="Save" :size="15" />
+          {{ t('record.controls.save') }}
+        </button>
         <button class="record-export__btn" @click="downloadTrack('geojson')">
           <Icon name="Download" :size="15" />
           GeoJSON
@@ -197,6 +288,25 @@ const recenter = () => mapRef.value?.recenter()
   color: var(--color-on-primary);
   margin-right: auto;
   margin-left: var(--space-2);
+}
+
+.record-badge--target {
+  margin-right: auto;
+  margin-left: var(--space-2);
+  max-width: 55vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.record-badge--sim:has(+ .record-badge--target) {
+  margin-right: var(--space-2);
+}
+
+.record-badge--sim + .record-badge--target {
+  margin-left: 0;
 }
 
 .record-badge__dot {
@@ -324,6 +434,25 @@ const recenter = () => mapRef.value?.recenter()
   transition: var(--press-transition);
 }
 
+.record-ctrl {
+  position: relative;
+}
+
+.record-ctrl__count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 11px;
+  font-weight: var(--font-extrabold);
+  line-height: 20px;
+}
+
 .record-ctrl:active {
   transform: scale(var(--press-scale));
 }
@@ -363,6 +492,7 @@ const recenter = () => mapRef.value?.recenter()
 
 .record-export {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
   margin-top: var(--space-4);
@@ -381,6 +511,12 @@ const recenter = () => mapRef.value?.recenter()
   padding: 8px 16px;
   cursor: pointer;
   transition: var(--press-transition);
+}
+
+.record-export__btn--primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .record-export__btn:active {

@@ -10,7 +10,6 @@
   "favorites": "Favorites",
   "mySpots": "My spots",
   "history": "Route history",
-  "historyLocked": "Available once you save recorded routes",
   "tabs": {
     "spots": "Spots",
     "routes": "Routes"
@@ -50,5 +49,10 @@
     "footer": "Explore freely or create your account to save your favorite spots",
     "login": "Sign in",
     "register": "Create account"
-  }
+  },
+  "changeAvatar": "Change profile photo",
+  "avatarSaved": "Profile photo updated",
+  "historyEmpty": "You haven't saved any routes yet",
+  "recordFirst": "Record a route",
+  "newSpot": "New spot"
 }

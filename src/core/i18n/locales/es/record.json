@@ -14,6 +14,30 @@
     "photo": "Foto",
     "finish": "Finalizar",
     "pause": "Pausa",
-    "resume": "Reanudar"
+    "resume": "Reanudar",
+    "save": "Guardar ruta"
+  },
+  "photoAdded": "Foto agregada al recorrido",
+  "tooShort": "La ruta es muy corta para guardarla",
+  "towards": "Hacia {name}",
+  "photoNoLocation": "No se pudo ubicar la foto; intenta de nuevo",
+  "save": {
+    "title": "Guardar ruta",
+    "spot": "¿A qué spot llega esta ruta?",
+    "spotsLoading": "Buscando spots cercanos…",
+    "noSpots": "No hay spots publicados cerca del final de tu ruta",
+    "createSpot": "Proponer un spot aquí",
+    "difficulty": "Dificultad",
+    "travelMode": "¿Cómo te moviste?",
+    "description": "Nombre o descripción",
+    "descriptionPlaceholder": "Ej. Por el sendero del río",
+    "photos": "Sin fotos | 1 foto | {count} fotos",
+    "submit": "Guardar ruta",
+    "saved": "Ruta guardada",
+    "photosFailed": "Ruta guardada, pero {count} foto(s) no se pudieron subir",
+    "loginRequired": "Inicia sesión para guardar tus rutas. Tu recorrido se conserva.",
+    "login": "Iniciar sesión",
+    "pickSpot": "Elige el spot de destino",
+    "catalogsFailed": "No se pudieron cargar las opciones"
   }
 }

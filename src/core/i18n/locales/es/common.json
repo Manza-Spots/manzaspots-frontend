@@ -25,6 +25,14 @@
     "email": "Ingresa un email válido",
     "minLength": "Mínimo {count} caracteres",
     "generic": "Algo salió mal, intenta de nuevo",
-    "loadFailed": "No se pudo cargar"
+    "loadFailed": "No se pudo cargar",
+    "loginRequired": "Inicia sesión para continuar",
+    "maxLength": "Máximo {count} caracteres"
+  },
+  "photo": {
+    "header": "Foto",
+    "fromGallery": "Elegir de la galería",
+    "takePicture": "Tomar foto",
+    "failed": "No se pudo abrir la cámara. Revisa los permisos de cámara y fotos en Ajustes."
   }
 }

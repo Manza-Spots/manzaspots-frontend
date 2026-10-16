@@ -9,5 +9,7 @@
   "terms": "Términos de uso",
   "privacy": "Política de privacidad",
   "account": "Cuenta",
-  "title": "Configuraciones"
+  "title": "Configuraciones",
+  "admin": "Administración",
+  "moderation": "Moderar spots"
 }

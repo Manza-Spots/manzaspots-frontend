@@ -1,4 +1,4 @@
-import { api } from '@/core/api'
+import { api, unwrap, unwrapList } from '@/core/api'
 import { API_ENDPOINTS } from '@/core/config/api.config'
 
 export const spotsApi = {
@@ -36,5 +36,46 @@ export const spotsApi = {
 
   async removeFavorite(id) {
     await api.delete(API_ENDPOINTS.SPOTS.FAVORITE(id))
+  },
+
+  /**
+   * Propone un spot nuevo. Queda pendiente de revisión hasta que un admin lo apruebe.
+   * @param {{ name: string, description: string, file: File, location: object }} data
+   *   `location` es un GeoJSON Point.
+   */
+  async createSpot({ name, description, file, location }) {
+    const form = new FormData()
+    form.append('name', name)
+    form.append('description', description)
+    form.append('spot_thumbnail_path', file)
+    form.append('location', JSON.stringify(location))
+    const response = await api.postForm(API_ENDPOINTS.SPOTS.CREATE, form)
+    return unwrap(response)
+  },
+
+  /** Agrega una foto a la galería del spot. */
+  async addPhoto(spotId, { file, description = '' }) {
+    const form = new FormData()
+    form.append('img_path', file)
+    if (description) form.append('description', description)
+    const response = await api.postForm(API_ENDPOINTS.SPOTS.CAPTIONS(spotId), form)
+    return unwrap(response)
+  },
+
+  // ─── Moderación (solo staff) ──────────────────────────────────────────────
+
+  async getPendingSpots() {
+    const response = await api.get(API_ENDPOINTS.SPOTS.LIST, { params: { status: 'PENDING' } })
+    return unwrapList(response)
+  },
+
+  async authorizeSpot(id) {
+    const response = await api.post(API_ENDPOINTS.SPOTS.AUTHORIZE(id))
+    return unwrap(response)
+  },
+
+  async denySpot(id, reason) {
+    const response = await api.post(API_ENDPOINTS.SPOTS.DENY(id), { reason })
+    return unwrap(response)
   },
 }

@@ -35,6 +35,35 @@
     "routesEmpty": "Todavía no hay rutas registradas",
     "favorite": "Agregar a favoritos",
     "unfavorite": "Quitar de favoritos",
-    "notFound": "No se encontró el spot"
+    "notFound": "No se encontró el spot",
+    "addPhoto": "Agregar foto",
+    "photoAdded": "Foto agregada a la galería",
+    "photoDescription": "Descripción (opcional)",
+    "photoDescriptionPlaceholder": "Cuéntanos algo de esta foto",
+    "uploadPhoto": "Subir foto",
+    "recordFirst": "Grabar la primera ruta",
+    "routeFavorite": "Guardar ruta en favoritos",
+    "routeUnfavorite": "Quitar ruta de favoritos"
+  },
+  "create": {
+    "title": "Nuevo spot",
+    "photo": "Foto del spot",
+    "addPhoto": "Agregar foto",
+    "changePhoto": "Cambiar foto",
+    "name": "Nombre",
+    "namePlaceholder": "Ej. Cascada El Salto",
+    "description": "Descripción",
+    "descriptionPlaceholder": "¿Qué lo hace especial? ¿Cómo es el lugar?",
+    "location": "Ubicación",
+    "locationHint": "Mueve el mapa para colocar el pin sobre el spot",
+    "useMyLocation": "Usar mi ubicación",
+    "submit": "Enviar a revisión",
+    "photoRequired": "Agrega una foto del spot",
+    "submitted": "¡Gracias! Tu spot quedó pendiente de revisión",
+    "reviewNote": "Un administrador revisará tu spot antes de publicarlo."
+  },
+  "status": {
+    "pending": "En revisión",
+    "rejected": "Rechazado"
   }
 }

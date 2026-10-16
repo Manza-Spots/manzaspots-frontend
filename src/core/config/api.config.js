@@ -26,23 +26,34 @@ export const API_ENDPOINTS = {
   USERS: {
     ME: '/users/me/',
     PROFILE: (id) => `/users/${id}/`,
-    UPDATE_PROFILE: '/users/me/update/',
+    PROFILE_THUMB: '/users/profile/thumb/',
+    EMAIL_CHANGE: '/users/me/email/request-change',
   },
 
   SPOTS: {
     LIST: '/spots/',
     DETAIL: (id) => `/spots/${id}/`,
     CREATE: '/spots/',
+    MINE: '/spots/my_spots/',
     FAVORITES: '/spots/favorites/',
     FAVORITE: (id) => `/spots/${id}/favorites/`,
+    AUTHORIZE: (id) => `/spots/${id}/authorize/`,
+    DENY: (id) => `/spots/${id}/deny/`,
+    CAPTIONS: (id) => `/spots/${id}/captions/`,
     ROUTES: (id) => `/spots/${id}/routes/`,
   },
 
   ROUTES: {
-    LIST: '/routes/',
-    DETAIL: (id) => `/routes/${id}/`,
-    CREATE: '/routes/',
-    TRACK: '/routes/track/',
+    MINE: '/routes/mine/',
+    FAVORITES: '/routes/favorites/',
+    ADD_FAVORITE: (spotId, id) => `/spots/${spotId}/routes/${id}/add_favorite/`,
+    REMOVE_FAVORITE: (spotId, id) => `/spots/${spotId}/routes/${id}/remove_favorite/`,
+    PHOTOS: (spotId, id) => `/spots/${spotId}/routes/${id}/photos/`,
+  },
+
+  CATALOGS: {
+    DIFFICULTIES: '/difficulties/',
+    TRAVEL_MODES: '/travel-modes/',
   },
 }
 

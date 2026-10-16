@@ -2,12 +2,21 @@ import { Capacitor } from '@capacitor/core'
 import { Geolocation } from '@capacitor/geolocation'
 import { LocalNotifications } from '@capacitor/local-notifications'
 
+// Espera máxima para que el plugin nativo confirme que liberó el watch.
+const CLEAR_WATCH_TIMEOUT_MS = 2000
+// Como mucho una notificación de error de GPS por minuto.
+const ERROR_NOTIFICATION_INTERVAL_MS = 60 * 1000
+
 class LocationService {
   constructor() {
     this.isNative = Capacitor.isNativePlatform()
     this.watchId = null
     this.backgroundTaskId = null
     this.isTracking = false
+    // Se incrementa en cada stop: un start que seguía esperando permisos sabe
+    // que ya lo cancelaron y no deja un watch huérfano.
+    this.session = 0
+    this.lastErrorNotifiedAt = 0
   }
 
   async requestPermissions() {
@@ -15,11 +24,15 @@ class LocationService {
       try {
         const locationPermission = await Geolocation.requestPermissions()
 
-        const notificationPermission = await LocalNotifications.requestPermissions()
+        // Las notificaciones son opcionales: negarlas no debe impedir grabar.
+        try {
+          await LocalNotifications.requestPermissions()
+        } catch (error) {
+          console.warn('No se pudo pedir permiso de notificaciones', error)
+        }
 
-        return (
-          locationPermission.location === 'granted' && notificationPermission.display === 'granted'
-        )
+        return locationPermission.location === 'granted'
+
       } catch (error) {
         console.error('Error requesting permissions:', error)
         return false
@@ -59,28 +72,47 @@ class LocationService {
       return
     }
 
-    const hasPermissions = await this.checkPermissions()
-    if (!hasPermissions) {
-      const granted = await this.requestPermissions()
-      if (!granted) {
-        throw new Error('Location permissions not granted')
+    this.isTracking = true
+    const session = this.session
+
+    try {
+      const hasPermissions = await this.checkPermissions()
+      if (!hasPermissions) {
+        const granted = await this.requestPermissions()
+        if (!granted) {
+          throw new Error('Location permissions not granted')
+        }
       }
+    } catch (error) {
+      if (session === this.session) this.isTracking = false
+      throw error
     }
+
+    // Se finalizó (o se salió de la vista) mientras se resolvían los permisos.
+    if (session !== this.session) return
 
     const defaultOptions = {
       enableHighAccuracy: true,
-      timeout: 10000,
+      // En un watch, el timeout es la espera máxima entre posiciones. Con 10 s,
+      // bajo techo o con poca señal el plugin de iOS da por muerto el watch y
+      // la grabación deja de recibir puntos para siempre.
+      timeout: 5 * 60 * 1000,
       maximumAge: 0,
     }
 
     const trackingOptions = { ...defaultOptions, ...options }
 
-    this.isTracking = true
-
     if (this.isNative) {
       await this.startNativeTracking(callback, trackingOptions)
     } else {
       this.startWebTracking(callback, trackingOptions)
+    }
+
+    // Lo detuvieron mientras se registraba el watch nativo.
+    if (session !== this.session) {
+      const orphan = this.watchId
+      this.watchId = null
+      this.clearWatch(orphan)
     }
   }
 
@@ -145,24 +177,32 @@ class LocationService {
     }
   }
 
+  /**
+   * Detiene el seguimiento sin bloquear a quien lo llama: el estado se limpia
+   * de inmediato y la liberación del watch nativo tiene un tope de espera.
+   */
   async stopTracking() {
-    if (!this.isTracking) return
+    this.session += 1
+    const watchId = this.watchId
+    this.watchId = null
+    this.backgroundTaskId = null
+    this.isTracking = false
+
+    await this.clearWatch(watchId)
+  }
+
+  async clearWatch(watchId) {
+    if (watchId == null) return
 
     try {
       if (this.isNative) {
-        if (this.watchId) {
-          await Geolocation.clearWatch({ id: this.watchId })
-        }
+        await Promise.race([
+          Geolocation.clearWatch({ id: watchId }),
+          new Promise((resolve) => setTimeout(resolve, CLEAR_WATCH_TIMEOUT_MS)),
+        ])
       } else {
-        if (this.watchId) {
-          navigator.geolocation.clearWatch(this.watchId)
-        }
+        navigator.geolocation.clearWatch(watchId)
       }
-
-      this.watchId = null
-      this.backgroundTaskId = null
-      this.isTracking = false
-
     } catch (error) {
       console.error('Error stopping tracking:', error)
     }
@@ -240,7 +280,9 @@ class LocationService {
   handleTrackingError(error) {
     console.error('Tracking error:', error)
 
-    if (this.isNative) {
+    const now = Date.now()
+    if (this.isNative && now - this.lastErrorNotifiedAt > ERROR_NOTIFICATION_INTERVAL_MS) {
+      this.lastErrorNotifiedAt = now
       this.showTrackingNotification('Error de GPS', 'Hubo un problema obteniendo tu ubicación')
     }
   }

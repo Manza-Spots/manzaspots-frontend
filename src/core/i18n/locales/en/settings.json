@@ -9,5 +9,7 @@
   "terms": "Terms of use",
   "privacy": "Privacy policy",
   "account": "Account",
-  "title": "Settings"
+  "title": "Settings",
+  "admin": "Administration",
+  "moderation": "Review spots"
 }

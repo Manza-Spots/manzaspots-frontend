@@ -8,6 +8,9 @@ import { usePullToRefresh } from '@/shared/composables/usePullToRefresh'
 import { useRefreshable } from '@/shared/composables/useRefreshable'
 import { useToast } from '@/shared/composables/useToast'
 import { profileApi } from '@/features/profile/api/profileApi'
+import { routesApi } from '@/features/routes/api/routesApi'
+import { compressImage, pickImage } from '@/shared/utils/image'
+import RouteCard from '@/features/spots/components/RouteCard.vue'
 import { mapSpot, mapRoute } from '@/features/spots/utils/spotMapper'
 import Button from '@/shared/components/ButtonComponent.vue'
 import Avatar from '@/shared/components/Avatar.vue'
@@ -69,12 +72,62 @@ async function loadMySpots() {
   }
 }
 
+// Historial: rutas guardadas por el usuario. En el perfil se ven las más
+// recientes; el resto, en el sheet.
+const HISTORY_PREVIEW = 3
+const myRoutes = ref([])
+const myRoutesError = ref(false)
+
+async function loadMyRoutes() {
+  try {
+    const raw = await routesApi.getMyRoutes()
+    myRoutes.value = raw.map(mapRoute)
+    myRoutesError.value = false
+  } catch (error) {
+    console.warn('No se pudo cargar el historial de rutas:', error)
+    myRoutesError.value = true
+  }
+}
+
 // Recarga completa del perfil: es lo que ejecutan el tirón hacia abajo, la
 // vuelta del segundo plano y la reconexión.
 async function reloadProfile() {
   if (!isAuthenticated.value) return
   // Stats y avatar salen de /me (el login puede traer un usuario ligero).
-  await Promise.all([refreshUser(), loadMySpots()])
+  await Promise.all([refreshUser(), loadMySpots(), loadMyRoutes()])
+}
+
+const uploadingAvatar = ref(false)
+
+async function changeAvatar() {
+  if (uploadingAvatar.value) return
+  uploadingAvatar.value = true
+  try {
+    const file = await pickImage()
+    if (!file) return
+    await profileApi.updateAvatar(await compressImage(file, { maxSize: 512 }))
+    await refreshUser()
+    toast.success(t('profile.avatarSaved'))
+  } catch (error) {
+    toast.error(error.message || t('common.errors.generic'))
+  } finally {
+    uploadingAvatar.value = false
+  }
+}
+
+const goToCreateSpot = () => router.push({ name: 'CreateSpot' })
+const goToRecord = () => router.push({ name: 'RecordRoute' })
+
+const openRoute = (route) =>
+  router.push({ name: 'SpotDetail', params: { id: route.spotId }, query: { route: route.id } })
+
+const openHistory = () => {
+  if (!myRoutes.value.length) return
+  bottomSheet.open(
+    ProfileListSheet,
+    { routes: myRoutes.value },
+    { title: t('profile.history'), closable: true },
+  )
 }
 
 useRefreshable(reloadProfile)
@@ -133,7 +186,17 @@ const openFavorites = async () => {
     <template v-if="isAuthenticated">
       <div class="profile-content">
         <div class="identity">
-          <Avatar :src="avatarUrl" :name="displayName" size="xl" shape="circle" />
+          <button
+            class="avatar-btn"
+            :class="{ 'is-loading': uploadingAvatar }"
+            :aria-label="t('profile.changeAvatar')"
+            @click="changeAvatar"
+          >
+            <Avatar :src="avatarUrl" :name="displayName" size="xl" shape="circle" />
+            <span class="avatar-badge">
+              <Icon name="Camera" :size="14" />
+            </span>
+          </button>
           <div class="identity-text">
             <h2 class="identity-name">{{ displayName }}</h2>
             <p v-if="username" class="identity-username">@{{ username }}</p>
@@ -165,10 +228,16 @@ const openFavorites = async () => {
         <section class="content-section">
           <div class="section-head">
             <span class="section-label">{{ t('profile.mySpots') }}</span>
-            <span v-if="mySpots.length" class="section-count">
-              {{ mySpots.length }}
-              <Icon name="ChevronRight" :size="14" />
-            </span>
+            <div class="section-actions">
+              <button class="section-add" @click="goToCreateSpot">
+                <Icon name="Plus" :size="14" />
+                {{ t('profile.newSpot') }}
+              </button>
+              <button v-if="mySpots.length" class="section-count" @click="openMySpots">
+                {{ mySpots.length }}
+                <Icon name="ChevronRight" :size="14" />
+              </button>
+            </div>
           </div>
           <div v-if="mySpotsError" class="mini-map-card mini-map-card--error">
             <div class="mini-map-empty">
@@ -189,10 +258,31 @@ const openFavorites = async () => {
         </section>
 
         <section class="content-section">
-          <span class="section-label">{{ t('profile.history') }}</span>
-          <div class="history-locked">
-            <Icon name="Lock" :size="18" />
-            <span>{{ t('profile.historyLocked') }}</span>
+          <div class="section-head">
+            <span class="section-label">{{ t('profile.history') }}</span>
+            <button v-if="myRoutes.length" class="section-count" @click="openHistory">
+              {{ myRoutes.length }}
+              <Icon name="ChevronRight" :size="14" />
+            </button>
+          </div>
+          <div v-if="myRoutesError" class="history-empty">
+            <Icon name="AlertCircle" :size="18" />
+            <span>{{ t('common.errors.loadFailed') }}</span>
+            <button class="history-cta" @click="loadMyRoutes">{{ t('common.buttons.retry') }}</button>
+          </div>
+          <template v-else-if="myRoutes.length">
+            <RouteCard
+              v-for="r in myRoutes.slice(0, HISTORY_PREVIEW)"
+              :key="r.id"
+              :route="r"
+              class="history-card"
+              @click="openRoute(r)"
+            />
+          </template>
+          <div v-else class="history-empty">
+            <Icon name="Route" :size="18" />
+            <span>{{ t('profile.historyEmpty') }}</span>
+            <button class="history-cta" @click="goToRecord">{{ t('profile.recordFirst') }}</button>
           </div>
         </section>
       </div>
@@ -403,7 +493,74 @@ const openFavorites = async () => {
   font-weight: var(--font-semibold);
 }
 
-.history-locked {
+.avatar-btn {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 50%;
+  transition: var(--press-transition);
+}
+
+.avatar-btn:active {
+  transform: scale(var(--press-scale));
+}
+
+.avatar-btn.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.avatar-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-bg);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.section-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  transition: var(--press-transition);
+}
+
+.section-add:active {
+  transform: scale(var(--press-scale));
+}
+
+.history-card {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.history-cta {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+}
+
+.history-empty {
   display: flex;
   align-items: center;
   gap: var(--space-3);

@@ -102,7 +102,18 @@ function onGlobalCancel(e) {
   if (e.pointerId === pointerId) abort()
 }
 
+// Un arrastre que se quedó con el gesto no debe terminar en "tap" sobre la fila.
+let swallowClick = false
+
+function onClickCapture(e) {
+  if (!swallowClick) return
+  swallowClick = false
+  e.stopPropagation()
+  e.preventDefault()
+}
+
 function onDown(e) {
+  swallowClick = false
   if (props.disabled || committing.value) return
   // Un segundo dedo no secuestra un arrastre en curso. Solo se ignora si el
   // primero llegó a capturar el gesto; si no, el anterior nunca fue nuestro y
@@ -138,6 +149,7 @@ function onMove(e) {
 
     dragging.value = true
     revealed.value = true
+    swallowClick = true
     watchGesture()
     try {
       fgEl.value?.setPointerCapture(pointerId)
@@ -205,7 +217,7 @@ onUnmounted(unwatchGesture)
 </script>
 
 <template>
-  <div ref="rootEl" class="s2d">
+  <div ref="rootEl" class="s2d" @click.capture="onClickCapture">
     <div v-show="revealed" class="s2d-bg" :class="{ armed }">
       <div class="s2d-bg-inner">
         <Icon name="Trash2" :size="20" />

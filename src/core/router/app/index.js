@@ -9,6 +9,15 @@ export default [
     },
   },
   {
+    path: '/spots/new',
+    name: 'CreateSpot',
+    component: () => import('@/views/CreateSpotView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Nuevo spot',
+    },
+  },
+  {
     path: '/spots/:id',
     name: 'SpotDetail',
     component: () => import('@/views/SpotDetailView.vue'),

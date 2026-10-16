@@ -15,6 +15,11 @@ import { useFavoriteSync } from '@/features/spots/composables/useFavoriteSync'
 import { useNavVisibility } from '@/shared/composables/useNavVisibility'
 import { useToast } from '@/shared/composables/useToast'
 import { useRefreshable } from '@/shared/composables/useRefreshable'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useAuth } from '@/features/auth/composables/useAuth'
+import { routesApi } from '@/features/routes/api/routesApi'
+import { compressImage, pickImage } from '@/shared/utils/image'
+import AddSpotPhotoSheet from '@/features/spots/components/AddSpotPhotoSheet.vue'
 
 defineOptions({ name: 'SpotDetailView' })
 
@@ -27,7 +32,10 @@ const { spot, routes, loading, error, load, toggleFavorite } = useSpotDetail()
 const { isNavHidden } = useNavVisibility()
 const { markFavorite } = useFavoriteSync()
 
+const bottomSheet = useBottomSheet()
+const { isAuthenticated } = useAuth()
 const savingFavorite = ref(false)
+const addingPhoto = ref(false)
 
 const DETENTS = ['header', 0.6, 0.89]
 const FULL = 2
@@ -43,7 +51,10 @@ const spotId = computed(() => route.params.id)
 isNavHidden.value = true
 
 watch(routes, (list) => {
-  if (list.length && selectedRouteId.value == null) selectedRouteId.value = list[0].id
+  if (!list.length || selectedRouteId.value != null) return
+  // ?route=<id> llega al volver de guardar una ruta o desde el perfil.
+  const requested = list.find((r) => String(r.id) === String(route.query.route))
+  selectedRouteId.value = (requested ?? list[0]).id
 })
 
 const selectRoute = (id) => {
@@ -77,13 +88,65 @@ const goBack = () => {
 }
 
 const onToggleFavorite = async () => {
-  if (savingFavorite.value) return
+  if (savingFavorite.value || !requireAuth()) return
   savingFavorite.value = true
   const ok = await toggleFavorite()
   savingFavorite.value = false
 
   markFavorite(spot.value.id, spot.value.isFavorite)
   if (!ok) toast.error(t('common.errors.generic'))
+}
+
+// Las acciones que escriben requieren sesión: se manda a login y se vuelve aquí.
+const requireAuth = () => {
+  if (isAuthenticated.value) return true
+  toast.info(t('common.errors.loginRequired'))
+  router.push({ name: 'Login', query: { redirect: route.fullPath } })
+  return false
+}
+
+const startRoute = () => {
+  router.push({
+    name: 'RecordRoute',
+    query: selectedRouteId.value != null
+      ? { spot: spot.value.id, route: selectedRouteId.value }
+      : { spot: spot.value.id },
+  })
+}
+
+const openDirections = () => {
+  const { lat, lng } = spot.value.location
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank')
+}
+
+const addPhoto = async () => {
+  if (!requireAuth() || addingPhoto.value) return
+  addingPhoto.value = true
+  try {
+    const file = await pickImage()
+    if (!file) return
+    bottomSheet.open(
+      AddSpotPhotoSheet,
+      { spotId: spot.value.id, file: await compressImage(file), onAdded: () => load(spotId.value) },
+      { title: t('spots.detail.addPhoto'), closable: true },
+    )
+  } finally {
+    addingPhoto.value = false
+  }
+}
+
+const toggleRouteFavorite = async (target) => {
+  if (!requireAuth()) return
+  const previous = target.isFavorite
+  target.isFavorite = !previous
+  try {
+    if (previous) await routesApi.removeFavorite(spot.value.id, target.id)
+    else await routesApi.addFavorite(spot.value.id, target.id)
+  } catch (error) {
+    target.isFavorite = previous
+    console.error('Error actualizando la ruta favorita:', error)
+    toast.error(t('common.errors.generic'))
+  }
 }
 
 onMounted(() => load(spotId.value))
@@ -173,7 +236,13 @@ useRefreshable(() => load(spotId.value))
         </template>
 
         <div class="sheet-body">
-          <SpotGallery v-if="!isFull || tab === 'gallery'" :photos="spot.gallery" />
+          <SpotGallery
+            v-if="!isFull || tab === 'gallery'"
+            :photos="spot.gallery"
+            can-add
+            :adding="addingPhoto"
+            @add="addPhoto"
+          />
           <section v-if="!isFull || tab === 'routes'" class="routes">
             <header v-if="!isFull" class="routes-head">
               <span class="routes-title">{{ t('spots.detail.routes') }}</span>
@@ -185,7 +254,9 @@ useRefreshable(() => load(spotId.value))
               :route="r"
               selectable
               :selected="r.id === selectedRouteId"
+              favoritable
               @click="selectRoute(r.id)"
+              @toggle-favorite="toggleRouteFavorite(r)"
             />
 
             <div v-if="!routes.length" class="routes-empty">
@@ -196,7 +267,13 @@ useRefreshable(() => load(spotId.value))
         </div>
 
         <template #footer>
-          <SpotRouteActionBar :route-name="selectedRouteName" />
+          <SpotRouteActionBar
+            :route-name="selectedRouteName"
+            :has-routes="routes.length > 0"
+            :can-navigate="!!spot.location"
+            @start="startRoute"
+            @directions="openDirections"
+          />
         </template>
       </DetentSheet>
     </template>

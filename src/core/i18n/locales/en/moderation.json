@@ -1,0 +1,13 @@
+{
+  "title": "Review spots",
+  "empty": "No spots pending review",
+  "approve": "Approve",
+  "reject": "Reject",
+  "reasonLabel": "Rejection reason",
+  "reasonPlaceholder": "e.g. Wrong location or inappropriate photo",
+  "reasonRequired": "Write the reason",
+  "approved": "Spot approved",
+  "rejected": "Spot rejected",
+  "by": "Suggested by {name}",
+  "openMap": "View on map"
+}
