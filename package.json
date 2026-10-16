@@ -23,6 +23,7 @@
     "cap:dev:ios": "CAP_ENV=dev npx cap run ios",
     "tunnel": "sh scripts/tunnel.sh",
     "build:staging": "vite build --mode staging",
+    "cap:staging:sync": "npm run build:staging && CAP_ENV=staging npx cap sync",
     "cap:staging:android": "npm run build:staging && CAP_ENV=staging npx cap run android",
     "cap:staging:ios": "npm run build:staging && CAP_ENV=staging npx cap run ios"
   },
