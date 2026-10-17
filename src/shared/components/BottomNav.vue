@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Icon from './Icon.vue'
+import OfflineIndicator from './OfflineIndicator.vue'
 import { useAppReady } from '@/shared/composables/useAppReady'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useImmersiveMode } from '@/shared/composables/useImmersiveMode'
@@ -211,6 +212,8 @@ const handleFloatingAction = () => {
       class="nav-layout"
       :class="{ 'is-visible': isNavVisible && !isNavHidden, 'is-immersive': isImmersive }"
     >
+      <OfflineIndicator :on-photo="isImmersive" />
+
       <div
         class="nav-pill"
         :class="{ 'is-compact': isSearching, 'is-zoomed': isClicking }"

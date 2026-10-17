@@ -79,6 +79,7 @@ export function mapRoute(route) {
     distanceKm: route.distance ?? null,
     difficultyName: route.difficulty_name ?? '',
     travelModeName: route.travel_mode_name ?? '',
+    travelMode: route.travel_mode ?? null,
     userName: route.user_name ?? '',
     isFavorite: route.is_favorite ?? false,
     path: route.path ?? null,

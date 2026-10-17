@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { RouterView } from 'vue-router'
 import PWAUpdatePrompt from '@/shared/components/PWAUpdatePrompt.vue'
-import OfflineIndicator from '@/shared/components/OfflineIndicator.vue'
 import ToastContainer from '@/shared/components/ToastContainer.vue'
 import BottomSheet from '@/shared/components/BottomSheet.vue'
 import BottomNav from './shared/components/BottomNav.vue'
@@ -72,7 +71,6 @@ onMounted(async () => {
 <template>
   <div id="app">
     <SplashScreen v-if="showSplash" @done="showSplash = false" />
-    <OfflineIndicator />
     <PWAUpdatePrompt />
     <ToastContainer />
     <BottomSheet />

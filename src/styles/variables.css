@@ -285,4 +285,10 @@ html.dark {
      el botón queda fuera del indicador de inicio en iPhone y conserva el margen
      de siempre en web. El navbar no la usa: ancla en offsets fijos. */
   --bottom-bar-padding: max(var(--space-6), calc(var(--safe-area-inset-bottom) + var(--space-2)));
+
+  /* Ancla de lo que flota sobre el navbar: sus 80px fijos + 16px de aire, sin
+     safe-area. Mientras se ve el aviso de conexión sobre el navbar crece lo que
+     ocupa ese aviso (lo fija useConnectionNotice), y el contenido no queda debajo. */
+  --nav-notice-offset: 0px;
+  --nav-anchor: calc(96px + var(--nav-notice-offset));
 }

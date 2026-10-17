@@ -21,7 +21,7 @@ const { keyboardHeight } = useKeyboard()
 // la info del spot tapada; el contenedor sigue a pantalla completa, así su fondo
 // oscuro rellena el hueco de abajo (en vez de dejar ver el mapa).
 const listStyle = computed(() =>
-  keyboardHeight.value > 0 ? { bottom: `calc(${keyboardHeight.value}px + 96px)` } : {},
+  keyboardHeight.value > 0 ? { bottom: `calc(${keyboardHeight.value}px + var(--nav-anchor))` } : {},
 )
 
 const pagerRef = ref(null)
@@ -194,9 +194,10 @@ const formatKm = (distance) => {
   position: absolute;
   left: var(--space-5);
   right: 56px;
-  bottom: 96px;
+  bottom: var(--nav-anchor);
   z-index: 6;
   color: var(--color-text-inverse);
+  transition: bottom var(--transition-slow);
 }
 
 .slide-km {

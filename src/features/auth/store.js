@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from './api/authApi'
 import { storage } from '@/core/storage'
+import { isNetworkError } from '@/core/network/connectivity'
 
 const TOKEN_KEY = 'access_token'
 const REFRESH_TOKEN_KEY = 'refresh_token'
@@ -57,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
           await fetchUser()
         } catch (error) {
           console.error('Initialize fetch user error:', error)
-          await clearAuth()
+          if (!isNetworkError(error)) await clearAuth()
         }
       }
 
@@ -175,7 +176,8 @@ export const useAuthStore = defineStore('auth', () => {
       return userData
     } catch (error) {
       console.error('Fetch user error:', error)
-      await logout()
+      // Sin red no se cierra la sesión: el usuario no hizo nada mal.
+      if (!isNetworkError(error)) await logout()
       throw error
     }
   }
@@ -196,7 +198,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return response
     } catch (error) {
-      await logout()
+      if (!isNetworkError(error)) await logout()
       throw error
     }
   }

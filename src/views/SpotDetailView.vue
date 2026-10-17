@@ -20,6 +20,9 @@ import { useAuth } from '@/features/auth/composables/useAuth'
 import { routesApi } from '@/features/routes/api/routesApi'
 import { compressImage, pickImage } from '@/shared/utils/image'
 import AddSpotPhotoSheet from '@/features/spots/components/AddSpotPhotoSheet.vue'
+import RouteDownloadRow from '@/features/offline/components/RouteDownloadRow.vue'
+import { useRouteDownload } from '@/features/offline/composables/useRouteDownload'
+import { isNetworkError } from '@/core/network/connectivity'
 
 defineOptions({ name: 'SpotDetailView' })
 
@@ -77,10 +80,31 @@ const tabOptions = computed(() => [
   { value: 'gallery', label: `${t('spots.detail.tabGallery')} (${spot.value?.gallery.length ?? 0})` },
 ])
 
+const selectedRoute = computed(
+  () => routes.value.find((r) => r.id === selectedRouteId.value && r.path?.coordinates) ?? null,
+)
+
 const selectedRouteName = computed(() => {
   const route = routes.value.find((r) => r.id === selectedRouteId.value)
   return route ? route.description || t('profile.routeUnnamed') : ''
 })
+
+// Descarga de la ruta elegida para seguirla sin señal.
+const offline = useRouteDownload(spot, selectedRoute)
+
+const downloadRoute = async () => {
+  if (await offline.download()) toast.success(t('offline.downloaded'))
+  else toast.error(t('offline.downloadFailed'))
+}
+
+const removeDownload = async () => {
+  try {
+    await offline.remove()
+  } catch (err) {
+    console.warn('No se pudo borrar la ruta descargada', err)
+    toast.error(t('common.errors.generic'))
+  }
+}
 
 const goBack = () => {
   if (window.history.state?.back) router.back()
@@ -180,6 +204,18 @@ useRefreshable(() => load(spotId.value))
       <p>{{ t('common.buttons.loading') }}</p>
     </div>
 
+    <!-- Sin conexión el spot no carga, pero sus rutas descargadas sí se pueden seguir. -->
+    <div v-else-if="isNetworkError(error)" class="detail-state">
+      <Icon name="WifiOff" :size="34" />
+      <p>{{ t('common.network.offlineSpot') }}</p>
+      <button type="button" class="detail-back" @click="router.push({ name: 'Profile' })">
+        {{ t('offline.title') }}
+      </button>
+      <button type="button" class="detail-back detail-back--plain" @click="goBack">
+        {{ t('common.buttons.back') }}
+      </button>
+    </div>
+
     <div v-else-if="error || !spot" class="detail-state">
       <Icon name="AlertCircle" :size="34" />
       <p>{{ t('spots.detail.notFound') }}</p>
@@ -276,7 +312,16 @@ useRefreshable(() => load(spotId.value))
             :can-navigate="!!spot.location"
             @start="startRoute"
             @directions="openDirections"
-          />
+          >
+            <RouteDownloadRow
+              v-if="selectedRoute"
+              :status="offline.status.value"
+              :progress="offline.progress.value"
+              :saved-bytes="offline.savedBytes.value"
+              @download="downloadRoute"
+              @remove="removeDownload"
+            />
+          </SpotRouteActionBar>
         </template>
       </DetentSheet>
     </template>
@@ -397,6 +442,8 @@ useRefreshable(() => load(spotId.value))
 
 .detail-state p {
   margin: 0;
+  padding: 0 var(--space-8);
+  text-align: center;
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
 }
@@ -409,6 +456,11 @@ useRefreshable(() => load(spotId.value))
   font-size: var(--text-sm);
   font-weight: var(--font-bold);
   transition: var(--press-transition);
+}
+
+.detail-back--plain {
+  background: transparent;
+  color: var(--color-primary);
 }
 
 .detail-back:active {

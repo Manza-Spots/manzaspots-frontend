@@ -7,6 +7,7 @@ import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { usePullToRefresh } from '@/shared/composables/usePullToRefresh'
 import { useRefreshable } from '@/shared/composables/useRefreshable'
 import { useToast } from '@/shared/composables/useToast'
+import { isOnline } from '@/core/network/connectivity'
 import { profileApi } from '@/features/profile/api/profileApi'
 import { routesApi } from '@/features/routes/api/routesApi'
 import { compressImage, pickImage } from '@/shared/utils/image'
@@ -18,6 +19,7 @@ import Icon from '@/shared/components/Icon.vue'
 import PullToRefreshIndicator from '@/shared/components/PullToRefreshIndicator.vue'
 import SpotsMiniMap from '@/features/profile/components/SpotsMiniMap.vue'
 import ProfileListSheet from '@/features/profile/components/ProfileListSheet.vue'
+import OfflineRoutesSection from '@/features/offline/components/OfflineRoutesSection.vue'
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -240,7 +242,12 @@ const openFavorites = async () => {
             </div>
           </div>
           <div v-if="mySpotsError" class="mini-map-card mini-map-card--error">
-            <div class="mini-map-empty">
+            <!-- Sin conexión no hay nada que reintentar: se recarga sola al volver. -->
+            <div v-if="!isOnline" class="mini-map-empty">
+              <Icon name="WifiOff" :size="28" />
+              <span>{{ t('common.network.offlineSection') }}</span>
+            </div>
+            <div v-else class="mini-map-empty">
               <Icon name="AlertCircle" :size="28" />
               <span>{{ t('common.errors.loadFailed') }}</span>
               <Button variant="outline" size="sm" :loading="loadingMySpots" @click="loadMySpots">
@@ -265,7 +272,11 @@ const openFavorites = async () => {
               <Icon name="ChevronRight" :size="14" />
             </button>
           </div>
-          <div v-if="myRoutesError" class="history-empty">
+          <div v-if="myRoutesError && !isOnline" class="history-empty">
+            <Icon name="WifiOff" :size="18" />
+            <span>{{ t('common.network.offlineSection') }}</span>
+          </div>
+          <div v-else-if="myRoutesError" class="history-empty">
             <Icon name="AlertCircle" :size="18" />
             <span>{{ t('common.errors.loadFailed') }}</span>
             <button class="history-cta" @click="loadMyRoutes">{{ t('common.buttons.retry') }}</button>
@@ -285,6 +296,8 @@ const openFavorites = async () => {
             <button class="history-cta" @click="goToRecord">{{ t('profile.recordFirst') }}</button>
           </div>
         </section>
+
+        <OfflineRoutesSection />
       </div>
     </template>
 
@@ -312,6 +325,8 @@ const openFavorites = async () => {
         <p class="welcome-footer-text">
           {{ $t('profile.welcome.footer') }}
         </p>
+
+        <OfflineRoutesSection class="welcome-offline" hide-when-empty />
       </div>
     </template>
   </div>
@@ -488,6 +503,8 @@ const openFavorites = async () => {
   justify-content: center;
   gap: var(--space-2);
   height: 100%;
+  padding: 0 var(--space-6);
+  text-align: center;
   color: var(--color-text-tertiary);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
@@ -571,6 +588,10 @@ const openFavorites = async () => {
   background: var(--color-surface-2);
   color: var(--color-text-tertiary);
   font-size: var(--text-sm);
+}
+
+.welcome-offline {
+  margin-top: var(--space-8);
 }
 
 .welcome-container {

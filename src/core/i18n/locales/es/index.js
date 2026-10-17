@@ -6,6 +6,7 @@ import legal from './legal.json'
 import settings from './settings.json'
 import record from './record.json'
 import follow from './follow.json'
+import offline from './offline.json'
 import spots from './spots.json'
 import moderation from './moderation.json'
 
@@ -18,6 +19,7 @@ export default {
   settings,
   record,
   follow,
+  offline,
   spots,
   moderation,
 }

@@ -1,5 +1,7 @@
 import { HTTP_STATUS, AUTH_ERRORS } from '@/core/config/api.config'
 import { useToast } from '@/shared/composables/useToast'
+import { isOffline } from '@/core/network/connectivity'
+import i18n from '@/core/i18n'
 
 class ApiError extends Error {
   constructor(message, status, data = null) {
@@ -52,10 +54,18 @@ export class ErrorHandler {
     }
   }
 
+  // La petición no llegó al servidor. Sin conexión no se avisa: ya lo dice el
+  // aviso fijo de la barra de navegación y cada vista muestra su estado; un
+  // aviso por petición fallida llenaba la pantalla de copias. Con conexión el
+  // servidor no responde, y eso sí se avisa (useToast junta los repetidos).
   handleNetworkError(error) {
-    const apiError = new ApiError(AUTH_ERRORS.NETWORK_ERROR, 0, { originalError: error })
+    const offline = isOffline() || error?.code === 'ERR_OFFLINE'
+    const message = i18n.global.t(offline ? 'common.network.offlineAction' : 'common.network.unreachable')
+    const apiError = new ApiError(message, 0, { originalError: error })
+    apiError.network = true
+    apiError.offline = offline
 
-    this.toast.error('No se pudo conectar con el servidor. Verifica tu conexión.')
+    if (!offline) this.toast.error(message)
 
     return apiError
   }

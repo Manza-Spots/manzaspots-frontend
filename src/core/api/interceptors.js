@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/features/auth/store'
 import { errorHandler } from './errorHandler'
 import { HTTP_STATUS } from '@/core/config/api.config'
+import { isOffline, isNetworkError } from '@/core/network/connectivity'
 
 let isRefreshing = false
 let failedQueue = []
@@ -20,6 +21,15 @@ const processQueue = (error, token = null) => {
 export const setupInterceptors = (axiosInstance) => {
   axiosInstance.interceptors.request.use(
     (config) => {
+      // Sin conexión falla al instante en vez de esperar el timeout de cada
+      // petición; el manejador de errores la trata como error de red.
+      if (isOffline()) {
+        const error = new Error('Sin conexión')
+        error.code = 'ERR_OFFLINE'
+        error.config = config
+        return Promise.reject(error)
+      }
+
       const authStore = useAuthStore()
 
       if (authStore.token) {
@@ -89,6 +99,8 @@ export const setupInterceptors = (axiosInstance) => {
             return axiosInstance(originalRequest)
           } catch (refreshError) {
             processQueue(refreshError, null)
+            // Sin red no se sabe si la sesión caducó: se conserva y se reintenta luego.
+            if (isNetworkError(refreshError)) return Promise.reject(refreshError)
             authStore.logout()
             window.location.href = '/login'
             return Promise.reject(refreshError)

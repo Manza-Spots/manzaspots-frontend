@@ -75,6 +75,11 @@ const distance = computed(() => {
           <Icon name="Footprints" :size="12" />
           {{ route.travelModeName }}
         </span>
+        <!-- Rutas descargadas para usar sin señal: lo que ocupan. -->
+        <span v-if="route.offlineSize" class="route-badge">
+          <Icon name="Download" :size="12" />
+          {{ route.offlineSize }}
+        </span>
       </div>
     </div>
   </div>

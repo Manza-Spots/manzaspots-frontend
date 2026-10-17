@@ -65,7 +65,7 @@ watch(() => props.spot.id, () => {
   position: absolute;
   left: var(--space-6);
   right: var(--space-6);
-  bottom: 96px;
+  bottom: var(--nav-anchor);
   max-width: 520px;
   margin: 0 auto;
   height: 56px;
@@ -81,7 +81,9 @@ watch(() => props.spot.id, () => {
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: var(--press-transition);
+  transition:
+    var(--press-transition),
+    bottom var(--transition-slow);
 }
 
 .peek:active {
