@@ -336,7 +336,14 @@ onUnmounted(() => {
             <Icon name="X" :size="20" />
           </IconButton>
         </div>
-        <ButtonComponent v-else variant="secondary" size="lg" full-width @click="finish">
+        <ButtonComponent
+          v-else
+          class="follow-finish"
+          variant="secondary"
+          size="lg"
+          full-width
+          @click="finish"
+        >
           <Icon name="Square" :size="16" />
           {{ t('follow.controls.finish') }}
         </ButtonComponent>
@@ -548,6 +555,8 @@ onUnmounted(() => {
   text-align: center;
 }
 
+/* Igual que la barra de acción del detalle del spot (SpotRouteActionBar):
+   botón en píldora y botón de icono del mismo alto. */
 .follow-actions {
   display: flex;
   align-items: center;
@@ -556,6 +565,18 @@ onUnmounted(() => {
 
 .follow-actions__start {
   flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-full);
+}
+
+.follow-actions :deep(.icon-btn) {
+  width: 56px;
+  height: 56px;
+  flex: none;
+}
+
+.follow-finish {
+  border-radius: var(--radius-full);
 }
 
 .follow-stat__value {
