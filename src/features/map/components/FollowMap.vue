@@ -262,21 +262,20 @@ onMounted(() => {
     addEndpointMarkers()
     showOverview(0)
     frame = requestAnimationFrame(tick)
+    // La posición pudo llegar antes que el mapa (la que ya tenía la app).
+    placeFirstPosition(props.position)
   })
 })
 
 // Primera lectura: aparece la flecha y la cámara vuela a la perspectiva.
-watch(
-  () => props.position,
-  (pos) => {
-    if (!pos || !isLoaded.value) return
-    if (!shown) {
-      shown = { lng: pos[0], lat: pos[1], bearing: props.bearing, heading: props.userHeading }
-      ensureUserMarker(pos)
-      if (props.mode === 'nav') flyToNav()
-    }
-  },
-)
+const placeFirstPosition = (pos) => {
+  if (!pos || !isLoaded.value || shown) return
+  shown = { lng: pos[0], lat: pos[1], bearing: props.bearing, heading: props.userHeading }
+  ensureUserMarker(pos)
+  if (props.mode === 'nav') flyToNav()
+}
+
+watch(() => props.position, placeFirstPosition)
 
 watch(
   () => props.mode,

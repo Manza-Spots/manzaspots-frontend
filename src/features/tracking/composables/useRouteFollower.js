@@ -260,12 +260,20 @@ export function useRouteFollower(guide, travelMode) {
     const known = source.getLastKnownPosition?.(KNOWN_POSITION_MAX_AGE_MS)
     if (known) {
       handlePosition({ ...known, cached: true })
-      return
+    } else {
+      source
+        .getCurrentPosition({ enableHighAccuracy: false, maximumAge: 2 * 60 * 1000, timeout: 8000 })
+        .then((pos) => {
+          if (running && !rawPosition.value && pos) handlePosition({ ...pos, cached: true })
+        })
+        .catch(() => {})
     }
+    // Y una lectura nueva aunque el teléfono esté quieto: el watch compartido
+    // solo manda posiciones al moverse y, sin una fresca, Iniciar no se habilita.
     source
-      .getCurrentPosition({ enableHighAccuracy: false, maximumAge: 2 * 60 * 1000, timeout: 8000 })
+      .getCurrentPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 20000 })
       .then((pos) => {
-        if (running && !rawPosition.value && pos) handlePosition({ ...pos, cached: true })
+        if (running && pos) handlePosition(pos)
       })
       .catch(() => {})
   }
@@ -303,7 +311,7 @@ export function useRouteFollower(guide, travelMode) {
     stopTimer()
     lastFix = null
     if (Capacitor.isNativePlatform()) KeepAwake.allowSleep().catch(() => {})
-    await Promise.allSettled([source.stopTracking(), headingService.stop()])
+    await Promise.allSettled([source.stopTracking(handlePosition), headingService.stop()])
   }
 
   onBeforeUnmount(stop)

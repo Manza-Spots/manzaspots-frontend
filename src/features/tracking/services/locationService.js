@@ -7,6 +7,21 @@ const CLEAR_WATCH_TIMEOUT_MS = 2000
 // Como mucho una notificación de error de GPS por minuto.
 const ERROR_NOTIFICATION_INTERVAL_MS = 60 * 1000
 
+// Una lectura del watch compartido con menos de esto vale como actual.
+const SHARED_FIX_MAX_AGE_MS = 15 * 1000
+// En un watch, el timeout es la espera máxima entre posiciones. Con 10 s, bajo
+// techo o con poca señal el plugin de iOS da por muerto el watch y la grabación
+// deja de recibir puntos para siempre.
+const WATCH_TIMEOUT_MS = 5 * 60 * 1000
+// Errores tras los que el plugin de iOS deja de mandar posiciones sin avisar:
+// al vencer el timeout descarta los watches (0010) y tras "ubicación no
+// disponible" (0002, frecuente bajo techo o al arrancar el GPS) su flujo interno
+// se completa y no se reconecta. Solo se recuperan cerrando y reabriendo el watch.
+const RECOVERABLE_ERROR_CODES = new Set(['OS-PLUG-GLOC-0002', 'OS-PLUG-GLOC-0010'])
+// Espera antes de reabrir; se duplica si el error se repite, hasta el tope.
+const WATCH_RESTART_DELAY_MS = 2000
+const WATCH_RESTART_MAX_DELAY_MS = 30 * 1000
+
 class LocationService {
   constructor() {
     this.isNative = Capacitor.isNativePlatform()
@@ -20,6 +35,18 @@ class LocationService {
     // Última posición obtenida por cualquier pantalla (mapa de spots, detalle,
     // grabar...). Sirve para mostrar algo al instante en lugar de esperar al GPS.
     this.lastPosition = null
+    // Un solo watch del GPS repartido entre las pantallas que lo piden: el mapa
+    // de Spots queda vivo (KeepAlive) con el suyo abierto mientras se graba o se
+    // sigue una ruta, y con un único suscriptor esas pantallas no recibían nada.
+    this.subscribers = new Set()
+    this.restartingWatch = false
+    this.restartDelayMs = WATCH_RESTART_DELAY_MS
+  }
+
+  emit(position) {
+    const p = this.remember(position)
+    this.restartDelayMs = WATCH_RESTART_DELAY_MS
+    this.subscribers.forEach((callback) => callback(p))
   }
 
   remember(position) {
@@ -81,9 +108,16 @@ class LocationService {
     }
   }
 
+  /**
+   * Suscribe `callback` a las posiciones del GPS. Si el watch ya está abierto,
+   * se comparte (y recibe enseguida la última lectura si es reciente). Las
+   * opciones solo aplican a quien abre el watch.
+   */
   async startTracking(callback, options = {}) {
+    this.subscribers.add(callback)
     if (this.isTracking) {
-      console.warn('Tracking already started')
+      const recent = this.getLastKnownPosition(SHARED_FIX_MAX_AGE_MS)
+      if (recent) callback(recent)
       return
     }
 
@@ -99,6 +133,7 @@ class LocationService {
         }
       }
     } catch (error) {
+      this.subscribers.delete(callback)
       if (session === this.session) this.isTracking = false
       throw error
     }
@@ -108,19 +143,16 @@ class LocationService {
 
     const defaultOptions = {
       enableHighAccuracy: true,
-      // En un watch, el timeout es la espera máxima entre posiciones. Con 10 s,
-      // bajo techo o con poca señal el plugin de iOS da por muerto el watch y
-      // la grabación deja de recibir puntos para siempre.
-      timeout: 5 * 60 * 1000,
+      timeout: WATCH_TIMEOUT_MS,
       maximumAge: 0,
     }
 
     const trackingOptions = { ...defaultOptions, ...options }
 
     if (this.isNative) {
-      await this.startNativeTracking(callback, trackingOptions)
+      await this.startNativeTracking(trackingOptions)
     } else {
-      this.startWebTracking(callback, trackingOptions)
+      this.startWebTracking(trackingOptions)
     }
 
     // Lo detuvieron mientras se registraba el watch nativo.
@@ -131,19 +163,23 @@ class LocationService {
     }
   }
 
-  async startNativeTracking(callback, options) {
+  async startNativeTracking(options) {
     try {
       // Sin @capacitor/background-task el seguimiento se detiene al pasar
       // la app a segundo plano.
       this.watchId = await Geolocation.watchPosition(options, (position, err) => {
         if (err) {
           console.error('Geolocation error:', err)
+          if (RECOVERABLE_ERROR_CODES.has(err.code) && this.isTracking && this.subscribers.size > 0) {
+            this.restartNativeWatch(options)
+            return
+          }
           this.handleTrackingError(err)
           return
         }
 
         if (position) {
-          callback(this.remember({
+          this.emit({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
@@ -152,7 +188,7 @@ class LocationService {
             speed: position.coords.speed ?? null,
             heading: position.coords.heading ?? null,
             timestamp: position.timestamp,
-          }))
+          })
         }
       })
 
@@ -163,11 +199,33 @@ class LocationService {
     }
   }
 
-  startWebTracking(callback, options) {
+  // Cierra y reabre el watch nativo para que el plugin vuelva a mandar posiciones.
+  async restartNativeWatch(options) {
+    if (this.restartingWatch) return
+    this.restartingWatch = true
+    const session = this.session
+    const staleWatch = this.watchId
+    this.watchId = null
+    const delay = this.restartDelayMs
+    this.restartDelayMs = Math.min(delay * 2, WATCH_RESTART_MAX_DELAY_MS)
+    try {
+      await this.clearWatch(staleWatch)
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      if (session === this.session && this.subscribers.size > 0) {
+        await this.startNativeTracking(options)
+      }
+    } catch (error) {
+      this.handleTrackingError(error)
+    } finally {
+      this.restartingWatch = false
+    }
+  }
+
+  startWebTracking(options) {
     try {
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          callback(this.remember({
+          this.emit({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
@@ -176,7 +234,7 @@ class LocationService {
             speed: position.coords.speed ?? null,
             heading: position.coords.heading ?? null,
             timestamp: position.timestamp,
-          }))
+          })
         },
         (error) => {
           console.error('Web geolocation error:', error)
@@ -193,10 +251,15 @@ class LocationService {
   }
 
   /**
-   * Detiene el seguimiento sin bloquear a quien lo llama: el estado se limpia
-   * de inmediato y la liberación del watch nativo tiene un tope de espera.
+   * Da de baja a `callback`; el watch se cierra cuando ya nadie lo usa (sin
+   * argumento se cierra para todos). No bloquea a quien lo llama: el estado se
+   * limpia de inmediato y la liberación del watch nativo tiene un tope de espera.
    */
-  async stopTracking() {
+  async stopTracking(callback) {
+    if (callback) this.subscribers.delete(callback)
+    else this.subscribers.clear()
+    if (this.subscribers.size > 0) return
+
     this.session += 1
     const watchId = this.watchId
     this.watchId = null
@@ -230,11 +293,30 @@ class LocationService {
       maximumAge: 0,
     }
 
-    const positionOptions = { ...defaultOptions, ...options }
+    let positionOptions = { ...defaultOptions, ...options }
+    // Lo que espera quien llama, aunque al plugin se le pida otro timeout.
+    const callerTimeout = positionOptions.timeout
+
+    // Con un watch abierto, el plugin de iOS comparte con él un solo GPS: cada
+    // lectura suelta le cambia la precisión y le reinicia el temporizador con su
+    // propio timeout (10 s), y si en ese lapso no llega una posición, apaga el
+    // watch. Se responde con la última lectura del watch si es reciente; si no,
+    // se pide con la precisión y el timeout del watch.
+    if (this.isNative && this.isTracking) {
+      const recent = this.getLastKnownPosition(Math.max(positionOptions.maximumAge, SHARED_FIX_MAX_AGE_MS))
+      if (recent) return recent
+      positionOptions = { ...positionOptions, enableHighAccuracy: true, timeout: WATCH_TIMEOUT_MS }
+    }
 
     try {
       if (this.isNative) {
-        const position = await Geolocation.getCurrentPosition(positionOptions)
+        let timer = null
+        const position = await Promise.race([
+          Geolocation.getCurrentPosition(positionOptions),
+          new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error('Location request timed out')), callerTimeout)
+          }),
+        ]).finally(() => clearTimeout(timer))
         return this.remember({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,

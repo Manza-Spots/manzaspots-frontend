@@ -126,7 +126,7 @@ export function useRouteRecorder() {
     lastTrack.value = track
     reset()
 
-    source.stopTracking()
+    source.stopTracking(handlePosition)
     persistTrack(track)
     return track
   }
@@ -197,7 +197,7 @@ export function useRouteRecorder() {
 
   onBeforeUnmount(() => {
     stopTimer()
-    source.stopTracking()
+    source.stopTracking(handlePosition)
   })
 
   return {
