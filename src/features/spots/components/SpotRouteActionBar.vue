@@ -61,7 +61,7 @@ const label = computed(() => {
 <style scoped>
 .action-bar {
   position: relative;
-  padding: var(--space-4) var(--space-6) var(--space-6);
+  padding: var(--space-4) var(--space-6) var(--bottom-bar-padding);
 
   background: var(--color-bg);
 }

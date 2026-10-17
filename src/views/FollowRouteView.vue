@@ -377,7 +377,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 20;
-  padding: calc(var(--safe-area-inset-top) + var(--space-3)) var(--space-4) 0;
+  padding: calc(var(--safe-area-inset-top) + var(--space-4)) var(--space-4) 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -506,7 +506,7 @@ onUnmounted(() => {
   background: var(--color-surface);
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
-  padding: var(--space-5) var(--space-6) calc(var(--safe-area-inset-bottom) + var(--space-5));
+  padding: var(--space-5) var(--space-6) var(--bottom-bar-padding);
 }
 
 .follow-hint {
