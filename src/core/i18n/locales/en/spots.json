@@ -27,7 +27,7 @@
     "galleryEmpty": "This spot has no photos yet",
     "tabRoutes": "Routes",
     "tabGallery": "Gallery",
-    "startRoute": "Start {name}",
+    "startRoute": "Follow {name}",
     "pickRoute": "Pick a route",
     "directions": "Directions",
     "routeCount": "No routes registered | 1 route registered | {count} routes registered",

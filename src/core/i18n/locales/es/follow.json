@@ -1,0 +1,60 @@
+{
+  "loading": "Cargando ruta…",
+  "loadFailed": "No se pudo cargar la ruta",
+  "back": "Volver",
+  "waitingGps": "Buscando tu ubicación…",
+  "maneuver": {
+    "straight": "Sigue la ruta",
+    "slight": {
+      "left": "Ligeramente a la izquierda",
+      "right": "Ligeramente a la derecha"
+    },
+    "turn": {
+      "left": "Gira a la izquierda",
+      "right": "Gira a la derecha"
+    },
+    "sharp": {
+      "left": "Vuelta cerrada a la izquierda",
+      "right": "Vuelta cerrada a la derecha"
+    },
+    "uturn": "Da la vuelta"
+  },
+  "toFinish": "Hasta el final de la ruta",
+  "offRoute": "Te saliste de la ruta",
+  "offRouteDistance": "Estás a {distance} del trazo",
+  "arrived": "Llegaste al final de la ruta",
+  "arrivedSummary": "Tiempo: {time}",
+  "stats": {
+    "remaining": "Falta",
+    "duration": "Restante",
+    "arrival": "Llegada"
+  },
+  "controls": {
+    "overview": "Ver ruta",
+    "navigate": "Navegar",
+    "finish": "Terminar",
+    "start": "Iniciar"
+  },
+  "calibrate": "Brújula imprecisa: mueve el teléfono en forma de 8",
+  "locationDenied": "Activa el permiso de ubicación para seguir la ruta",
+  "approach": {
+    "title": "Ve al punto de inicio",
+    "subtitle": "Acércate a menos de {radius} para comenzar",
+    "lowAccuracy": "Afinando tu ubicación (±{accuracy})"
+  },
+  "join": {
+    "title": "Acércate al trazo"
+  },
+  "started": "Comenzaste la ruta",
+  "offRouteGrace": "A {distance} del trazo · vuelve o tendrás que reiniciar",
+  "offRouteLocked": "Reinicia la ruta para seguirla",
+  "restart": {
+    "title": "Te saliste de la ruta",
+    "body": "Para seguir esta ruta tienes que volver al punto de inicio y empezar de nuevo. Tu avance y tu tiempo se reinician.",
+    "confirm": "Reiniciar ruta"
+  },
+  "ready": {
+    "title": "Estás en el punto de inicio",
+    "subtitle": "Toca Iniciar para comenzar la ruta"
+  }
+}

@@ -280,4 +280,9 @@ html.dark {
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
+  /* Barra fija al pie en pantallas sin navbar (detalle del spot, seguir ruta):
+     el botón queda fuera del indicador de inicio en iPhone y conserva el margen
+     de siempre en web. El navbar no la usa: ancla en offsets fijos. */
+  --bottom-bar-padding: max(var(--space-6), calc(var(--safe-area-inset-bottom) + var(--space-2)));
 }

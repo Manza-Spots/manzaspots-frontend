@@ -36,11 +36,10 @@ const {
   downloadTrack,
 } = useRouteRecorder()
 
-// Al grabar desde el detalle de un spot: destino preseleccionado y, si se
-// eligió una ruta, su trazo como guía en el mapa.
+// Al grabar desde el detalle de un spot, ese spot queda como destino.
+// Seguir una ruta existente es otra pantalla (FollowRouteView).
 const targetSpotId = route.query.spot ?? null
 const targetSpot = ref(null)
-const guidePath = ref(null)
 const addingPhoto = ref(false)
 
 const statusLabel = () => {
@@ -101,12 +100,7 @@ const onFinish = () => {
 async function loadTarget() {
   if (!targetSpotId) return
   try {
-    const [spot, routes] = await Promise.all([
-      spotsApi.getSpot(targetSpotId),
-      route.query.route ? spotsApi.getSpotRoutes(targetSpotId) : Promise.resolve([]),
-    ])
-    targetSpot.value = spot
-    guidePath.value = routes.find((r) => String(r.id) === String(route.query.route))?.path ?? null
+    targetSpot.value = await spotsApi.getSpot(targetSpotId)
   } catch (error) {
     console.warn('No se pudo cargar el spot de destino', error)
   }
@@ -118,7 +112,7 @@ onMounted(loadTarget)
 <template>
   <div class="record-view">
     <div class="record-map">
-      <RecordMap ref="mapRef" :points="points" :guide="guidePath" />
+      <RecordMap ref="mapRef" :points="points" />
 
       <div class="record-head">
         <span
