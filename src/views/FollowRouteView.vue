@@ -4,15 +4,21 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
 import ButtonComponent from '@/shared/components/ButtonComponent.vue'
+import IconButton from '@/shared/components/IconButton.vue'
 import FollowMap from '@/features/map/components/FollowMap.vue'
+import RestartRouteSheet from '@/features/routes/components/RestartRouteSheet.vue'
 import { spotsApi } from '@/features/spots/api/spotsApi'
 import { createRouteGuide } from '@/features/tracking/utils/routeGuide'
 import { useRouteFollower } from '@/features/tracking/composables/useRouteFollower'
 import { gpsSimulator } from '@/features/tracking/services/gpsSimulator'
+import { useBottomSheet } from '@/shared/composables/useBottomSheet'
+import { useToast } from '@/shared/composables/useToast'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const bottomSheet = useBottomSheet()
+const toast = useToast()
 
 const spotId = route.query.spot ?? null
 const routeId = route.query.route ?? null
@@ -46,11 +52,18 @@ watch(sheetRef, (sheet) => {
 })
 
 const {
-  status,
+  phase,
   error,
   isSim,
+  joined,
   state,
+  accuracy,
+  distanceToStartM,
+  offRouteM,
+  remainingM,
+  progressM,
   displayPosition,
+  approachLine,
   cameraHeading,
   userHeading,
   compassUnreliable,
@@ -58,12 +71,14 @@ const {
   etaSeconds,
   start,
   stop,
+  begin,
+  restart,
+  startRadiusM,
+  startAccuracyM,
 } = useRouteFollower(guide, travelMode)
 
 const routeName = computed(() => followed.value?.description || t('profile.routeUnnamed'))
-const progress = computed(() =>
-  state.value && guide.value ? state.value.progressM / guide.value.totalM : 0,
-)
+const progress = computed(() => (guide.value ? progressM.value / guide.value.totalM : 0))
 
 const formatDistance = (meters) => {
   if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`
@@ -78,12 +93,16 @@ const formatDuration = (seconds) => {
   return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')} min`
 }
 
+// Reloj para recalcular la hora de llegada aunque el GPS no mande lecturas.
+const now = ref(Date.now())
+const clock = setInterval(() => {
+  now.value = Date.now()
+}, 15000)
+
 const arrivalClock = computed(() => {
-  // Se lee el contador para recalcular la hora cada segundo.
-  void elapsedSeconds.value
   if (etaSeconds.value == null) return '--:--'
   return new Intl.DateTimeFormat(locale.value, { hour: 'numeric', minute: '2-digit' }).format(
-    Date.now() + etaSeconds.value * 1000,
+    now.value + etaSeconds.value * 1000,
   )
 })
 
@@ -101,9 +120,30 @@ const banner = computed(() => {
   if (error.value === 'location') {
     return { kind: 'off', icon: 'AlertCircle', title: t('follow.locationDenied') }
   }
-  const s = state.value
-  if (!s) return { kind: 'waiting', icon: 'LocateFixed', title: t('follow.waitingGps') }
-  if (status.value === 'arrived') {
+  if (phase.value === 'locating') {
+    return { kind: 'waiting', icon: 'LocateFixed', title: t('follow.waitingGps') }
+  }
+  if (phase.value === 'approaching') {
+    const lowAccuracy = accuracy.value != null && accuracy.value > startAccuracyM
+    return {
+      kind: 'approach',
+      icon: 'Navigation',
+      distance: formatDistance(distanceToStartM.value ?? 0),
+      title: t('follow.approach.title'),
+      subtitle: lowAccuracy
+        ? t('follow.approach.lowAccuracy', { accuracy: formatDistance(accuracy.value) })
+        : t('follow.approach.subtitle', { radius: formatDistance(startRadiusM) }),
+    }
+  }
+  if (phase.value === 'ready') {
+    return {
+      kind: 'ready',
+      icon: 'Flag',
+      title: t('follow.ready.title'),
+      subtitle: t('follow.ready.subtitle'),
+    }
+  }
+  if (phase.value === 'arrived') {
     return {
       kind: 'arrived',
       icon: 'Flag',
@@ -111,12 +151,29 @@ const banner = computed(() => {
       subtitle: t('follow.arrivedSummary', { time: formatDuration(elapsedSeconds.value) }),
     }
   }
+  if (phase.value === 'offRoute') {
+    return {
+      kind: 'off',
+      icon: 'AlertCircle',
+      title: t('follow.offRoute'),
+      subtitle: t('follow.offRouteLocked'),
+    }
+  }
+  if (!joined.value) {
+    return {
+      kind: 'approach',
+      icon: 'Navigation',
+      distance: formatDistance(offRouteM.value),
+      title: t('follow.join.title'),
+    }
+  }
+  const s = state.value
   if (s.offRoute) {
     return {
       kind: 'off',
       icon: 'AlertCircle',
       title: t('follow.offRoute'),
-      subtitle: t('follow.offRouteDistance', { distance: formatDistance(s.offRouteM) }),
+      subtitle: t('follow.offRouteGrace', { distance: formatDistance(s.offRouteM) }),
     }
   }
   const next = s.nextManeuver
@@ -145,6 +202,24 @@ const finish = async () => {
   goBack()
 }
 
+// Antes de tocar Iniciar el botón principal es Iniciar (deshabilitado lejos del
+// inicio); después, Terminar.
+const notStarted = computed(() => ['locating', 'approaching', 'ready'].includes(phase.value))
+
+const onBegin = () => {
+  if (begin()) toast.success(t('follow.started'))
+}
+
+// Salirse no deja volver a entrar en otro punto: se reinicia o se termina.
+watch(phase, (current) => {
+  if (current !== 'offRoute') return
+  bottomSheet.open(
+    RestartRouteSheet,
+    { onRestart: restart, onFinish: finish },
+    { title: t('follow.restart.title'), closable: false, closeOnBackdrop: false },
+  )
+})
+
 async function load() {
   try {
     const routes = await spotsApi.getSpotRoutes(spotId)
@@ -166,6 +241,8 @@ async function load() {
 
 onMounted(load)
 onUnmounted(() => {
+  clearInterval(clock)
+  if (phase.value === 'offRoute') bottomSheet.close()
   insetsObserver?.disconnect()
   if (isSim) gpsSimulator.setPath(null)
 })
@@ -187,13 +264,16 @@ onUnmounted(() => {
         :bearing="cameraHeading"
         :user-heading="userHeading"
         :progress="progress"
+        :approach="approachLine"
         :mode="mode"
         :insets="insets"
       />
 
       <div ref="topRef" class="follow-top">
         <div class="follow-banner" :class="`follow-banner--${banner.kind}`">
-          <Icon :name="banner.icon" :size="34" :stroke-width="2.5" />
+          <span class="follow-banner__icon" :class="{ 'is-searching': banner.kind === 'waiting' }">
+            <Icon :name="banner.icon" :size="34" :stroke-width="2.5" />
+          </span>
           <div class="follow-banner__text">
             <div v-if="banner.distance" class="follow-banner__distance">{{ banner.distance }}</div>
             <div class="follow-banner__title">{{ banner.title }}</div>
@@ -226,9 +306,7 @@ onUnmounted(() => {
 
         <div class="follow-stats">
           <div class="follow-stat">
-            <div class="follow-stat__value">
-              {{ state ? formatDistance(state.remainingM) : '--' }}
-            </div>
+            <div class="follow-stat__value">{{ formatDistance(remainingM) }}</div>
             <div class="follow-stat__key">{{ t('follow.stats.remaining') }}</div>
           </div>
           <div class="follow-stat">
@@ -243,7 +321,22 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <ButtonComponent variant="secondary" size="lg" full-width @click="finish">
+        <div v-if="notStarted" class="follow-actions">
+          <ButtonComponent
+            class="follow-actions__start"
+            variant="primary"
+            size="lg"
+            :disabled="phase !== 'ready'"
+            @click="onBegin"
+          >
+            <Icon name="Navigation" :size="18" />
+            {{ t('follow.controls.start') }}
+          </ButtonComponent>
+          <IconButton :label="t('follow.back')" @click="goBack">
+            <Icon name="X" :size="20" />
+          </IconButton>
+        </div>
+        <ButtonComponent v-else variant="secondary" size="lg" full-width @click="finish">
           <Icon name="Square" :size="16" />
           {{ t('follow.controls.finish') }}
         </ButtonComponent>
@@ -299,13 +392,36 @@ onUnmounted(() => {
   color: var(--color-text-primary);
 }
 
+.follow-banner--approach {
+  background: var(--color-mar-deep);
+}
+
 .follow-banner--off {
   background: var(--color-coral);
 }
 
+.follow-banner--ready,
 .follow-banner--arrived {
   background: var(--color-primary);
   color: var(--color-on-primary);
+}
+
+.follow-banner__icon {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* Buscando ubicación: el mismo halo que late bajo la posición en los mapas. */
+.follow-banner__icon.is-searching::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  opacity: 0.4;
+  animation: pulse-ring 2s infinite ease-out;
+  pointer-events: none;
 }
 
 .follow-banner__text {
@@ -430,6 +546,16 @@ onUnmounted(() => {
 
 .follow-stat {
   text-align: center;
+}
+
+.follow-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.follow-actions__start {
+  flex: 1;
 }
 
 .follow-stat__value {

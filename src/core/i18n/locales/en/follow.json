@@ -5,9 +5,18 @@
   "waitingGps": "Finding your location…",
   "maneuver": {
     "straight": "Follow the route",
-    "slight": { "left": "Bear left", "right": "Bear right" },
-    "turn": { "left": "Turn left", "right": "Turn right" },
-    "sharp": { "left": "Sharp left", "right": "Sharp right" },
+    "slight": {
+      "left": "Bear left",
+      "right": "Bear right"
+    },
+    "turn": {
+      "left": "Turn left",
+      "right": "Turn right"
+    },
+    "sharp": {
+      "left": "Sharp left",
+      "right": "Sharp right"
+    },
     "uturn": "Turn around"
   },
   "toFinish": "To the end of the route",
@@ -23,8 +32,29 @@
   "controls": {
     "overview": "Show route",
     "navigate": "Navigate",
-    "finish": "Finish"
+    "finish": "Finish",
+    "start": "Start"
   },
   "calibrate": "Compass is inaccurate: move your phone in a figure 8",
-  "locationDenied": "Allow location access to follow the route"
+  "locationDenied": "Allow location access to follow the route",
+  "approach": {
+    "title": "Head to the starting point",
+    "subtitle": "Get within {radius} to start",
+    "lowAccuracy": "Refining your location (±{accuracy})"
+  },
+  "join": {
+    "title": "Get onto the trail"
+  },
+  "started": "You started the route",
+  "offRouteGrace": "{distance} from the trail · go back or you will have to restart",
+  "offRouteLocked": "Restart the route to keep following it",
+  "restart": {
+    "title": "You left the route",
+    "body": "To follow this route you need to go back to the starting point and begin again. Your progress and time are reset.",
+    "confirm": "Restart route"
+  },
+  "ready": {
+    "title": "You're at the starting point",
+    "subtitle": "Tap Start to begin the route"
+  }
 }

@@ -17,6 +17,21 @@ class LocationService {
     // que ya lo cancelaron y no deja un watch huérfano.
     this.session = 0
     this.lastErrorNotifiedAt = 0
+    // Última posición obtenida por cualquier pantalla (mapa de spots, detalle,
+    // grabar...). Sirve para mostrar algo al instante en lugar de esperar al GPS.
+    this.lastPosition = null
+  }
+
+  remember(position) {
+    this.lastPosition = position
+    return position
+  }
+
+  /** Última posición conocida si no es más vieja que `maxAgeMs`; si no, null. */
+  getLastKnownPosition(maxAgeMs) {
+    const last = this.lastPosition
+    if (!last) return null
+    return Date.now() - (last.timestamp ?? 0) <= maxAgeMs ? last : null
   }
 
   async requestPermissions() {
@@ -128,7 +143,7 @@ class LocationService {
         }
 
         if (position) {
-          callback({
+          callback(this.remember({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
@@ -137,7 +152,7 @@ class LocationService {
             speed: position.coords.speed ?? null,
             heading: position.coords.heading ?? null,
             timestamp: position.timestamp,
-          })
+          }))
         }
       })
 
@@ -152,7 +167,7 @@ class LocationService {
     try {
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          callback({
+          callback(this.remember({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
@@ -161,7 +176,7 @@ class LocationService {
             speed: position.coords.speed ?? null,
             heading: position.coords.heading ?? null,
             timestamp: position.timestamp,
-          })
+          }))
         },
         (error) => {
           console.error('Web geolocation error:', error)
@@ -220,7 +235,7 @@ class LocationService {
     try {
       if (this.isNative) {
         const position = await Geolocation.getCurrentPosition(positionOptions)
-        return {
+        return this.remember({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
@@ -228,12 +243,12 @@ class LocationService {
           speed: position.coords.speed ?? null,
           heading: position.coords.heading ?? null,
           timestamp: position.timestamp,
-        }
+        })
       } else {
         return new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(
             (position) => {
-              resolve({
+              resolve(this.remember({
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
                 accuracy: position.coords.accuracy,
@@ -241,7 +256,7 @@ class LocationService {
                 speed: position.coords.speed ?? null,
                 heading: position.coords.heading ?? null,
                 timestamp: position.timestamp,
-              })
+              }))
             },
             reject,
             positionOptions

@@ -14,11 +14,11 @@ const SIMPLIFY_TOLERANCE_M = 6
 const MIN_TURN_DEG = 30
 // Dos curvas más juntas que esto se anuncian como una sola.
 const MIN_TURN_GAP_M = 12
-// Ventana de búsqueda alrededor del último avance: evita saltar al tramo de
-// vuelta en rutas de ida y vuelta o con cruces.
+// Ventana de búsqueda alrededor del último avance: el avance nunca salta a
+// otro tramo (el de vuelta en una ida y vuelta, un cruce, el final de un
+// circuito). Lejos de la ventana se está fuera de la ruta.
 const SEARCH_BACK_M = 60
 const SEARCH_AHEAD_M = 400
-const REACQUIRE_M = 40
 // Histéresis del aviso de desvío.
 const OFF_ROUTE_M = 35
 const BACK_ON_ROUTE_M = 20
@@ -174,17 +174,18 @@ export function createRouteGuide(coordinates) {
     /**
      * Ubica una posición sobre la ruta.
      * @param {[number, number]} lngLat
-     * @param {object} [previous]  Estado anterior (para la ventana de búsqueda y la histéresis).
+     * @param {object} [previous]  Estado anterior (ventana de búsqueda e histéresis).
+     *   Sin él se busca en toda la ruta; para empezar desde el inicio, `{ progressM: 0 }`.
+     * @param {object} [options]
+     * @param {number} [options.aheadM]  Cuánto puede avanzar desde `previous`. Quien
+     *   sigue la ruta lo limita a lo que se puede recorrer desde la última lectura,
+     *   para que un atajo o una curva cerrada (zigzag) no adelanten el avance.
      */
-    locate(lngLat, previous = null) {
+    locate(lngLat, previous = null, { aheadM = SEARCH_AHEAD_M } = {}) {
       const p = projection.toXY(lngLat)
-      let hit = previous
-        ? nearest(p, previous.progressM - SEARCH_BACK_M, previous.progressM + SEARCH_AHEAD_M)
-        : null
-      if (!hit || hit.distance > REACQUIRE_M) {
-        const global = nearest(p, -Infinity, Infinity)
-        if (!hit || global.distance < hit.distance) hit = global
-      }
+      const hit = previous
+        ? nearest(p, previous.progressM - SEARCH_BACK_M, previous.progressM + aheadM)
+        : nearest(p, -Infinity, Infinity)
 
       const wasOff = previous?.offRoute ?? false
       const offRoute = wasOff ? hit.distance > BACK_ON_ROUTE_M : hit.distance > OFF_ROUTE_M

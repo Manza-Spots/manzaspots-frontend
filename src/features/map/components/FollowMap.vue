@@ -34,6 +34,12 @@ const props = defineProps({
     type: String,
     default: 'nav',
   },
+  // Recta [[lng, lat], [lng, lat]] desde la posición hasta el inicio de la ruta,
+  // mientras no se ha llegado al trazo.
+  approach: {
+    type: Array,
+    default: null,
+  },
   // Alto (px) que tapan el cartel de arriba y el panel de abajo: la cámara
   // encuadra solo la franja visible entre ambos.
   insets: {
@@ -43,6 +49,7 @@ const props = defineProps({
 })
 
 const ROUTE_SOURCE = 'follow-route'
+const APPROACH_SOURCE = 'follow-approach'
 const NAV_ZOOM = 17
 // Una inclinación mayor dibuja hasta el horizonte: más tiles, datos y batería.
 const NAV_PITCH = 55
@@ -76,6 +83,12 @@ const cssVar = (name, fallback) =>
 
 const routeFeature = () => ({ type: 'Feature', properties: {}, geometry: props.route })
 
+const approachFeature = () => ({
+  type: 'Feature',
+  properties: {},
+  geometry: { type: 'LineString', coordinates: props.approach ?? [] },
+})
+
 const routeBounds = () => {
   const bounds = new maplibregl.LngLatBounds()
   props.route.coordinates.forEach((c) => bounds.extend(c))
@@ -108,6 +121,24 @@ const ensureRouteLayers = () => {
     layout: { 'line-join': 'round', 'line-cap': 'round' },
     paint: { 'line-width': 7, 'line-gradient': progressGradient() },
   })
+
+  // Camino hasta el inicio: punteado y tenue, como era la guía al grabar.
+  map.value.addSource(APPROACH_SOURCE, { type: 'geojson', data: approachFeature() })
+  map.value.addLayer(
+    {
+      id: 'follow-approach-line',
+      type: 'line',
+      source: APPROACH_SOURCE,
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: {
+        'line-color': cssVar('--color-primary', '#1f7d4f'),
+        'line-width': 4,
+        'line-opacity': 0.7,
+        'line-dasharray': [1.5, 1.5],
+      },
+    },
+    'follow-route-casing',
+  )
 }
 
 const addEndpointMarkers = () => {
@@ -252,6 +283,13 @@ watch(
   (mode) => {
     if (mode === 'overview') showOverview()
     else flyToNav()
+  },
+)
+
+watch(
+  () => props.approach,
+  () => {
+    if (isLoaded.value) map.value?.getSource(APPROACH_SOURCE)?.setData(approachFeature())
   },
 )
 
