@@ -45,9 +45,10 @@ npm run lint
 
 ### Probar en dispositivo con datos móviles (API local vía ngrok)
 
-Con el Docker del backend corriendo y `.env.staging` configurado:
+Con `.env.staging` configurado:
 
 ```sh
+npm run api:up             # levanta el Docker del backend (../manzaspots-backend)
 npm run tunnel             # deja esta terminal abierta
 npm run cap:staging:sync   # luego npx cap open ios, o usa npm run cap:staging:android
 ```

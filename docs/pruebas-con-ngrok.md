@@ -43,11 +43,15 @@ iPhone/Android (datos móviles) ──HTTPS──▶ ngrok (dominio fijo) ──
 
 ## Cada vez que quieras probar
 
-1. **Levanta el backend** (desde el repo `manzaspots-backend`), si no está corriendo:
+1. **Levanta el backend**, si no está corriendo. Desde este repo (supone que `manzaspots-backend`
+   está en la carpeta de al lado):
 
    ```sh
-   docker compose up -d
+   npm run api:up
    ```
+
+   Equivale a correr `docker compose up -d` dentro de `manzaspots-backend`. Al arrancar aplica las
+   migraciones, así que la API tarda unos segundos en responder.
 
 2. **Abre el túnel** en una terminal y déjala abierta durante toda la prueba. El script también
    mantiene la Mac despierta (`caffeinate`) mientras el túnel está abierto:
@@ -103,6 +107,7 @@ iPhone/Android (datos móviles) ──HTTPS──▶ ngrok (dominio fijo) ──
 | `ERR_NGROK_313` · *Only paid plans may create endpoints with custom subdomains* | El dominio de `.env.staging` no es tu dominio fijo | Copia el dominio exacto de https://dashboard.ngrok.com/domains |
 | `ERR_NGROK_3200` · *The endpoint … is offline* | El túnel no está abierto | `npm run tunnel` y deja la terminal abierta |
 | `ERR_NGROK_6024` o la app recibe HTML en vez de JSON | La app se sincronizó sin `CAP_ENV=staging` | `npm run cap:staging:sync` y vuelve a instalar |
-| `npm run tunnel`: *La API no responde en localhost:8000* | El Docker del backend no está arriba | `docker compose up -d` en `manzaspots-backend` |
+| `npm run tunnel`: *La API no responde en localhost:8000* | El Docker del backend no está arriba, o sigue aplicando migraciones | `npm run api:up` y espera unos segundos |
+| `docker compose up -d`: *no configuration file provided* | Se corrió fuera de `manzaspots-backend` | `npm run api:up` desde este repo |
 | Gradle: *Unsupported class file major version 70* (o 69) | Gradle se ejecuta con Java 26 (o 25) | Paso 4 de la configuración inicial |
 | La app sigue llamando a la IP de casa (`192.168.x.x`) | Se instaló un build normal, no el de staging | `npm run cap:staging:sync` (o `cap:staging:android`) y vuelve a instalar |
