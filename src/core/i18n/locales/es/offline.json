@@ -1,0 +1,11 @@
+{
+  "download": "Descargar para usar sin señal",
+  "downloading": "Descargando… {percent} %",
+  "saved": "Lista para usar sin señal",
+  "remove": "Borrar",
+  "downloaded": "Ruta descargada: puedes seguirla sin señal",
+  "downloadFailed": "No se pudo descargar la ruta. Revisa tu conexión",
+  "title": "Rutas sin señal",
+  "usingSaved": "Sin conexión: usando la ruta descargada",
+  "empty": "Descarga una ruta desde el detalle de un spot para seguirla sin señal"
+}

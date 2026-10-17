@@ -32,7 +32,7 @@ const { keyboardHeight } = useKeyboard()
 // varía por dispositivo) para un gap consistente en iPhone y web; sube junto
 // con el teclado. La altura la limita la lista (3 resultados + scroll).
 const panelStyle = computed(() => ({
-  bottom: `calc(${keyboardHeight.value}px + 96px)`,
+  bottom: `calc(${keyboardHeight.value}px + var(--nav-anchor))`,
 }))
 
 const countLabel = computed(() =>

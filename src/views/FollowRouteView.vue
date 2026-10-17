@@ -13,6 +13,8 @@ import { useRouteFollower } from '@/features/tracking/composables/useRouteFollow
 import { gpsSimulator } from '@/features/tracking/services/gpsSimulator'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useToast } from '@/shared/composables/useToast'
+import { getOfflineRoute } from '@/features/offline/services/offlineRoutes'
+import { isOffline } from '@/core/network/connectivity'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -220,10 +222,35 @@ watch(phase, (current) => {
   )
 })
 
+// Con la ruta descargada no se espera a una API que no contesta (señal débil).
+const API_TIMEOUT_MS = 6000
+
+// La ruta de la API; si no responde, la descargada para usar sin señal.
+async function findRoute() {
+  const saved = await getOfflineRoute(spotId, routeId)
+  // Sin conexión ni se intenta: el aviso de error de la API sobraría.
+  if (saved && isOffline()) return saved.route
+  try {
+    const request = spotsApi.getSpotRoutes(spotId)
+    const timeout = new Promise((resolve) => setTimeout(resolve, API_TIMEOUT_MS, null))
+    const routes = await (saved ? Promise.race([request, timeout]) : request)
+    if (!routes) {
+      request.catch(() => {})
+      throw new Error('La API no respondió a tiempo')
+    }
+    const found = routes.find((r) => String(r.id) === String(routeId))
+    if (found?.path?.coordinates || !saved) return found
+  } catch (err) {
+    if (!saved) throw err
+    console.warn('Sin respuesta de la API; se usa la ruta descargada', err)
+  }
+  toast.info(t('offline.usingSaved'))
+  return saved.route
+}
+
 async function load() {
   try {
-    const routes = await spotsApi.getSpotRoutes(spotId)
-    const found = routes.find((r) => String(r.id) === String(routeId))
+    const found = await findRoute()
     const ready = found?.path?.coordinates ? createRouteGuide(found.path.coordinates) : null
     if (!ready) throw new Error('La ruta no tiene trazo')
 

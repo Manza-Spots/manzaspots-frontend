@@ -34,5 +34,13 @@
     "fromGallery": "Elegir de la galería",
     "takePicture": "Tomar foto",
     "failed": "No se pudo abrir la cámara. Revisa los permisos de cámara y fotos en Ajustes."
+  },
+  "network": {
+    "offline": "Sin conexión",
+    "reconnected": "Conexión recuperada",
+    "offlineAction": "Necesitas conexión para hacer esto",
+    "unreachable": "No se pudo conectar con el servidor. Inténtalo de nuevo.",
+    "offlineSection": "Sin conexión. Se actualizará al volver la señal",
+    "offlineSpot": "Sin conexión. Tus rutas descargadas están en Perfil"
   }
 }

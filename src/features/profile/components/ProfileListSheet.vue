@@ -27,6 +27,20 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Sustituyen abrir y quitar una ruta (p. ej., las descargadas sin señal se
+  // abren en Seguir y se borran del dispositivo, no de favoritos).
+  onOpenRoute: {
+    type: Function,
+    default: null,
+  },
+  onRemoveRoute: {
+    type: Function,
+    default: null,
+  },
+  emptyRoutesText: {
+    type: String,
+    default: '',
+  },
 })
 
 const { t } = useI18n()
@@ -57,7 +71,8 @@ function openSpot(spot) {
 
 function openRoute(route) {
   bottomSheet.close()
-  router.push({ name: 'SpotDetail', params: { id: route.spotId }, query: { route: route.id } })
+  if (props.onOpenRoute) props.onOpenRoute(route)
+  else router.push({ name: 'SpotDetail', params: { id: route.spotId }, query: { route: route.id } })
 }
 
 async function removeRoute(route) {
@@ -67,7 +82,8 @@ async function removeRoute(route) {
   const [removed] = localRoutes.value.splice(index, 1) // optimista
 
   try {
-    await profileApi.removeFavoriteRoute(route.spotId, route.id)
+    if (props.onRemoveRoute) await props.onRemoveRoute(route)
+    else await profileApi.removeFavoriteRoute(route.spotId, route.id)
   } catch (error) {
     localRoutes.value.splice(index, 0, removed)
     toast.error(error.message || t('common.errors.generic'))
@@ -178,7 +194,12 @@ function onEnter(el, done) {
         </TransitionGroup>
         <div v-if="!localRoutes.length" class="empty">
           <Icon name="Route" :size="34" />
-          <p>{{ removable ? t('profile.emptyRoutes') : t('profile.historyEmpty') }}</p>
+          <p>
+            {{
+              emptyRoutesText ||
+              (removable ? t('profile.emptyRoutes') : t('profile.historyEmpty'))
+            }}
+          </p>
         </div>
       </template>
     </div>

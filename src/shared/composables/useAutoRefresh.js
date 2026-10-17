@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import { App } from '@capacitor/app'
 import { isNative } from '@/core/capacitor'
+import { onReconnect } from '@/core/network/connectivity'
 import { triggerRefresh } from './useRefreshable'
 
 // Volver en unos segundos no justifica recargar; volver tras un rato sí.
@@ -13,18 +14,16 @@ const STALE_AFTER_MS = 2 * 60 * 1000
  * Se llama una sola vez, desde App.vue. Qué se recarga lo decide cada
  * vista a través de useRefreshable.
  *
- * Escucha `online` directamente en vez de reutilizar usePWA: ese composable
- * llama a useRegisterSW en cada invocación y registraría el service worker
- * por segunda vez.
+ * La reconexión llega del módulo de conectividad (plugin Network en nativo,
+ * eventos del navegador en web), el mismo que usan la API y el aviso de la barra.
  */
 export function useAutoRefresh() {
   let backgroundedAt = null
   let appListener = null
-
-  const onReconnect = () => triggerRefresh()
+  let stopReconnect = null
 
   onMounted(() => {
-    window.addEventListener('online', onReconnect)
+    stopReconnect = onReconnect(() => triggerRefresh())
 
     if (isNative) {
       App.addListener('appStateChange', ({ isActive }) => {
@@ -44,7 +43,7 @@ export function useAutoRefresh() {
   })
 
   onUnmounted(() => {
-    window.removeEventListener('online', onReconnect)
+    stopReconnect?.()
     appListener?.remove()
     appListener = null
   })

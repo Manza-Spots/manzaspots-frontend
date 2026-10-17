@@ -34,5 +34,13 @@
     "fromGallery": "Choose from gallery",
     "takePicture": "Take photo",
     "failed": "Couldn't open the camera. Check the camera and photos permissions in Settings."
+  },
+  "network": {
+    "offline": "No connection",
+    "reconnected": "Back online",
+    "offlineAction": "You need a connection to do this",
+    "unreachable": "Couldn't reach the server. Try again.",
+    "offlineSection": "No connection. It will update when you're back online",
+    "offlineSpot": "No connection. Your downloaded routes are in Profile"
   }
 }

@@ -350,7 +350,10 @@ onMounted(loadTarget)
   background: var(--color-surface);
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
-  padding: var(--space-2) var(--space-6) calc(110px + var(--safe-area-inset-bottom));
+  /* Ancla fija sobre el navbar (sin safe-area, como el resto): crece mientras
+     se ve el aviso de conexión y vuelve al ocultarse. */
+  padding: var(--space-2) var(--space-6) var(--nav-anchor);
+  transition: padding-bottom var(--transition-slow);
 }
 
 .record-grabber {

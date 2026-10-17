@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, shallowRef, computed, watch } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { mapStyleUrl, registerMapCache } from '@/features/offline/services/mapCache'
 import { locationService } from '@/features/tracking/services/locationService'
 import { gpsSimulator, isSimEnabled } from '@/features/tracking/services/gpsSimulator'
 import { toGeoJSON } from '@/features/tracking/utils/geo'
@@ -30,11 +31,8 @@ const defaultCenter = [-104.316111, 19.053333]
 const isDarkMode = ref(false)
 let observer = null
 
-const mapStyle = computed(() =>
-  isDarkMode.value
-    ? 'https://tiles.openfreemap.org/styles/positron'
-    : 'https://tiles.openfreemap.org/styles/liberty',
-)
+// Pasa por la caché del mapa para que se vea sin señal.
+const mapStyle = computed(() => mapStyleUrl(isDarkMode.value))
 
 const lastPoint = computed(() => props.points.at(-1) ?? null)
 
@@ -98,6 +96,7 @@ onMounted(() => {
 
   if (!mapContainer.value) return
 
+  registerMapCache()
   map.value = new maplibregl.Map({
     container: mapContainer.value,
     style: mapStyle.value,

@@ -1,0 +1,11 @@
+{
+  "download": "Download to use without signal",
+  "downloading": "Downloading… {percent}%",
+  "saved": "Ready to use without signal",
+  "remove": "Delete",
+  "downloaded": "Route downloaded: you can follow it without signal",
+  "downloadFailed": "Couldn't download the route. Check your connection",
+  "title": "Offline routes",
+  "usingSaved": "Offline: using the downloaded route",
+  "empty": "Download a route from a spot page to follow it without signal"
+}

@@ -35,6 +35,8 @@ const label = computed(() => {
 
 <template>
   <div class="action-bar">
+    <!-- Acciones extra de la ruta elegida (p. ej., la descarga sin señal). -->
+    <slot></slot>
     <div class="action-row">
       <ButtonComponent
         class="action-start"
