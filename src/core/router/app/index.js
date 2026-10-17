@@ -36,6 +36,15 @@ export default [
     },
   },
   {
+    path: '/follow-route',
+    name: 'FollowRoute',
+    component: () => import('@/views/FollowRouteView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Seguir ruta',
+    },
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import('@/views/ProfileView.vue'),

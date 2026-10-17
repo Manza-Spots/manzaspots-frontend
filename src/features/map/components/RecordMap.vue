@@ -12,15 +12,9 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  // Trazo de referencia (GeoJSON LineString) de una ruta existente a seguir.
-  guide: {
-    type: Object,
-    default: null,
-  },
 })
 
 const ROUTE_SOURCE = 'route'
-const GUIDE_SOURCE = 'guide'
 const FOLLOW_ZOOM = 16
 
 const mapContainer = ref(null)
@@ -63,34 +57,6 @@ const ensureRouteLayer = () => {
       'line-opacity': 0.95,
     },
   })
-}
-
-const guideData = () => ({
-  type: 'Feature',
-  properties: {},
-  geometry: props.guide ?? { type: 'LineString', coordinates: [] },
-})
-
-// La guía va debajo de la ruta grabada, punteada y tenue.
-const ensureGuideLayer = () => {
-  if (!map.value || map.value.getSource(GUIDE_SOURCE)) return
-
-  map.value.addSource(GUIDE_SOURCE, { type: 'geojson', data: guideData() })
-  map.value.addLayer(
-    {
-      id: 'guide-line',
-      type: 'line',
-      source: GUIDE_SOURCE,
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: {
-        'line-color': getPrimaryColor(),
-        'line-width': 4,
-        'line-opacity': 0.45,
-        'line-dasharray': [1.5, 1.5],
-      },
-    },
-    map.value.getLayer('route-line') ? 'route-line' : undefined,
-  )
 }
 
 const getPrimaryColor = () => {
@@ -144,7 +110,6 @@ onMounted(() => {
 
   map.value.on('load', async () => {
     isLoaded.value = true
-    ensureGuideLayer()
     ensureRouteLayer()
 
     // Centrar en la ubicación real (o simulada) ya en estado idle.
@@ -171,19 +136,11 @@ watch(
   },
 )
 
-watch(
-  () => props.guide,
-  () => {
-    if (isLoaded.value) map.value?.getSource(GUIDE_SOURCE)?.setData(guideData())
-  },
-)
-
 watch(mapStyle, (newStyle) => {
   if (!map.value) return
   map.value.setStyle(newStyle)
   // setStyle elimina capas/fuentes propias; se reañaden al recargar el estilo.
   map.value.once('styledata', () => {
-    ensureGuideLayer()
     ensureRouteLayer()
     updateRoute()
   })

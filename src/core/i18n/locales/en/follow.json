@@ -1,0 +1,30 @@
+{
+  "loading": "Loading route…",
+  "loadFailed": "Couldn't load the route",
+  "back": "Back",
+  "waitingGps": "Finding your location…",
+  "maneuver": {
+    "straight": "Follow the route",
+    "slight": { "left": "Bear left", "right": "Bear right" },
+    "turn": { "left": "Turn left", "right": "Turn right" },
+    "sharp": { "left": "Sharp left", "right": "Sharp right" },
+    "uturn": "Turn around"
+  },
+  "toFinish": "To the end of the route",
+  "offRoute": "You left the route",
+  "offRouteDistance": "You're {distance} from the trail",
+  "arrived": "You reached the end of the route",
+  "arrivedSummary": "Time: {time}",
+  "stats": {
+    "remaining": "Left",
+    "duration": "Remaining",
+    "arrival": "Arrival"
+  },
+  "controls": {
+    "overview": "Show route",
+    "navigate": "Navigate",
+    "finish": "Finish"
+  },
+  "calibrate": "Compass is inaccurate: move your phone in a figure 8",
+  "locationDenied": "Allow location access to follow the route"
+}

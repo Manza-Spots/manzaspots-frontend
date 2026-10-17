@@ -43,7 +43,7 @@ const label = computed(() => {
         :disabled="!canStart"
         @click="emit('start')"
       >
-        <Icon :name="hasRoute ? 'Play' : 'Radio'" :size="18" />
+        <Icon :name="hasRoute ? 'Navigation' : 'Radio'" :size="18" />
         <span class="action-label">{{ label }}</span>
       </ButtonComponent>
 
