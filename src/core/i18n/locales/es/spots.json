@@ -27,7 +27,7 @@
     "galleryEmpty": "Este spot aún no tiene fotos",
     "tabRoutes": "Rutas",
     "tabGallery": "Galería",
-    "startRoute": "Iniciar {name}",
+    "startRoute": "Seguir {name}",
     "pickRoute": "Elige una ruta",
     "directions": "Cómo llegar",
     "routeCount": "Sin rutas registradas | 1 ruta registrada | {count} rutas registradas",

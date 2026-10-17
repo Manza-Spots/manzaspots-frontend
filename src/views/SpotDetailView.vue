@@ -105,13 +105,16 @@ const requireAuth = () => {
   return false
 }
 
+// Con una ruta elegida se sigue; sin rutas se graba la primera hacia este spot.
 const startRoute = () => {
-  router.push({
-    name: 'RecordRoute',
-    query: selectedRouteId.value != null
-      ? { spot: spot.value.id, route: selectedRouteId.value }
-      : { spot: spot.value.id },
-  })
+  if (selectedRouteId.value != null) {
+    router.push({
+      name: 'FollowRoute',
+      query: { spot: spot.value.id, route: selectedRouteId.value },
+    })
+  } else {
+    router.push({ name: 'RecordRoute', query: { spot: spot.value.id } })
+  }
 }
 
 const openDirections = () => {

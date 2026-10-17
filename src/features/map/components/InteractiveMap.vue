@@ -34,6 +34,8 @@ const defaultCenter = [-104.316111, 19.053333]
 const isDarkMode = ref(false)
 let observer = null
 let radiusTimer = null
+// Suscripción al GPS compartido; al desmontar se da de baja solo esta.
+let onUserPosition = null
 
 const mapStyle = computed(() => {
   return isDarkMode.value
@@ -173,10 +175,11 @@ onMounted(() => {
       .setLngLat(defaultCenter)
       .addTo(map.value)
 
+    onUserPosition = (pos) => {
+      userMarker.setLngLat([pos.longitude, pos.latitude])
+    }
     locationService
-      .startTracking((pos) => {
-        userMarker.setLngLat([pos.longitude, pos.latitude])
-      })
+      .startTracking(onUserPosition)
       .catch((err) => {
         console.warn('Ubicación predeterminada usada', err)
         userMarker.remove()
@@ -325,7 +328,7 @@ defineExpose({
 onUnmounted(() => {
   if (observer) observer.disconnect()
   clearTimeout(radiusTimer)
-  locationService.stopTracking()
+  if (onUserPosition) locationService.stopTracking(onUserPosition)
 
   if (map.value) {
     map.value.remove()

@@ -34,7 +34,8 @@ const hideBottomNav = computed(() => {
     '/register',
     '/forgot-password',
     '/reset-password',
-    '/email-verified'
+    '/email-verified',
+    '/follow-route'
   ]
   return hiddenRoutes.includes(route.path)
 })

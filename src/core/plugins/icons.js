@@ -85,6 +85,14 @@ import {
   Ruler,
   Droplets,
   Waves,
+  ArrowUp,
+  ArrowUpLeft,
+  ArrowUpRight,
+  CornerUpLeft,
+  CornerUpRight,
+  Undo2,
+  Redo2,
+  Flag,
 } from 'lucide-vue-next'
 
 export const icons = {
@@ -174,4 +182,12 @@ export const icons = {
   Ruler,
   Droplets,
   Waves,
+  ArrowUp,
+  ArrowUpLeft,
+  ArrowUpRight,
+  CornerUpLeft,
+  CornerUpRight,
+  Undo2,
+  Redo2,
+  Flag,
 }
