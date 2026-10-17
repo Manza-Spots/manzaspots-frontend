@@ -3,11 +3,15 @@ import { CapacitorConfig } from '@capacitor/cli'
 // El dev server (hot reload sobre el dispositivo) solo se usa cuando CAP_ENV=dev.
 // En producción se omite `server.url` para que la app cargue desde `dist/` (webDir).
 const isDev = process.env.CAP_ENV === 'dev'
+// En staging la API va por ngrok, que responde con su página de aviso a cualquier
+// User-Agent de navegador; con uno propio las peticiones le llegan directo a la API.
+const isStaging = process.env.CAP_ENV === 'staging'
 
 const config: CapacitorConfig = {
   appId: 'com.manzaspots.hiking',
   appName: 'Manzaspots',
   webDir: 'dist',
+  overrideUserAgent: isStaging ? 'Manzaspots/staging' : undefined,
   server: isDev
     ? {
         url: 'http://192.168.1.75:5173', // para debugueo local

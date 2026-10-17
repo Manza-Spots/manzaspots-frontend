@@ -42,3 +42,15 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### Probar en dispositivo con datos móviles (API local vía ngrok)
+
+Con el Docker del backend corriendo y `.env.staging` configurado:
+
+```sh
+npm run tunnel             # deja esta terminal abierta
+npm run cap:staging:sync   # luego npx cap open ios, o usa npm run cap:staging:android
+```
+
+La configuración inicial, los pasos completos y la solución de problemas están en
+[docs/pruebas-con-ngrok.md](docs/pruebas-con-ngrok.md).
