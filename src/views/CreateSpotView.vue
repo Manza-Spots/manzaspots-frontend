@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Icon from '@/shared/components/Icon.vue'
@@ -9,6 +9,17 @@ import Textarea from '@/shared/components/Textarea.vue'
 import ButtonComponent from '@/shared/components/ButtonComponent.vue'
 import LocationPickerMap from '@/features/map/components/LocationPickerMap.vue'
 import { spotsApi } from '@/features/spots/api/spotsApi'
+import { findNearbySpots, NEARBY_SPOT_RADIUS_M } from '@/features/spots/utils/nearbySpots'
+import {
+  saveRecordedRoute,
+  getRouteDraft,
+  clearRouteDraft,
+} from '@/features/routes/services/saveRecordedRoute'
+import {
+  getUnsavedTrack,
+  getPendingPhotos,
+  markLastTrackSaved,
+} from '@/features/tracking/composables/useRouteRecorder'
 import { locationService } from '@/features/tracking/services/locationService'
 import { toPoint } from '@/features/tracking/utils/geo'
 import { compressImage, pickImage } from '@/shared/utils/image'
@@ -18,6 +29,8 @@ import { useToast } from '@/shared/composables/useToast'
 defineOptions({ name: 'CreateSpotView' })
 
 const NAME_MAX = 50
+// Espera a que el pin se quede quieto antes de buscar spots cercanos.
+const NEARBY_CHECK_DELAY_MS = 500
 
 const route = useRoute()
 const router = useRouter()
@@ -34,6 +47,85 @@ const locating = ref(false)
 const submitting = ref(false)
 
 isNavHidden.value = true
+
+// Llegando desde "Guardar ruta" sin spots cerca: el spot nuevo se envía junto
+// con la ruta grabada. Sin ruta pendiente (p. ej. la app se reinició) es un
+// spot normal.
+const pendingRoute = ref(null) // { track, draft }
+const fromRoute = computed(() => !!pendingRoute.value)
+
+// Un spot por lugar: con otro a menos de NEARBY_SPOT_RADIUS_M del pin no se
+// propone uno nuevo, se usa el existente.
+const nearbySpots = ref([])
+const checkingNearby = ref(false)
+const assigning = ref(false)
+const nearbyRadius = `${NEARBY_SPOT_RADIUS_M} m`
+let nearbyTimer = null
+let nearbyRequest = 0
+
+async function checkNearby(point) {
+  const request = ++nearbyRequest
+  checkingNearby.value = true
+  try {
+    const spots = await findNearbySpots(point)
+    if (request === nearbyRequest) nearbySpots.value = spots
+  } catch (error) {
+    // Sin respuesta no se bloquea la propuesta: la revisión la filtra igual.
+    console.warn('No se pudieron buscar spots cercanos', error)
+    if (request === nearbyRequest) nearbySpots.value = []
+  } finally {
+    if (request === nearbyRequest) checkingNearby.value = false
+  }
+}
+
+watch(location, (point) => {
+  clearTimeout(nearbyTimer)
+  if (!point) return
+  nearbyTimer = setTimeout(() => checkNearby(point), NEARBY_CHECK_DELAY_MS)
+})
+
+const canSubmit = computed(
+  () => !!location.value && !checkingNearby.value && !nearbySpots.value.length,
+)
+
+async function loadPendingRoute() {
+  if (route.query.fromRoute == null) return
+  const [track, draft] = [await getUnsavedTrack(), getRouteDraft()]
+  if (track && draft) pendingRoute.value = { track, draft }
+}
+
+// Guarda la ruta pendiente en un spot (existente o el recién creado).
+async function saveRouteTo(spotId) {
+  const { track, draft } = pendingRoute.value
+  const { failedPhotos } = await saveRecordedRoute(spotId, {
+    track,
+    photos: getPendingPhotos(),
+    ...draft,
+  })
+  await markLastTrackSaved()
+  clearRouteDraft()
+  if (failedPhotos) toast.warning(t('record.save.photosFailed', { count: failedPhotos }))
+  return failedPhotos
+}
+
+async function useNearbySpot(spot) {
+  if (!fromRoute.value) {
+    if (!spot.isPending) router.push({ name: 'SpotDetail', params: { id: spot.id } })
+    return
+  }
+  if (assigning.value) return
+  assigning.value = true
+  try {
+    const failedPhotos = await saveRouteTo(spot.id)
+    if (!failedPhotos) toast.success(t('record.save.saved'))
+    // Un spot en revisión aún no tiene detalle público: su ruta se ve en Perfil.
+    router.replace(spot.isPending ? { name: 'Profile' } : { name: 'SpotDetail', params: { id: spot.id } })
+  } catch (error) {
+    toast.error(error.message || t('common.errors.generic'))
+  } finally {
+    assigning.value = false
+  }
+}
 
 /** Ubicación sugerida por query (?lat&lng), p. ej. el final de una ruta grabada. */
 function initialLocation() {
@@ -84,20 +176,35 @@ function validate() {
       : ''
   errors.description = form.description.trim() ? '' : t('common.errors.required')
   errors.photo = photo.value ? '' : t('spots.create.photoRequired')
-  return !errors.name && !errors.description && !errors.photo && !!location.value
+  return !errors.name && !errors.description && !errors.photo && canSubmit.value
 }
 
 async function submit() {
   if (submitting.value || !validate()) return
   submitting.value = true
   try {
-    await spotsApi.createSpot({
+    const spot = await spotsApi.createSpot({
       name: form.name.trim(),
       description: form.description.trim(),
       file: photo.value.file,
       location: toPoint(location.value),
     })
-    toast.success(t('spots.create.submitted'))
+
+    if (fromRoute.value) {
+      try {
+        const failedPhotos = await saveRouteTo(spot.id)
+        if (!failedPhotos) toast.success(t('spots.create.submittedWithRoute'))
+      } catch (error) {
+        // El spot ya existe: la ruta queda pendiente en Grabar y ahí lo
+        // ofrecerá como "en revisión" para reintentar.
+        console.warn('Spot creado pero la ruta no se pudo guardar', error)
+        toast.warning(t('spots.create.routeFailed'))
+        router.replace({ name: 'RecordRoute' })
+        return
+      }
+    } else {
+      toast.success(t('spots.create.submitted'))
+    }
     router.replace({ name: 'Profile' })
   } catch (error) {
     const fields = error.fieldErrors || {}
@@ -116,10 +223,13 @@ const goBack = () => {
 }
 
 onMounted(() => {
-  if (!location.value) useMyLocation()
+  loadPendingRoute()
+  if (location.value) checkNearby(location.value)
+  else useMyLocation()
 })
 
 onUnmounted(() => {
+  clearTimeout(nearbyTimer)
   isNavHidden.value = false
   if (photo.value) URL.revokeObjectURL(photo.value.url)
 })
@@ -179,6 +289,34 @@ onUnmounted(() => {
         <p class="location-hint">{{ t('spots.create.locationHint') }}</p>
       </section>
 
+      <section v-if="nearbySpots.length" class="nearby">
+        <p class="nearby-title">
+          <Icon name="AlertCircle" :size="16" />
+          {{ t('spots.create.nearby.title', { radius: nearbyRadius }) }}
+        </p>
+        <p class="nearby-hint">
+          {{ fromRoute ? t('spots.create.nearby.hintRoute') : t('spots.create.nearby.hint') }}
+        </p>
+        <button
+          v-for="spot in nearbySpots"
+          :key="spot.id"
+          type="button"
+          class="nearby-spot"
+          :disabled="assigning || (!fromRoute && spot.isPending)"
+          @click="useNearbySpot(spot)"
+        >
+          <img v-if="spot.imageUrl" :src="spot.imageUrl" alt="" class="nearby-thumb" />
+          <span class="nearby-name">{{ spot.name }}</span>
+          <span v-if="spot.isPending" class="nearby-pending">{{ t('record.save.pending') }}</span>
+          <span class="nearby-distance">{{ spot.distance }}</span>
+          <Icon v-if="fromRoute || !spot.isPending" name="ChevronRight" :size="16" />
+        </button>
+      </section>
+
+      <p v-if="fromRoute" class="review-note">
+        <Icon name="Route" :size="14" />
+        {{ t('spots.create.withRouteNote') }}
+      </p>
       <p class="review-note">
         <Icon name="Info" :size="14" />
         {{ t('spots.create.reviewNote') }}
@@ -190,7 +328,7 @@ onUnmounted(() => {
         size="lg"
         full-width
         :loading="submitting"
-        :disabled="!location"
+        :disabled="!canSubmit"
       >
         {{ t('spots.create.submit') }}
       </ButtonComponent>
@@ -343,6 +481,84 @@ onUnmounted(() => {
   margin: 0;
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
+}
+
+/* Spots existentes a menos del radio: misma tarjeta que en "Guardar ruta". */
+.nearby {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-sand-tint);
+}
+
+.nearby-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-arena-deep);
+}
+
+.nearby-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.nearby-spot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-tertiary);
+  text-align: left;
+  transition: var(--press-transition);
+}
+
+.nearby-spot:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.nearby-thumb {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.nearby-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nearby-pending {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-sand-tint);
+  color: var(--color-arena-deep);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+}
+
+.nearby-distance {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
 }
 
 .review-note {

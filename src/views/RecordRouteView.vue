@@ -72,9 +72,11 @@ const takePhoto = async () => {
   }
 }
 
-const onSaved = (savedRoute, spotId) => {
+const onSaved = (savedRoute, spot) => {
   markSaved()
-  router.push({ name: 'SpotDetail', params: { id: spotId }, query: { route: savedRoute.id } })
+  // Un spot en revisión aún no tiene detalle público: su ruta se ve en Perfil.
+  if (spot.isPending) router.push({ name: 'Profile' })
+  else router.push({ name: 'SpotDetail', params: { id: spot.id }, query: { route: savedRoute.id } })
 }
 
 const openSave = (track) => {

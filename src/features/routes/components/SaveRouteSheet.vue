@@ -10,9 +10,9 @@ import { useAuth } from '@/features/auth/composables/useAuth'
 import { useBottomSheet } from '@/shared/composables/useBottomSheet'
 import { useToast } from '@/shared/composables/useToast'
 import { routesApi } from '@/features/routes/api/routesApi'
-import { spotsApi } from '@/features/spots/api/spotsApi'
-import { mapSpot } from '@/features/spots/utils/spotMapper'
-import { toLineString, toPoint } from '@/features/tracking/utils/geo'
+import { saveRecordedRoute, setRouteDraft } from '@/features/routes/services/saveRecordedRoute'
+import { findNearbySpots, NEARBY_SPOT_RADIUS_M } from '@/features/spots/utils/nearbySpots'
+import { toLineString } from '@/features/tracking/utils/geo'
 
 const props = defineProps({
   // Ruta finalizada: { points, distanceKm, durationSeconds }
@@ -35,9 +35,6 @@ const props = defineProps({
     default: () => {},
   },
 })
-
-// Radio (km) alrededor del final de la ruta para sugerir spots de destino.
-const NEARBY_RADIUS_KM = 10
 
 const router = useRouter()
 const { t } = useI18n()
@@ -95,29 +92,20 @@ async function loadCatalogs() {
   }
 }
 
+// La ruta se asigna al spot donde termina: solo se ofrecen los que están a
+// menos de NEARBY_SPOT_RADIUS_M del final, y si no hay ninguno se propone uno
+// nuevo. Así no se crean dos spots para el mismo lugar.
 async function loadSpots() {
   if (!endPoint.value) return
   loadingSpots.value = true
   try {
-    const raw = await spotsApi.getSpots({
-      lat: endPoint.value.lat,
-      lng: endPoint.value.lng,
-      radius: NEARBY_RADIUS_KM,
-    })
-    let list = raw.map((s) => mapSpot(s, endPoint.value))
-
-    // El spot preseleccionado puede quedar fuera del radio: se agrega igual.
-    if (selectedSpotId.value && !list.some((s) => s.id === selectedSpotId.value)) {
-      try {
-        const spot = await spotsApi.getSpot(selectedSpotId.value)
-        list = [mapSpot(spot, endPoint.value), ...list]
-      } catch {
-        selectedSpotId.value = null
-      }
-    }
-
+    const list = await findNearbySpots(endPoint.value)
     spots.value = list
-    selectedSpotId.value ??= list[0]?.id ?? null
+    // El spot preseleccionado (grabando desde su detalle) solo vale si la ruta
+    // terminó en él.
+    if (!list.some((s) => s.id === selectedSpotId.value)) {
+      selectedSpotId.value = list[0]?.id ?? null
+    }
   } catch (error) {
     console.warn('No se pudieron cargar los spots cercanos', error)
   } finally {
@@ -130,9 +118,18 @@ function goLogin() {
   router.push({ name: 'Login', query: { redirect: '/record-route' } })
 }
 
+const selectedSpot = computed(() => spots.value.find((s) => s.id === selectedSpotId.value) ?? null)
+const nearbyRadius = `${NEARBY_SPOT_RADIUS_M} m`
+
+// El formulario del spot nuevo guarda la ruta con lo elegido aquí.
 function createSpotHere() {
+  setRouteDraft({
+    difficulty: difficulty.value,
+    travelMode: travelMode.value,
+    description: description.value,
+  })
   bottomSheet.close()
-  router.push({ name: 'CreateSpot', query: endPoint.value ?? {} })
+  router.push({ name: 'CreateSpot', query: { ...(endPoint.value ?? {}), fromRoute: 1 } })
 }
 
 async function save() {
@@ -145,34 +142,21 @@ async function save() {
   }
 
   saving.value = true
-  const spotId = selectedSpotId.value
+  const spot = selectedSpot.value
   try {
-    const route = await routesApi.createRoute(spotId, {
-      path,
+    const { route, failedPhotos } = await saveRecordedRoute(spot.id, {
+      track: props.track,
+      photos: props.photos,
       difficulty: difficulty.value,
-      travel_mode: travelMode.value,
-      description: description.value.trim(),
+      travelMode: travelMode.value,
+      description: description.value,
     })
 
-    // Las fotos se suben una a una: una que falle no tumba la ruta ya creada.
-    let failed = 0
-    for (const photo of props.photos) {
-      try {
-        await routesApi.uploadRoutePhoto(spotId, route.id, {
-          file: photo.file,
-          location: toPoint(photo.location),
-        })
-      } catch (error) {
-        console.warn('No se pudo subir una foto de la ruta', error)
-        failed += 1
-      }
-    }
-
-    if (failed) toast.warning(t('record.save.photosFailed', { count: failed }))
+    if (failedPhotos) toast.warning(t('record.save.photosFailed', { count: failedPhotos }))
     else toast.success(t('record.save.saved'))
 
     bottomSheet.close()
-    props.onSaved(route, spotId)
+    props.onSaved(route, spot)
   } catch (error) {
     toast.error(error.message || t('common.errors.generic'))
   } finally {
@@ -233,19 +217,15 @@ onMounted(() => {
           >
             <img v-if="spot.imageUrl" :src="spot.imageUrl" alt="" class="spot-thumb" />
             <span class="spot-name">{{ spot.name }}</span>
+            <span v-if="spot.isPending" class="spot-pending">{{ t('record.save.pending') }}</span>
             <span v-if="spot.distance" class="spot-distance">{{ spot.distance }}</span>
             <Icon v-if="spot.id === selectedSpotId" name="CheckCircle" :size="18" class="spot-check" />
           </button>
         </div>
 
         <div v-else class="no-spots">
-          <p>{{ t('record.save.noSpots') }}</p>
+          <p>{{ t('record.save.noSpots', { radius: nearbyRadius }) }}</p>
         </div>
-
-        <button type="button" class="create-spot" @click="createSpotHere">
-          <Icon name="Plus" :size="14" />
-          {{ t('record.save.createSpot') }}
-        </button>
       </section>
 
       <p v-if="catalogsError" class="field-hint field-hint--error">
@@ -272,7 +252,19 @@ onMounted(() => {
         :rows="2"
       />
 
+      <!-- Sin spots cerca, la ruta se guarda junto con el spot que se proponga. -->
       <ButtonComponent
+        v-if="!loadingSpots && !spots.length"
+        variant="primary"
+        size="lg"
+        full-width
+        @click="createSpotHere"
+      >
+        <Icon name="Plus" :size="18" />
+        {{ t('record.save.createSpot') }}
+      </ButtonComponent>
+      <ButtonComponent
+        v-else
         variant="primary"
         size="lg"
         full-width
@@ -427,13 +419,13 @@ onMounted(() => {
   text-align: center;
 }
 
-.create-spot {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.spot-pending {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-sand-tint);
+  color: var(--color-arena-deep);
   font-size: var(--text-xs);
   font-weight: var(--font-bold);
-  color: var(--color-primary);
 }
 </style>
