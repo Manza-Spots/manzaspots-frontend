@@ -25,7 +25,7 @@
     "title": "Guardar ruta",
     "spot": "¿A qué spot llega esta ruta?",
     "spotsLoading": "Buscando spots cercanos…",
-    "noSpots": "No hay spots publicados cerca del final de tu ruta",
+    "noSpots": "No hay spots a menos de {radius} del final de tu ruta. Propón uno: tu ruta se guardará en él.",
     "createSpot": "Proponer un spot aquí",
     "difficulty": "Dificultad",
     "travelMode": "¿Cómo te moviste?",
@@ -38,6 +38,7 @@
     "loginRequired": "Inicia sesión para guardar tus rutas. Tu recorrido se conserva.",
     "login": "Iniciar sesión",
     "pickSpot": "Elige el spot de destino",
-    "catalogsFailed": "No se pudieron cargar las opciones"
+    "catalogsFailed": "No se pudieron cargar las opciones",
+    "pending": "En revisión"
   }
 }

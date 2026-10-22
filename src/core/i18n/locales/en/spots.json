@@ -60,7 +60,15 @@
     "submit": "Submit for review",
     "photoRequired": "Add a photo of the spot",
     "submitted": "Thanks! Your spot is pending review",
-    "reviewNote": "An admin will review your spot before it is published."
+    "reviewNote": "An admin will review your spot before it is published.",
+    "submittedWithRoute": "Spot sent for review with your route",
+    "routeFailed": "The spot was sent for review, but the route could not be saved. Try again from Record.",
+    "withRouteNote": "Your recorded route will be saved to this spot.",
+    "nearby": {
+      "title": "There is already a spot within {radius}",
+      "hint": "To avoid duplicate places, use the existing one or move the pin.",
+      "hintRoute": "Tap the spot to save your route to it, or move the pin if it is a different place."
+    }
   },
   "status": {
     "pending": "In review",

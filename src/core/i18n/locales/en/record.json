@@ -25,8 +25,8 @@
     "title": "Save route",
     "spot": "Which spot does this route lead to?",
     "spotsLoading": "Looking for nearby spots…",
-    "noSpots": "There are no published spots near the end of your route",
-    "createSpot": "Suggest a spot here",
+    "noSpots": "No spots within {radius} of where your route ends. Propose one: your route will be saved to it.",
+    "createSpot": "Propose a spot here",
     "difficulty": "Difficulty",
     "travelMode": "How did you get there?",
     "description": "Name or description",
@@ -38,6 +38,7 @@
     "loginRequired": "Log in to save your routes. Your trip is kept.",
     "login": "Log in",
     "pickSpot": "Pick the destination spot",
-    "catalogsFailed": "Couldn't load the options"
+    "catalogsFailed": "Couldn't load the options",
+    "pending": "Under review"
   }
 }

@@ -16,6 +16,27 @@ function clearPendingPhotos() {
   pendingPhotos.value = []
 }
 
+// Acceso a la última ruta sin montar la grabadora: proponer un spot nuevo desde
+// la hoja de guardar sale de Grabar y es esa pantalla la que guarda la ruta.
+
+/** Última ruta finalizada que aún no se guarda, o null. */
+export async function getUnsavedTrack() {
+  const track = await storage.get(LAST_ROUTE_KEY)
+  return track?.points?.length && !track.saved ? track : null
+}
+
+/** Fotos del recorrido pendientes de subir. */
+export function getPendingPhotos() {
+  return pendingPhotos.value
+}
+
+/** Marca la última ruta como guardada (Grabar ya no ofrece guardarla). */
+export async function markLastTrackSaved() {
+  const track = await storage.get(LAST_ROUTE_KEY)
+  if (track) await storage.set(LAST_ROUTE_KEY, { ...track, saved: true })
+  clearPendingPhotos()
+}
+
 /**
  * Grabadora de rutas: posee la suscripción al GPS (real o simulado) y expone
  * el estado reactivo de la grabación. Es la única fuente de verdad; el mapa

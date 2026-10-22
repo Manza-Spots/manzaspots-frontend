@@ -60,7 +60,15 @@
     "submit": "Enviar a revisión",
     "photoRequired": "Agrega una foto del spot",
     "submitted": "¡Gracias! Tu spot quedó pendiente de revisión",
-    "reviewNote": "Un administrador revisará tu spot antes de publicarlo."
+    "reviewNote": "Un administrador revisará tu spot antes de publicarlo.",
+    "submittedWithRoute": "Spot enviado a revisión con tu ruta",
+    "routeFailed": "El spot se envió a revisión, pero la ruta no se pudo guardar. Inténtalo de nuevo desde Grabar.",
+    "withRouteNote": "Tu ruta grabada se guardará en este spot.",
+    "nearby": {
+      "title": "Ya hay un spot a menos de {radius}",
+      "hint": "Para no duplicar lugares, usa el que ya existe o mueve el pin.",
+      "hintRoute": "Toca el spot para guardar tu ruta en él, o mueve el pin si es otro lugar."
+    }
   },
   "status": {
     "pending": "En revisión",
